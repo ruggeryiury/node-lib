@@ -1,3 +1,4 @@
+export * from './lib/bytes/randomBytes'
 export * from './lib/hash/@types'
 export * from './lib/hash/createHash'
 export * from './lib/path/@types'

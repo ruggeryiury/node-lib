@@ -1,6 +1,6 @@
 {
   "name": "node-lib",
-  "version": "4.1.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Useful and straightforward abstractions for many NodeJS internal methods.",
   "homepage": "https://github.com/ruggeryiury/node-lib#readme",
@@ -12,14 +12,20 @@
   "author": "Ruggery Iury Corrêa <ruggeryiury@gmail.com>",
   "license": "MIT",
   "keywords": [
+    "binary-reader",
+    "binary-reader-writer",
+    "binary-writer",
     "fs",
     "fs-library",
+    "hashing",
+    "hash",
     "javascript",
     "javascript-library",
     "node",
     "nodejs",
     "nodejs-modules",
     "path",
+    "random-bytes",
     "typescript",
     "typescript-library"
   ],
