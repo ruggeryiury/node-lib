@@ -1,4 +1,4 @@
-import { FilePath, } from '../../core'
+import { FilePath } from '../../core'
 import { resolve, type PathLikeTypes } from '../../lib'
 
 /**

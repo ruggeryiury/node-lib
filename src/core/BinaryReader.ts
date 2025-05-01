@@ -1,5 +1,5 @@
 import type { FileHandle } from 'fs/promises'
-import { DirPath, FilePath, type BinaryWriteEncodings } from '../core'
+import { type DirPath, FilePath, type BinaryWriteEncodings } from '../core'
 import { pathLikeToString, type PathLikeTypes } from '../lib'
 
 /**

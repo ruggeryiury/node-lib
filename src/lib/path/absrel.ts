@@ -2,7 +2,6 @@ import { isAbsolute as nodeIsAbsolute } from 'node:path'
 import { FilePath } from '../../core'
 import type { PathLikeTypes } from '../../lib'
 
-
 /**
  * Determines whether path is an absolute path.
  *
