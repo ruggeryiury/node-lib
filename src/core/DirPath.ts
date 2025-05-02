@@ -1,7 +1,7 @@
 import { type Stats } from 'node:fs'
-import { FilePath } from '../core'
+import { FilePath } from '../core.exports'
 import { PathError } from '../errors'
-import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, stat, statSync, writeFileOnDir, writeFileOnDirSync, type BufferEncodingOrNull, type DirPathJSONRepresentation, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../lib'
+import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, stat, statSync, writeFileOnDir, writeFileOnDirSync, type BufferEncodingOrNull, type DirPathJSONRepresentation, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../lib.exports'
 
 /**
  * A path utility suite that gathers several functions

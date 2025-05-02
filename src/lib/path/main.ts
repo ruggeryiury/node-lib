@@ -1,8 +1,6 @@
 import type { WriteStream } from 'node:fs'
 import type { Stream } from 'node:stream'
-import type { DirPath, FilePath } from '../../core'
-
-// #region Types
+import type { DirPath, FilePath } from '../../core.exports'
 
 export type PathTypeValues = 'file' | 'directory'
 

@@ -1,7 +1,7 @@
 import { readFileSync as nodeReadFileSync, readdirSync } from 'node:fs'
 import { readFile as nodeReadFile, open, readdir } from 'node:fs/promises'
 import { PathError } from '../../errors'
-import { pathLikeToString, resolve, type BufferEncodingOrNull, type BufferEncodingText, type PathLikeTypes, type ReadFileReturnType } from '../../lib'
+import { pathLikeToString, resolve, type BufferEncodingOrNull, type BufferEncodingText, type PathLikeTypes, type ReadFileReturnType } from '../../lib.exports'
 
 /**
  * Asynchronously reads the entire contents of a file.

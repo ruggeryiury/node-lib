@@ -1,8 +1,8 @@
 import { mkdirSync, writeFileSync as nodeWriteFileSync } from 'node:fs'
 import { mkdir, writeFile as nodeWriteFile } from 'node:fs/promises'
-import { DirPath, FilePath } from '../../core'
+import { DirPath, FilePath } from '../../core.exports'
 import { PathError } from '../../errors'
-import { exists, pathLikeToString, resolve, type BufferEncodingBOM, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes, type PathLikeTypes, type StringOrBuffer } from '../../lib'
+import { exists, pathLikeToString, resolve, type BufferEncodingBOM, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes, type PathLikeTypes, type StringOrBuffer } from '../../lib.exports'
 
 /**
  * Asynchronously writes data to a file, optionally replacing it if it already exists.

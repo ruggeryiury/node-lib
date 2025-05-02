@@ -1,5 +1,7 @@
 import { createHash as nodeCreateHash, type BinaryToTextEncoding } from 'node:crypto'
-import { pathLikeToFilePath, type AllHashAlgorithms, type PathLikeTypes } from '../../lib'
+import { pathLikeToFilePath, type PathLikeTypes } from '../../lib.exports'
+
+export type AllHashAlgorithms = 'md4' | 'md5' | 'mdc2' | 'ripemd160' | 'rmd160' | 'sha1' | 'sha224' | 'sha256' | 'sha384' | 'sha512' | 'sha3-224' | 'sha3-256' | 'sha3-384' | 'sha3-512' | 'shake128' | 'shake256' | 'sm3' | 'whirlpool' | 'blake2b512' | 'blake2s256' | 'ssl3-md5' | 'ssl3-sha1'
 
 /**
  * Generates a hash from the input string/Buffer using the specified algorithm.
@@ -15,7 +17,7 @@ export const createHash = (input: Buffer | string, algorithm: AllHashAlgorithms 
 }
 
 /**
- * Asynchronously computes a cryptographic hash from the contents of a file .
+ * Asynchronously computes a cryptographic hash from the contents of a file.
  * - - - -
  * @param {PathLikeTypes} filePath The path to the file.
  * @param {AllHashAlgorithms} [algorithm] The hash algorithm to use. Default is `'sha256'`.
@@ -29,7 +31,7 @@ export const createHashFromFile = async (filePath: PathLikeTypes, algorithm: All
 }
 
 /**
- * Synchronously computes a cryptographic hash from the contents of a file .
+ * Synchronously computes a cryptographic hash from the contents of a file.
  * - - - -
  * @param {PathLikeTypes} filePath The path to the file.
  * @param {AllHashAlgorithms} [algorithm] The hash algorithm to use. Default is `'sha256'`.

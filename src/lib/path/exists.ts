@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { resolve } from '../../lib'
+import { resolve } from '../../lib.exports'
 
 /**
  * Returns `true` if the path exists, `false` otherwise.

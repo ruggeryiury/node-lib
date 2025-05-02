@@ -1,5 +1,5 @@
 import { PathError } from '../../errors'
-import { exists, isDir, isFile, isSymLink, pathLikeToString, type PathLikeTypes, type PathTypeValues } from '../../lib'
+import { exists, isDir, isFile, isSymLink, pathLikeToString, type PathLikeTypes, type PathTypeValues } from '../../lib.exports'
 
 /**
  * Ensures that a given path exists, throwing a `PathError` if it does not.

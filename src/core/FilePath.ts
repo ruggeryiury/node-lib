@@ -1,7 +1,8 @@
+import type { BinaryToTextEncoding } from 'crypto'
 import type { Stats } from 'fs'
 import type { FileHandle } from 'fs/promises'
 import { PathError } from '../errors'
-import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, type PathLikeTypes, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, type BufferEncodingBOM, type BufferEncodingOrNull, type BufferEncodingText, type FileAsyncWriteDataTypes, type FilePathJSONRepresentation, type FileSyncWriteDataTypes, type FileWriteStreamReturnObject, type ReadFileReturnType, type StringOrBuffer } from '../lib'
+import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, type PathLikeTypes, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, type BufferEncodingBOM, type BufferEncodingOrNull, type BufferEncodingText, type FileAsyncWriteDataTypes, type FilePathJSONRepresentation, type FileSyncWriteDataTypes, type FileWriteStreamReturnObject, type ReadFileReturnType, type StringOrBuffer, createHashFromFile, type AllHashAlgorithms, createHashFromFileSync } from '../lib.exports'
 import { DirPath } from './DirPath'
 
 /**
@@ -80,6 +81,28 @@ export class FilePath {
    */
   get exists(): boolean {
     return exists(this.path)
+  }
+
+  /**
+   * Asynchronously computes a cryptographic hash from the contents of the file.
+   * - - - -
+   * @param {AllHashAlgorithms} [algorithm] The hash algorithm to use. Default is `'sha256'`.
+   * @param {BinaryToTextEncoding} [digest] The output encoding for the hash. Default is `'hex'`.
+   * @returns {Promise<string>} A promise that resolves to the resulting hash string.
+   */
+  async generateHash(algorithm: AllHashAlgorithms = 'sha256', digest: BinaryToTextEncoding = 'hex'): Promise<string> {
+    return await createHashFromFile(this.path, algorithm, digest)
+  }
+
+  /**
+   * Synchronously computes a cryptographic hash from the contents of the file.
+   * - - - -
+   * @param {AllHashAlgorithms} [algorithm] The hash algorithm to use. Default is `'sha256'`.
+   * @param {BinaryToTextEncoding} [digest] The output encoding for the hash. Default is `'hex'`.
+   * @returns {Promise<string>} A promise that resolves to the resulting hash string.
+   */
+  generateHashSync(algorithm: AllHashAlgorithms = 'sha256', digest: BinaryToTextEncoding = 'hex'): string {
+    return createHashFromFileSync(this.path, algorithm, digest)
   }
 
   /**

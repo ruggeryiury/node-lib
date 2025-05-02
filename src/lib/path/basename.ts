@@ -1,5 +1,5 @@
 import { basename as nodeBasename } from 'node:path'
-import { pathLikeToString, type PathLikeTypes } from '../../lib'
+import { pathLikeToString, type PathLikeTypes } from '../../lib.exports'
 
 /**
  * Returns the last portion of a path.

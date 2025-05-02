@@ -1,6 +1,6 @@
 import { lstatSync, type Stats } from 'node:fs'
 import { lstat } from 'node:fs/promises'
-import { pathLikeToString, type PathLikeTypes } from '../../lib'
+import { pathLikeToString, type PathLikeTypes } from '../../lib.exports'
 
 /**
  * Asynchronously returns an object with the path stats.

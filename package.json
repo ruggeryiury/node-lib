@@ -41,12 +41,17 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./lib": {
+      "types": "./dist/lib.exports.d.ts",
+      "import": "./dist/lib.exports.js",
+      "require": "./dist/lib.exports.cjs"
     }
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",
     "@types/node": "^22.15.3",
-    "esbuild-fix-imports-plugin": "^1.0.19",
+    "esbuild-fix-imports-plugin": "^1.0.20",
     "eslint": "^9.25.1",
     "eslint-import-resolver-typescript": "^4.3.4",
     "eslint-plugin-import": "^2.31.0",

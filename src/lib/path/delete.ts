@@ -1,6 +1,6 @@
 import { rmSync, unlinkSync } from 'node:fs'
 import { rm, unlink } from 'node:fs/promises'
-import { exists, pathLikeToString, type PathLikeTypes } from '../../lib'
+import { exists, pathLikeToString, type PathLikeTypes } from '../../lib.exports'
 
 /**
  * Asynchronously deletes a file at the specified path if it exists.

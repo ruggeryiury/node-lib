@@ -1,8 +1,8 @@
 import { renameSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
-import { FilePath } from '../../core'
+import { FilePath } from '../../core.exports'
 import { PathError } from '../../errors'
-import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToString, resolve, type PathLikeTypes } from '../../lib'
+import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToString, resolve, type PathLikeTypes } from '../../lib.exports'
 
 /**
  * Asynchronously renames (or moves) a file from an old path to a new path.

@@ -1,4 +1,4 @@
-import { formarNumberWithDots, isHexString } from '../lib'
+import { formarNumberWithDots, isHexString } from '../lib.exports'
 
 export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'utf8' | 'hex'
 

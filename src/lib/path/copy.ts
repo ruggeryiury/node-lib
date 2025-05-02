@@ -1,8 +1,8 @@
 import { copyFileSync as nodeCopyFileSync } from 'node:fs'
 import { copyFile as nodeCopyFile } from 'node:fs/promises'
-import { FilePath } from '../../core'
+import { FilePath } from '../../core.exports'
 import { PathError } from '../../errors'
-import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToString, resolve, type PathLikeTypes } from '../../lib'
+import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToString, resolve, type PathLikeTypes } from '../../lib.exports'
 
 /**
  * Asynchronously copies a file from a source path to a destination path.

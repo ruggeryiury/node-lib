@@ -1,5 +1,5 @@
 import { dirname as nodeDirname } from 'node:path'
-import { pathLikeToString, type PathLikeTypes } from '../../lib'
+import { pathLikeToString, type PathLikeTypes } from '../../lib.exports'
 
 /**
  * Returns the directory name of a path.

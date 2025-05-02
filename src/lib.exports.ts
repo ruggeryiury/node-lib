@@ -1,6 +1,6 @@
 export * from './lib/bytes/randomBytes'
+export * from './lib/child-process/execAsync'
 export * from './lib/hash/createHash'
-export * from './lib/hash/main'
 export * from './lib/path/absrel'
 export * from './lib/path/basename'
 export * from './lib/path/copy'
