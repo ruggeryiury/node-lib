@@ -144,7 +144,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt8(value: number): void {
-    if (value < 0 || value > 255) throw new Error(`Value must be between 0 and 255, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeUIntLE(value, 0, 1)
     this.contents.push(buf)
@@ -157,7 +157,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt16LE(value: number): void {
-    if (value < 0 || value > 65535) throw new Error(`Value must be between 0 and 65.535, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntLE(value, 0, 2)
     this.contents.push(buf)
@@ -170,9 +170,35 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt16BE(value: number): void {
-    if (value < 0 || value > 65535) throw new Error(`Value must be between 0 and 65.535, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 65535) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntBE(value, 0, 2)
+    this.contents.push(buf)
+  }
+
+  /**
+   * Writes an unsigned 24-bit value on the binary file (little endian mode).
+   * - - - -
+   * @param {number} value The number to be added to the binary file.
+   * @returns {void}
+   */
+  writeUInt24LE(value: number): void {
+    if (value < 0 || value > 0xffffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
+    const buf = Buffer.alloc(3)
+    buf.writeUIntLE(value, 0, 3)
+    this.contents.push(buf)
+  }
+
+  /**
+   * Writes an unsigned 24-bit value on the binary file (big endian mode).
+   * - - - -
+   * @param {number} value The number to be added to the binary file.
+   * @returns {void}
+   */
+  writeUInt24BE(value: number): void {
+    if (value < 0 || value > 0xffffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
+    const buf = Buffer.alloc(3)
+    buf.writeUIntBE(value, 0, 3)
     this.contents.push(buf)
   }
 
@@ -183,7 +209,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt32LE(value: number): void {
-    if (value < 0 || value > 4294967295) throw new Error(`Value must be between 0 and 4.294.967.295, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xffffffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntLE(value, 0, 4)
     this.contents.push(buf)
@@ -196,7 +222,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt32BE(value: number): void {
-    if (value < 0 || value > 4294967295) throw new Error(`Value must be between 0 and 4.294.967.295, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xffffffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntBE(value, 0, 4)
     this.contents.push(buf)
@@ -238,6 +264,32 @@ export class BinaryWriter {
     if (value < -32768 || value > 32767) throw new Error(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntBE(value, 0, 2)
+    this.contents.push(buf)
+  }
+
+  /**
+   * Writes a signed 24-bit value on the binary file (little endian mode).
+   * - - - -
+   * @param {number} value The number to be added to the binary file.
+   * @returns {void}
+   */
+  writeInt24LE(value: number): void {
+    if (value < -8388608 || value > 8388607) throw new Error(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
+    const buf = Buffer.alloc(3)
+    buf.writeIntLE(value, 0, 3)
+    this.contents.push(buf)
+  }
+
+  /**
+   * Writes a signed 24-bit value on the binary file (big endian mode).
+   * - - - -
+   * @param {number} value The number to be added to the binary file.
+   * @returns {void}
+   */
+  writeInt24BE(value: number): void {
+    if (value < -8388608 || value > 8388607) throw new Error(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
+    const buf = Buffer.alloc(3)
+    buf.writeIntBE(value, 0, 3)
     this.contents.push(buf)
   }
 

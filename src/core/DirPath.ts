@@ -103,14 +103,12 @@ export class DirPath {
   }
 
   /**
-   * Returns a stringified JSON representation of this `DirPath` instance.
+   * Returns the string of the path of this `DirPath` instance.
    * - - - -
-   * @param {(string | number)[] | null | undefined} replacer `OPTIONAL` An array of strings and numbers that acts as an approved list for selecting the object properties that will be stringified.
-   * @param {number} space `OPTIONAL` Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read. Default is `0`.
    * @returns {string}
    */
-  toString(replacer?: (string | number)[] | null, space = 0): string {
-    return JSON.stringify(this.toJSON(), replacer, space)
+  toString(): string {
+    return this.path
   }
 
   /**

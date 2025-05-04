@@ -321,6 +321,42 @@ export class BinaryReader {
   }
 
   /**
+   * Asynchronously reads an unsigned, little-endian 24-bit integer.
+   * - - - -
+   * @returns {Promise<number>}
+   */
+  async readUInt24LE(): Promise<number> {
+    this.checkExistence()
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 3)
+      this.offset += 3
+      return buffer.readUIntLE(0, 3)
+    }
+    const buf = Buffer.alloc(3)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 3 })
+    this.offset += 3
+    return buf.readUIntLE(0, 3)
+  }
+
+  /**
+   * Asynchronously reads an unsigned, big-endian 24-bit integer.
+   * - - - -
+   * @returns {Promise<number>}
+   */
+  async readUInt24BE(): Promise<number> {
+    this.checkExistence()
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 3)
+      this.offset += 3
+      return buffer.readUIntBE(0, 3)
+    }
+    const buf = Buffer.alloc(3)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 3 })
+    this.offset += 3
+    return buf.readUIntBE(0, 3)
+  }
+
+  /**
    * Asynchronously reads an unsigned, little-endian 32-bit integer.
    * - - - -
    * @returns {Promise<number>}
@@ -408,6 +444,42 @@ export class BinaryReader {
     await this.operator.read({ buffer: buf, position: this.offset, length: 2 })
     this.offset += 2
     return buf.readInt16BE()
+  }
+
+  /**
+   * Asynchronously reads a signed, little-endian 24-bit integer.
+   * - - - -
+   * @returns {Promise<number>}
+   */
+  async readInt24LE(): Promise<number> {
+    this.checkExistence()
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 3)
+      this.offset += 3
+      return buffer.readIntLE(0, 3)
+    }
+    const buf = Buffer.alloc(3)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 3 })
+    this.offset += 3
+    return buf.readIntLE(0, 3)
+  }
+
+  /**
+   * Asynchronously reads a signed, big-endian 24-bit integer.
+   * - - - -
+   * @returns {Promise<number>}
+   */
+  async readInt24BE(): Promise<number> {
+    this.checkExistence()
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 3)
+      this.offset += 3
+      return buffer.readUIntBE(0, 3)
+    }
+    const buf = Buffer.alloc(3)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 3 })
+    this.offset += 3
+    return buf.readIntBE(0, 3)
   }
 
   /**
