@@ -1,5 +1,6 @@
 import { extname as nodeExtname } from 'node:path'
-import { pathLikeToString, type PathLikeTypes } from '../../lib.exports'
+import type { PathLikeTypes } from '../../core.exports'
+import { pathLikeToString } from '../../lib.exports'
 
 /**
  * Returns the extension of the path, from the last `.` to end of string

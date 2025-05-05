@@ -1,5 +1,5 @@
-import { FilePath } from '../../core.exports'
-import { resolve, type PathLikeTypes } from '../../lib.exports'
+import { FilePath, type PathLikeTypes } from '../../core.exports'
+import { resolve } from '../../lib.exports'
 
 /**
  * Evaluates path-like variables to an instantiated `FilePath` class.

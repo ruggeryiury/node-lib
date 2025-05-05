@@ -1,5 +1,6 @@
 import { open as nodeOpen, type FileHandle } from 'node:fs/promises'
-import { pathLikeToString, type PathLikeTypes } from '../../lib.exports'
+import type { PathLikeTypes } from '../../core.exports'
+import { pathLikeToString } from '../../lib.exports'
 
 /**
  * Asynchronously opens a `FileHandle`.

@@ -1,9 +1,64 @@
-import type { BinaryToTextEncoding } from 'crypto'
-import type { Stats } from 'fs'
-import type { FileHandle } from 'fs/promises'
+import type { BinaryToTextEncoding } from 'node:crypto'
+import type { Stats, WriteStream } from 'node:fs'
+import type { FileHandle } from 'node:fs/promises'
+import type { Stream } from 'node:stream'
 import { PathError } from '../errors'
-import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, type PathLikeTypes, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, type BufferEncodingBOM, type BufferEncodingOrNull, type BufferEncodingText, type FileAsyncWriteDataTypes, type FilePathJSONRepresentation, type FileSyncWriteDataTypes, type FileWriteStreamReturnObject, type ReadFileReturnType, type StringOrBuffer, createHashFromFile, type AllHashAlgorithms, createHashFromFileSync } from '../lib.exports'
+import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, createHashFromFileSync } from '../lib.exports'
 import { DirPath } from './DirPath'
+
+export interface FilePathJSONRepresentation {
+  /**
+   * The working path of the class instance.
+   */
+  path: string
+  /**
+   * A boolean value that tells if the file exists.
+   */
+  exists: boolean
+  /**
+   * The root folder of the file where the path evaluates to.
+   */
+  root: string
+  /**
+   * The name of the file with extension (if any).
+   */
+  fullname: string
+  /**
+   * The name of the file (without the extension).
+   */
+  name: string
+  /**
+   * The extension of the file, returns an empty string if the
+   * provided path evalutes to a directory.
+   */
+  ext: string
+}
+
+export type BufferEncodingOrNull = BufferEncoding | null | undefined
+export type BufferEncodingBOM = 'utf8-bom' | 'utf-8-bom' | 'utf8bom' | 'utf16le-bom' | 'utf-16le-bom' | 'utf16bom' | undefined
+export type BufferEncodingText = 'ascii' | 'latin1' | 'utf8' | 'utf-8' | undefined
+export type StringOrBuffer = string | Buffer
+
+export type ReadFileReturnType<T extends BufferEncodingOrNull> = T extends BufferEncoding ? string : T extends null | undefined ? Buffer : StringOrBuffer
+
+export type FileAsyncWriteDataTypes = string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView> | Stream
+export type FileSyncWriteDataTypes = string | NodeJS.ArrayBufferView
+
+/**
+ * Types that can be converted using `Path.of()` static method.
+ */
+export type PathLikeTypes = string | FilePath | DirPath | FilePathJSONRepresentation
+
+export interface FileWriteStreamReturnObject {
+  /**
+   * The writeable stream of the file.
+   */
+  stream: WriteStream
+  /**
+   * A `Promise` that will only be fullfilled when calling `stream.end()`.
+   */
+  once: Promise<unknown[]>
+}
 
 /**
  * A path utility suite that gathers several functions

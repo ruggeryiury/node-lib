@@ -1,6 +1,7 @@
 import { once } from 'node:events'
 import { createWriteStream } from 'node:fs'
-import { deleteFile, deleteFileSync, exists, pathLikeToString, type BufferEncodingOrNull, type FileWriteStreamReturnObject, type PathLikeTypes } from '../../lib.exports'
+import type { BufferEncodingOrNull, FileWriteStreamReturnObject, PathLikeTypes } from '../../core.exports'
+import { deleteFile, deleteFileSync, exists, pathLikeToString } from '../../lib.exports'
 
 /**
  * Asynchronously creates a writable file stream at the specified path.

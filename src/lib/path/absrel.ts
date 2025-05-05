@@ -1,6 +1,5 @@
 import { isAbsolute as nodeIsAbsolute } from 'node:path'
-import { FilePath } from '../../core.exports'
-import type { PathLikeTypes } from '../../lib.exports'
+import { FilePath, type PathLikeTypes } from '../../core.exports'
 
 /**
  * Determines whether path is an absolute path.

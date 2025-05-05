@@ -1,6 +1,6 @@
 import type { FileHandle } from 'fs/promises'
-import { type DirPath, FilePath, type BinaryWriteEncodings } from '../core.exports'
-import { pathLikeToString, type PathLikeTypes } from '../lib.exports'
+import { type DirPath, FilePath, type BinaryWriteEncodings, type PathLikeTypes } from '../core.exports'
+import { pathLikeToString } from '../lib.exports'
 
 /**
  * A class to read binary files.

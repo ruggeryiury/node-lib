@@ -1,7 +1,26 @@
 import { type Stats } from 'node:fs'
-import { FilePath } from '../core.exports'
+import { FilePath, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../core.exports'
 import { PathError } from '../errors'
-import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, stat, statSync, writeFileOnDir, writeFileOnDirSync, type BufferEncodingOrNull, type DirPathJSONRepresentation, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../lib.exports'
+import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, stat, statSync, writeFileOnDir, writeFileOnDirSync } from '../lib.exports'
+
+export interface DirPathJSONRepresentation {
+  /**
+   * The working path of the class instance.
+   */
+  path: string
+  /**
+   * A boolean value that tells if the directory exists.
+   */
+  exists: boolean
+  /**
+   * The root folder of the directory where the path evaluates to.
+   */
+  root: string
+  /**
+   * The name of the directory.
+   */
+  name: string
+}
 
 /**
  * A path utility suite that gathers several functions
