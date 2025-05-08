@@ -13,7 +13,6 @@ export default defineConfig({
   outDir: 'dist',
   bundle: false,
   treeshake: true,
-  minify: true,
   tsconfig: './prod.tsconfig.json',
   esbuildPlugins: [fixImportsPlugin()],
   sourcemap: true,
