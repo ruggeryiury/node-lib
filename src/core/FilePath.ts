@@ -167,8 +167,8 @@ export class FilePath {
    * @returns {DirPath}
    */
   gotoDir(directoryName: string): DirPath {
-    if (isAbsolute(directoryName)) throw new PathError(`Provided path ${directoryName} can't be an absolute path to resolve on gotoDir() operations.`)
-    return new DirPath(this.root, directoryName)
+    if (isAbsolute(directoryName)) return DirPath.of(directoryName)
+    return DirPath.of(this.root, directoryName)
   }
 
   /**
@@ -178,8 +178,8 @@ export class FilePath {
    * @returns {DirPath}
    */
   gotoFile(fileName: string): FilePath {
-    if (isAbsolute(fileName)) throw new PathError(`Provided path ${fileName} can't be an absolute path to resolve on gotoFile() operations.`)
-    return new FilePath(this.root, fileName)
+    if (isAbsolute(fileName)) return FilePath.of(fileName)
+    return FilePath.of(this.root, fileName)
   }
 
   /**
