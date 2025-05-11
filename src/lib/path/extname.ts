@@ -1,5 +1,5 @@
 import { extname as nodeExtname } from 'node:path'
-import type { PathLikeTypes } from '../../core.exports'
+import type { FilePathLikeTypes } from '../../core.exports'
 import { pathLikeToString } from '../../lib.exports'
 
 /**
@@ -9,10 +9,10 @@ import { pathLikeToString } from '../../lib.exports'
  * If there is no `.` in the last portion of the path or the first
  * character of it is `.`, then it returns an empty string.
  * - - - -
- * @param {PathLikeTypes} path The path to evaluate.
+ * @param {FilePathLikeTypes} path The path to evaluate.
  * @returns {string}
  */
-export const extname = (path: PathLikeTypes): string => {
+export const extname = (path: FilePathLikeTypes): string => {
   const p = pathLikeToString(path)
   return nodeExtname(p)
 }

@@ -1,6 +1,6 @@
 import { renameSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
-import { FilePath, type PathLikeTypes } from '../../core.exports'
+import { FilePath, type FilePathLikeTypes } from '../../core.exports'
 import { PathError } from '../../errors'
 import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToString, resolve } from '../../lib.exports'
 
@@ -13,13 +13,13 @@ import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToStri
  *
  * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
  * - - - -
- * @param {PathLikeTypes} oldPath The current file path.
- * @param {PathLikeTypes} newPath The new file path. Can be relative or absolute.
+ * @param {FilePathLikeTypes} oldPath The current file path.
+ * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
  * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
  * @throws {PathError} If the destination file exists and `replace` is `false`.
  */
-export const renameFile = async (oldPath: PathLikeTypes, newPath: PathLikeTypes, replace = false): Promise<FilePath> => {
+export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace = false): Promise<FilePath> => {
   const p = pathLikeToString(oldPath)
   let np = ''
   if (typeof newPath === 'object' && 'path' in newPath) {
@@ -46,13 +46,13 @@ export const renameFile = async (oldPath: PathLikeTypes, newPath: PathLikeTypes,
  *
  * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
  * - - - -
- * @param {PathLikeTypes} oldPath The current file path.
- * @param {PathLikeTypes} newPath The new file path. Can be relative or absolute.
+ * @param {FilePathLikeTypes} oldPath The current file path.
+ * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
  * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
  * @returns {Promise<FilePath>} A `FilePath` instance representing the new path of the renamed file.
  * @throws {PathError} If the destination file exists and `replace` is `false`.
  */
-export const renameFileSync = (oldPath: PathLikeTypes, newPath: PathLikeTypes, replace = false): FilePath => {
+export const renameFileSync = (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace = false): FilePath => {
   const op = pathLikeToString(oldPath)
   let np = ''
   if (typeof newPath === 'object' && 'path' in newPath) {

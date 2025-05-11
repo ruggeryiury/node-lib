@@ -1,6 +1,6 @@
 import { rmSync, unlinkSync } from 'node:fs'
 import { rm, unlink } from 'node:fs/promises'
-import type { PathLikeTypes } from '../../core.exports'
+import type { FilePathLikeTypes } from '../../core.exports'
 import { exists, pathLikeToString } from '../../lib.exports'
 
 /**
@@ -8,10 +8,10 @@ import { exists, pathLikeToString } from '../../lib.exports'
  *
  * Resolves the given path and performs a safe check before deletion to avoid errors.
  * - - - -
- * @param {PathLikeTypes} path The path to the file to delete.
+ * @param {FilePathLikeTypes} path The path to the file to delete.
  * @returns {Promise<void>}
  */
-export const deleteFile = async (path: PathLikeTypes): Promise<void> => {
+export const deleteFile = async (path: FilePathLikeTypes): Promise<void> => {
   const p = pathLikeToString(path)
   if (exists(p)) await unlink(p)
 }
@@ -21,10 +21,10 @@ export const deleteFile = async (path: PathLikeTypes): Promise<void> => {
  *
  * Resolves the given path and performs a safe check before deletion to avoid errors.
  * - - - -
- * @param {PathLikeTypes} path The path to the file to delete.
+ * @param {FilePathLikeTypes} path The path to the file to delete.
  * @returns {void}
  */
-export const deleteFileSync = (path: PathLikeTypes): void => {
+export const deleteFileSync = (path: FilePathLikeTypes): void => {
   const p = pathLikeToString(path)
   if (exists(p)) unlinkSync(p)
 }
@@ -34,11 +34,11 @@ export const deleteFileSync = (path: PathLikeTypes): void => {
  *
  * By default, deletes the directory recursively (including its contents).
  * - - - -
- * @param {PathLikeTypes} dirPath The directory path to delete.
+ * @param {FilePathLikeTypes} dirPath The directory path to delete.
  * @param {boolean} [recursive] `OPTIONAL` Whether to delete the contents of the directory recursively. Default is `true`.
  * @returns {Promise<void>} Resolves when the directory has been removed.
  */
-export const deleteDir = async (dirPath: PathLikeTypes, recursive = true): Promise<void> => {
+export const deleteDir = async (dirPath: FilePathLikeTypes, recursive = true): Promise<void> => {
   const dp = pathLikeToString(dirPath)
   await rm(dp, { recursive })
 }
@@ -48,11 +48,11 @@ export const deleteDir = async (dirPath: PathLikeTypes, recursive = true): Promi
  *
  * By default, deletes the directory recursively (including its contents).
  * - - - -
- * @param {PathLikeTypes} dirPath The directory path to delete.
+ * @param {FilePathLikeTypes} dirPath The directory path to delete.
  * @param {boolean} [recursive] `OPTIONAL` Whether to delete the contents of the directory recursively. Default is `true`.
  * @returns {void}
  */
-export const deleteDirSync = (dirPath: PathLikeTypes, recursive = true): void => {
+export const deleteDirSync = (dirPath: FilePathLikeTypes, recursive = true): void => {
   const dp = pathLikeToString(dirPath)
   rmSync(dp, { recursive })
 }

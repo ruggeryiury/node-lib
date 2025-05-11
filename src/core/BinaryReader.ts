@@ -1,5 +1,5 @@
 import type { FileHandle } from 'fs/promises'
-import { type DirPath, FilePath, type BinaryWriteEncodings, type PathLikeTypes } from '../core.exports'
+import { type DirPath, FilePath, type BinaryWriteEncodings, type FilePathLikeTypes } from '../core.exports'
 import { pathLikeToString } from '../lib.exports'
 
 /**
@@ -34,10 +34,10 @@ export class BinaryReader {
   /**
    * Asynchronously opens a `FileHandle` to a specific file path and use it to read bytes throughout this initialized class instance.
    * - - - -
-   * @param {PathLikeTypes} filePath The path of any binary file.
+   * @param {FilePathLikeTypes} filePath The path of any binary file.
    * @returns {Promise<BinaryReader>}
    */
-  static async fromFile(filePath: PathLikeTypes): Promise<BinaryReader> {
+  static async fromFile(filePath: FilePathLikeTypes): Promise<BinaryReader> {
     const path = FilePath.of(pathLikeToString(filePath))
     if (!path.exists) throw new Error(`Provided path ${path.path} does not exists.`)
     const handler = await path.open()
@@ -72,11 +72,11 @@ export class BinaryReader {
   /**
    * Creates a `BinaryReader` class instance.
    * - - - -
-   * @param {Exclude<PathLikeTypes, DirPath> | null} path The path of any binary file to be read. The `null` value can be used to manipulate `Buffer` objects.
+   * @param {Exclude<FilePathLikeTypes, DirPath> | null} path The path of any binary file to be read. The `null` value can be used to manipulate `Buffer` objects.
    * @param {FileHandle | Buffer} handlerOrBuffer A `FileHandle` or `Buffer` object that will be stored on this class instance.
    * If not provided, it will be simply inherited from file/buffer.
    */
-  constructor(path: Exclude<PathLikeTypes, DirPath> | null, handlerOrBuffer: FileHandle | Buffer) {
+  constructor(path: Exclude<FilePathLikeTypes, DirPath> | null, handlerOrBuffer: FileHandle | Buffer) {
     if (path instanceof FilePath) this.path = path
     else if (path !== null) this.path = FilePath.of(pathLikeToString(path))
     else this.path = path

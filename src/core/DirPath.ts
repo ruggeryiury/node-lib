@@ -23,6 +23,11 @@ export interface DirPathJSONRepresentation {
 }
 
 /**
+ * Types that can be converted using `DirPath.of()` static method.
+ */
+export type DirPathLikeTypes = string | DirPath | DirPathJSONRepresentation
+
+/**
  * A path utility suite that gathers several functions
  * related to a specific directory path.
  * - - - -

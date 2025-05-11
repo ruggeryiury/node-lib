@@ -1,6 +1,6 @@
 import { readFileSync as nodeReadFileSync, readdirSync } from 'node:fs'
 import { readFile as nodeReadFile, open, readdir } from 'node:fs/promises'
-import type { BufferEncodingOrNull, BufferEncodingText, PathLikeTypes, ReadFileReturnType } from '../../core.exports'
+import type { BufferEncodingOrNull, BufferEncodingText, FilePathLikeTypes, ReadFileReturnType } from '../../core.exports'
 import { PathError } from '../../errors'
 import { pathLikeToString, resolve } from '../../lib.exports'
 
@@ -10,11 +10,11 @@ import { pathLikeToString, resolve } from '../../lib.exports'
  * Returns a `Buffer` or a string depending on the encoding provided.
  * - - - -
  * @template {BufferEncodingOrNull} T
- * @param {PathLikeTypes} path The path to the file to read.
+ * @param {FilePathLikeTypes} path The path to the file to read.
  * @param {T} [encoding] `OPTIONAL` The encoding to use. If `undefined` or `null`, returns a `Buffer`.
  * @returns {Promise<ReadFileReturnType<T>>} A promise resolving to the file contents.
  */
-export const readFile = async <T extends BufferEncodingOrNull = undefined>(path: PathLikeTypes, encoding?: T): Promise<ReadFileReturnType<T>> => {
+export const readFile = async <T extends BufferEncodingOrNull = undefined>(path: FilePathLikeTypes, encoding?: T): Promise<ReadFileReturnType<T>> => {
   const p = pathLikeToString(path)
   return (await nodeReadFile(p, encoding)) as ReadFileReturnType<T>
 }
@@ -25,11 +25,11 @@ export const readFile = async <T extends BufferEncodingOrNull = undefined>(path:
  * Returns a `Buffer` or a string depending on the encoding provided.
  * - - - -
  * @template {BufferEncodingOrNull} T
- * @param {PathLikeTypes} path The path to the file to read.
+ * @param {FilePathLikeTypes} path The path to the file to read.
  * @param {T} [encoding] `OPTIONAL` The encoding to use. If `undefined` or `null`, returns a `Buffer`.
  * @returns {ReadFileReturnType<T>} The file contents.
  */
-export const readFileSync = <T extends BufferEncodingOrNull = undefined>(path: PathLikeTypes, encoding?: T): ReadFileReturnType<T> => {
+export const readFileSync = <T extends BufferEncodingOrNull = undefined>(path: FilePathLikeTypes, encoding?: T): ReadFileReturnType<T> => {
   const p = pathLikeToString(path)
   return nodeReadFileSync(p, encoding) as ReadFileReturnType<T>
 }
@@ -40,11 +40,11 @@ export const readFileSync = <T extends BufferEncodingOrNull = undefined>(path: P
  * Automatically trims and splits the file content on newline characters.
  * Assumes the file content is text (not binary).
  * - - - -
- * @param {PathLikeTypes} path The path to the file.
+ * @param {FilePathLikeTypes} path The path to the file.
  * @param {BufferEncodingText | undefined} [encoding] `OPTIONAL` The encoding to use. If not provided, defaults to `'utf8'`.
  * @returns {Promise<string[]>} A promise that resolves to an array of trimmed lines.
  */
-export const readLines = async (path: PathLikeTypes, encoding: BufferEncodingText = 'utf8'): Promise<string[]> => {
+export const readLines = async (path: FilePathLikeTypes, encoding: BufferEncodingText = 'utf8'): Promise<string[]> => {
   const p = pathLikeToString(path)
   const content = await readFile(p, encoding)
   return Buffer.isBuffer(content) ? content.toString(encoding).trim().split('\n') : content.trim().split('\n')
@@ -56,11 +56,11 @@ export const readLines = async (path: PathLikeTypes, encoding: BufferEncodingTex
  * Automatically trims and splits the file content on newline characters.
  * Assumes the file content is text (not binary).
  * - - - -
- * @param {PathLikeTypes} path The path to the file.
+ * @param {FilePathLikeTypes} path The path to the file.
  * @param {BufferEncodingText | undefined} [encoding] `OPTIONAL` The encoding to use. If not provided, defaults to `'utf8'`.
  * @returns {string[]} An array of trimmed lines.
  */
-export const readLinesSync = (path: PathLikeTypes, encoding: BufferEncodingText = 'utf8'): string[] => {
+export const readLinesSync = (path: FilePathLikeTypes, encoding: BufferEncodingText = 'utf8'): string[] => {
   const p = pathLikeToString(path)
   const content = readFileSync(p, encoding)
   return Buffer.isBuffer(content) ? content.toString(encoding).trim().split('\n') : content.trim().split('\n')
@@ -72,12 +72,12 @@ export const readLinesSync = (path: PathLikeTypes, encoding: BufferEncodingText 
  * Attempts to decode the content using the provided encoding, then parses it using `JSON.parse`.
  * Throws a `PathError` if the JSON is invalid.
  * - - - -
- * @param {PathLikeTypes} path The path to the JSON file.
+ * @param {FilePathLikeTypes} path The path to the JSON file.
  * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
  * @returns {Promise<unknown>} A promise that resolves to the parsed JSON object.
  * @throws {PathError} If the file contains invalid JSON.
  */
-export const readJSON = async (path: PathLikeTypes, encoding?: BufferEncodingText): Promise<unknown> => {
+export const readJSON = async (path: FilePathLikeTypes, encoding?: BufferEncodingText): Promise<unknown> => {
   const p = pathLikeToString(path)
   const contents = await readFile(p, encoding)
   try {
@@ -94,12 +94,12 @@ export const readJSON = async (path: PathLikeTypes, encoding?: BufferEncodingTex
  * Attempts to decode the content using the provided encoding, then parses it using `JSON.parse`.
  * Throws a `PathError` if the JSON is invalid.
  * - - - -
- * @param {PathLikeTypes} path The path to the JSON file.
+ * @param {FilePathLikeTypes} path The path to the JSON file.
  * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
  * @returns {unknown} A parsed JSON object.
  * @throws {PathError} If the file contains invalid JSON.
  */
-export const readJSONSync = (path: PathLikeTypes, encoding?: BufferEncodingText): unknown => {
+export const readJSONSync = (path: FilePathLikeTypes, encoding?: BufferEncodingText): unknown => {
   const p = pathLikeToString(path)
   const contents = readFileSync(p, encoding)
   try {
@@ -116,12 +116,12 @@ export const readJSONSync = (path: PathLikeTypes, encoding?: BufferEncodingText)
  * If `byteLength` is provided, reads that many bytes using a file descriptor.
  * Otherwise, reads the whole file and returns a subarray starting at the offset.
  * - - - -
- * @param {PathLikeTypes} path The path to the file.
+ * @param {FilePathLikeTypes} path The path to the file.
  * @param {number} byteOffset The byte offset from which to start reading.
  * @param {number} [byteLength] `OPTIONAL` The number of bytes to read. If not provided, reads to the end of the file.
  * @returns {Promise<Buffer>} A promise that resolves to the requested buffer segment.
  */
-export const readFileOffset = async (path: PathLikeTypes, byteOffset: number, byteLength?: number) => {
+export const readFileOffset = async (path: FilePathLikeTypes, byteOffset: number, byteLength?: number) => {
   const p = pathLikeToString(path)
   let buffer: Buffer
   if (byteLength !== undefined) {
@@ -142,12 +142,12 @@ export const readFileOffset = async (path: PathLikeTypes, byteOffset: number, by
  * By default, returns absolute paths to each entry. You can change this behavior
  * by setting `asAbsolutePaths` to `false`, in which case it will return only the names.
  * - - - -
- * @param {PathLikeTypes} dirPath The path to the directory to read.
+ * @param {FilePathLikeTypes} dirPath The path to the directory to read.
  * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
  * @returns {Promise<string[]>} A promise that resolves to an array of directory entries. Entries are either absolute paths or names depending on the flag.
  * @throws {PathError} If the directory cannot be read or does not exist.
  */
-export const readDir = async (dirPath: PathLikeTypes, asAbsolutePaths = true): Promise<string[]> => {
+export const readDir = async (dirPath: FilePathLikeTypes, asAbsolutePaths = true): Promise<string[]> => {
   const dp = pathLikeToString(dirPath)
   if (asAbsolutePaths) return (await readdir(dp)).map((path) => resolve(dp, path))
   else return await readdir(dp)
@@ -159,12 +159,12 @@ export const readDir = async (dirPath: PathLikeTypes, asAbsolutePaths = true): P
  * By default, returns absolute paths to each entry. You can change this behavior
  * by setting `asAbsolutePaths` to `false`, in which case it will return only the names.
  * - - - -
- * @param {PathLikeTypes} dirPath The path to the directory to read.
+ * @param {FilePathLikeTypes} dirPath The path to the directory to read.
  * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
  * @returns {string[]} An array of directory entries. Entries are either absolute paths or names depending on the flag.
  * @throws {PathError} If the directory cannot be read or does not exist.
  */
-export const readDirSync = (dirPath: PathLikeTypes, asAbsolutePaths = true): string[] => {
+export const readDirSync = (dirPath: FilePathLikeTypes, asAbsolutePaths = true): string[] => {
   const dp = pathLikeToString(dirPath)
   if (asAbsolutePaths) return readdirSync(dp).map((path) => resolve(dp, path))
   else return readdirSync(dp)

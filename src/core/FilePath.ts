@@ -45,9 +45,9 @@ export type FileAsyncWriteDataTypes = string | NodeJS.ArrayBufferView | Iterable
 export type FileSyncWriteDataTypes = string | NodeJS.ArrayBufferView
 
 /**
- * Types that can be converted using `Path.of()` static method.
+ * Types that can be converted using `FilePath.of()` static method.
  */
-export type PathLikeTypes = string | FilePath | DirPath | FilePathJSONRepresentation
+export type FilePathLikeTypes = string | FilePath | FilePathJSONRepresentation
 
 export interface FileWriteStreamReturnObject {
   /**
@@ -482,7 +482,7 @@ export class FilePath {
    *
    * Automatically resolves relative destination paths based on the source file's directory.
    * - - - -
-   * @param {PathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
+   * @param {FilePathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
    * @param {boolean} [replace] `OPTIONAL` Whether to replace the destination file if it already exists.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance pointing to the newly copied file.
    * @throws {PathError} If the destination file exists and `replace` is `false`.
@@ -502,7 +502,7 @@ export class FilePath {
    *
    * Automatically resolves relative destination paths based on the source file's directory.
    * - - - -
-   * @param {PathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
+   * @param {FilePathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
    * @param {boolean} [replace] `OPTIONAL` Whether to replace the destination file if it already exists.
    * @returns {Promise<FilePath>} A `FilePath` instance pointing to the newly copied file.
    * @throws {PathError} If the destination file exists and `replace` is `false`.
@@ -524,7 +524,7 @@ export class FilePath {
    *
    * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
    * - - - -
-   * @param {PathLikeTypes} newPath The new file path. Can be relative or absolute.
+   * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
    * @throws {PathError} If the destination file exists and `replace` is `false`.
@@ -544,7 +544,7 @@ export class FilePath {
    *
    * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
    * - - - -
-   * @param {PathLikeTypes} newPath The new file path. Can be relative or absolute.
+   * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
    * @returns {Promise<FilePath>} A `FilePath` instance representing the new path of the renamed file.
    * @throws {PathError} If the destination file exists and `replace` is `false`.

@@ -1,6 +1,6 @@
 import { copyFileSync as nodeCopyFileSync } from 'node:fs'
 import { copyFile as nodeCopyFile } from 'node:fs/promises'
-import { FilePath, type PathLikeTypes } from '../../core.exports'
+import { FilePath, type FilePathLikeTypes } from '../../core.exports'
 import { PathError } from '../../errors'
 import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToString, resolve } from '../../lib.exports'
 
@@ -13,13 +13,13 @@ import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToStri
  *
  * Automatically resolves relative destination paths based on the source file's directory.
  * - - - -
- * @param {PathLikeTypes} srcPath The source file path to copy from.
- * @param {PathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
+ * @param {FilePathLikeTypes} srcPath The source file path to copy from.
+ * @param {FilePathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
  * @param {boolean} [replace] `OPTIONAL` Whether to replace the destination file if it already exists.
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance pointing to the newly copied file.
  * @throws {PathError} If the destination file exists and `replace` is `false`.
  */
-export const copyFile = async (srcPath: PathLikeTypes, destPath: PathLikeTypes, replace = false): Promise<FilePath> => {
+export const copyFile = async (srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, replace = false): Promise<FilePath> => {
   const sp = pathLikeToString(srcPath)
   let dp = ''
   if (typeof destPath === 'object' && 'path' in destPath) {
@@ -46,13 +46,13 @@ export const copyFile = async (srcPath: PathLikeTypes, destPath: PathLikeTypes, 
  *
  * Automatically resolves relative destination paths based on the source file's directory.
  * - - - -
- * @param {PathLikeTypes} srcPath The source file path to copy from.
- * @param {PathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
+ * @param {FilePathLikeTypes} srcPath The source file path to copy from.
+ * @param {FilePathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
  * @param {boolean} [replace] `OPTIONAL` Whether to replace the destination file if it already exists.
  * @returns {Promise<FilePath>} A `FilePath` instance pointing to the newly copied file.
  * @throws {PathError} If the destination file exists and `replace` is `false`.
  */
-export const copyFileSync = (srcPath: PathLikeTypes, destPath: PathLikeTypes, replace = false): FilePath => {
+export const copyFileSync = (srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, replace = false): FilePath => {
   const sp = pathLikeToString(srcPath)
   let dp = ''
   if (typeof destPath === 'object' && 'path' in destPath) {
