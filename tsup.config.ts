@@ -4,7 +4,7 @@ import { fixImportsPlugin } from 'esbuild-fix-imports-plugin'
 export default defineConfig({
   entry: ['src/**/*.ts'],
   format: ['esm', 'cjs'],
-  external: ['node:events', 'node:fs', 'node:fs/promises', 'node:path', 'node:stream'],
+  external: ['node:*'],
   splitting: false,
   clean: true,
   dts: true,

@@ -2,7 +2,7 @@ import type { BinaryToTextEncoding } from 'node:crypto'
 import type { Stats, WriteStream } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
 import type { Stream } from 'node:stream'
-import { PathError } from '../errors'
+import type { PathError } from '../errors'
 import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, createHashFromFileSync } from '../lib.exports'
 import { DirPath } from './DirPath'
 
@@ -121,7 +121,6 @@ export class FilePath {
    * - - - -
    * @param {string[]} paths A sequence of paths or path segments.
    * @returns {FilePath}
-   * @throws {PathError} If the provided path doesn't resolve to an existing file.
    */
   static of(...paths: string[]): FilePath {
     return new FilePath(...paths)

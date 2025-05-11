@@ -1,6 +1,6 @@
 import { type Stats } from 'node:fs'
 import { FilePath, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../core.exports'
-import { PathError } from '../errors'
+import type { PathError } from '../errors'
 import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, stat, statSync, writeFileOnDir, writeFileOnDirSync } from '../lib.exports'
 
 export interface DirPathJSONRepresentation {
@@ -73,7 +73,6 @@ export class DirPath {
    * - - - -
    * @param {string[]} paths A sequence of paths or path segments.
    * @returns {DirPath}
-   * @throws {PathError} If the provided path doesn't resolve to an existing directory.
    */
   static of(...paths: string[]): DirPath {
     return new DirPath(...paths)
