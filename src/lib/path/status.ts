@@ -1,6 +1,6 @@
 import { lstatSync, type Stats } from 'node:fs'
 import { lstat } from 'node:fs/promises'
-import type { FilePathLikeTypes } from '../../core.exports'
+import type { DirPathLikeTypes, FilePathLikeTypes } from '../../core.exports'
 import { pathLikeToString } from '../../lib.exports'
 
 /**
@@ -9,7 +9,7 @@ import { pathLikeToString } from '../../lib.exports'
  * @param {FilePathLikeTypes} path The path to evaluate.
  * @returns {Promise<Stats>}
  */
-export const stat = async (path: FilePathLikeTypes): Promise<Stats> => {
+export const stat = async (path: FilePathLikeTypes | DirPathLikeTypes): Promise<Stats> => {
   const p = pathLikeToString(path)
   return await lstat(p)
 }
@@ -19,7 +19,7 @@ export const stat = async (path: FilePathLikeTypes): Promise<Stats> => {
  * @param {FilePathLikeTypes} path The path to evaluate.
  * @returns {Stats}
  */
-export const statSync = (path: FilePathLikeTypes): Stats => {
+export const statSync = (path: FilePathLikeTypes | DirPathLikeTypes): Stats => {
   const p = pathLikeToString(path)
   return lstatSync(p)
 }
@@ -29,7 +29,7 @@ export const statSync = (path: FilePathLikeTypes): Stats => {
  * @param {FilePathLikeTypes} path The path to evaluate.
  * @returns {boolean}
  */
-export const isFile = (path: FilePathLikeTypes): boolean => {
+export const isFile = (path: FilePathLikeTypes | DirPathLikeTypes): boolean => {
   const p = pathLikeToString(path)
   return statSync(p).isFile()
 }
@@ -40,7 +40,7 @@ export const isFile = (path: FilePathLikeTypes): boolean => {
  * @param {FilePathLikeTypes} path The path to evaluate.
  * @returns {boolean}
  */
-export const isDir = (path: FilePathLikeTypes): boolean => {
+export const isDir = (path: FilePathLikeTypes | DirPathLikeTypes): boolean => {
   const p = pathLikeToString(path)
   return statSync(p).isDirectory()
 }
@@ -51,7 +51,7 @@ export const isDir = (path: FilePathLikeTypes): boolean => {
  * @param {FilePathLikeTypes} path The path to evaluate.
  * @returns {Promise<boolean>}
  */
-export const isSymLink = async (path: FilePathLikeTypes): Promise<boolean> => {
+export const isSymLink = async (path: FilePathLikeTypes | DirPathLikeTypes): Promise<boolean> => {
   const p = pathLikeToString(path)
   return (await stat(p)).isSymbolicLink()
 }
