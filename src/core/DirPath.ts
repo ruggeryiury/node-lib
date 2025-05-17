@@ -1,7 +1,7 @@
 import { type Stats } from 'node:fs'
 import { FilePath, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../core.exports'
 import type { PathError } from '../errors'
-import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, stat, statSync, writeFileOnDir, writeFileOnDirSync } from '../lib.exports'
+import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, searchInFolder, searchInFolderSync, stat, statSync, writeFileOnDir, writeFileOnDirSync } from '../lib.exports'
 
 export interface DirPathJSONRepresentation {
   /**
@@ -163,13 +163,14 @@ export class DirPath {
    * by setting `asAbsolutePaths` to `false`, in which case it will return only the names.
    * - - - -
    * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
+   * @param {boolean} [recursive] `OPTIONAL` Recursively reads the folder. Default is `false`.
    * @returns {Promise<string[]>} A promise that resolves to an array of directory entries. Entries are either absolute paths or names depending on the flag.
    * @throws {PathError} If the directory cannot be read or does not exist.
    */
-  async readDir(asAbsolutePaths = true): Promise<string[]> {
+  async readDir(asAbsolutePaths = true, recursive = false): Promise<string[]> {
     ensurePathIsDir(this.path, 'readDir')
     ensurePathExistence(this.path, 'readDir', 'directory')
-    return await readDir(this.path, asAbsolutePaths)
+    return await readDir(this.path, asAbsolutePaths, recursive)
   }
 
   /**
@@ -266,9 +267,34 @@ export class DirPath {
    * By default, deletes the directory recursively (including its contents).
    * - - - -
    * @param {boolean} [recursive] `OPTIONAL` Whether to delete the contents of the directory recursively. Default is `true`.
-   * @returns {void}
+   * @returns {void} Resolves when the directory has been removed.
    */
   deleteDirSync(recursive = true): void {
     if (this.exists) deleteDirSync(this.path, recursive)
+  }
+
+  // #region Search Methods
+  /**
+   * Asynchronously searches for files and directories in a folder that match a given pattern.
+   * - - - -
+   * @param {RegExp | string | (RegExp | string)[]} [pattern] `OPTIONAL` A RegExp or string pattern to match file or directory names. If no pattern is provided, all paths will be returned on the array.
+   * @param {boolean} [recursive] `OPTIONAL` Whether to search recursively. Defaults to `true`.
+   * @returns {Promise<string[]>} An array of absolute paths that match the pattern.
+   */
+  async searchDir(pattern: RegExp | string | (RegExp | string)[] = '', recursive = true): Promise<string[]> {
+    ensurePathIsDir(this.path, 'searchDir')
+    ensurePathExistence(this.path, 'searchDir', 'directory')
+    return await searchInFolder(this.path, pattern, recursive)
+  }
+
+  /**
+   * Synchronously searches for files and directories in a folder that match a given pattern.
+   * - - - -
+   * @param {RegExp | string | (RegExp | string)[]} [pattern] `OPTIONAL` A RegExp or string pattern to match file or directory names. If no pattern is provided, all paths will be returned on the array.
+   * @param {boolean} [recursive] `OPTIONAL` Whether to search recursively. Defaults to `true`.
+   * @returns {string[]} An array of absolute paths that match the pattern.
+   */
+  searchDirSync(pattern: RegExp | string | (RegExp | string)[] = '', recursive = true): string[] {
+    return searchInFolderSync(this.path, pattern, recursive)
   }
 }

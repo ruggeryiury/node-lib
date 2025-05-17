@@ -143,14 +143,15 @@ export const readFileOffset = async (path: FilePathLikeTypes, byteOffset: number
  * by setting `asAbsolutePaths` to `false`, in which case it will return only the names.
  * - - - -
  * @param {FilePathLikeTypes} dirPath The path to the directory to read.
- * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
+ * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names. Default is `true`.
+ * @param {boolean} [recursive] `OPTIONAL` Recursively reads the folder. Default is `false`.
  * @returns {Promise<string[]>} A promise that resolves to an array of directory entries. Entries are either absolute paths or names depending on the flag.
  * @throws {PathError} If the directory cannot be read or does not exist.
  */
-export const readDir = async (dirPath: FilePathLikeTypes, asAbsolutePaths = true): Promise<string[]> => {
+export const readDir = async (dirPath: FilePathLikeTypes, asAbsolutePaths = true, recursive = false): Promise<string[]> => {
   const dp = pathLikeToString(dirPath)
-  if (asAbsolutePaths) return (await readdir(dp)).map((path) => resolve(dp, path))
-  else return await readdir(dp)
+  if (asAbsolutePaths) return (await readdir(dp, { recursive })).map((path) => resolve(dp, path))
+  else return await readdir(dp, { recursive })
 }
 
 /**
