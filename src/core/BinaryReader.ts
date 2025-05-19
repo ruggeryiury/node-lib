@@ -219,7 +219,7 @@ export class BinaryReader {
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
-    return buf.toString('utf8').replace(`\x00`, '')
+    return buf.toString('utf8').replace(new RegExp(`\x00`, 'g'), '')
   }
 
   /**
@@ -251,7 +251,7 @@ export class BinaryReader {
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
-    return buf.toString('hex').replace(`\x00`, '')
+    return buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
   }
 
   /**
@@ -591,6 +591,79 @@ export class BinaryReader {
     this.offset += 8
     return buf.readDoubleBE()
   }
+
+  /**
+   * Asynchronously reads an unsigned, little-endian 64-bit integer.
+   * - - - -
+   * @returns {Promise<bigint>}
+   */
+  async readUInt64LE(): Promise<bigint> {
+    this.checkExistence()
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 8)
+      this.offset += 8
+      return buffer.readBigUInt64LE()
+    }
+    const buf = Buffer.alloc(8)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
+    this.offset += 8
+    return buf.readBigUInt64LE()
+  }
+
+  /**
+   * Asynchronously reads an unsigned, big-endian 64-bit integer.
+   * - - - -
+   * @returns {Promise<bigint>}
+   */
+  async readUInt64BE(): Promise<bigint> {
+    this.checkExistence()
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 8)
+      this.offset += 8
+      return buffer.readBigUInt64BE()
+    }
+    const buf = Buffer.alloc(8)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
+    this.offset += 8
+    return buf.readBigUInt64BE()
+  }
+
+  /**
+   * Asynchronously reads an unsigned, big-endian 64-bit integer.
+   * - - - -
+   * @returns {Promise<bigint>}
+   */
+  async readInt64LE(): Promise<bigint> {
+    this.checkExistence()
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 8)
+      this.offset += 8
+      return buffer.readBigInt64LE()
+    }
+    const buf = Buffer.alloc(8)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
+    this.offset += 8
+    return buf.readBigInt64LE()
+  }
+
+  /**
+   * Asynchronously reads an unsigned, big-endian 64-bit integer.
+   * - - - -
+   * @returns {Promise<bigint>}
+   */
+  async readInt64BE(): Promise<bigint> {
+    this.checkExistence()
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 8)
+      this.offset += 8
+      return buffer.readBigInt64BE()
+    }
+    const buf = Buffer.alloc(8)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
+    this.offset += 8
+    return buf.readBigInt64BE()
+  }
+
   // #region Typos
 
   /**

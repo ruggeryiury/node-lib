@@ -369,6 +369,56 @@ export class BinaryWriter {
     this.contents.push(buf)
   }
 
+  // #region BigInt
+
+  /**
+   * Writes an unsigned 64-bit value on the binary file (little endian mode).
+   * - - - -
+   * @param {bigint} value The number to be added to the binary file.
+   * @returns {void}
+   */
+  writeUInt64LE(value: bigint): void {
+    const buf = Buffer.alloc(8)
+    buf.writeBigUInt64LE(value, 0)
+    this.contents.push(buf)
+  }
+
+  /**
+   * Writes an unsigned 64-bit value on the binary file (big endian mode).
+   * - - - -
+   * @param {bigint} value The number to be added to the binary file.
+   * @returns {void}
+   */
+  writeUInt64BE(value: bigint): void {
+    const buf = Buffer.alloc(8)
+    buf.writeBigUInt64BE(value, 0)
+    this.contents.push(buf)
+  }
+
+  /**
+   * Writes a signed 64-bit value on the binary file (little endian mode).
+   * - - - -
+   * @param {bigint} value The number to be added to the binary file.
+   * @returns {void}
+   */
+  writeInt64LE(value: bigint): void {
+    const buf = Buffer.alloc(8)
+    buf.writeBigInt64LE(value, 0)
+    this.contents.push(buf)
+  }
+
+  /**
+   * Writes a signed 64-bit value on the binary file (big endian mode).
+   * - - - -
+   * @param {bigint} value The number to be added to the binary file.
+   * @returns {void}
+   */
+  writeInt64BE(value: bigint): void {
+    const buf = Buffer.alloc(8)
+    buf.writeBigInt64BE(value, 0)
+    this.contents.push(buf)
+  }
+
   // #region Typos
 
   /**
