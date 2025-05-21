@@ -227,31 +227,37 @@ export class BinaryReader {
    * - - - -
    * @param {number | undefined} [allocSize] `OPTIONAL` The allocation size of the desired bytes. If `undefined`, the reader will
    * return all bytes from the file, starting by the class `offset` value.
+   * @param {boolean} [prefix] `OPTIONAL` Adds a `0x` prefix on the string. Default if `true`.
+   * @param {boolean} [uppercased] `OPTIONAL` Uppercase all letters of the hexadecimal string. Default if `false`.
    * @returns {Promise<string>}
    */
-  async readHex(allocSize?: number): Promise<string> {
+  async readHex(allocSize?: number, prefix = true, uppercased = false): Promise<string> {
     this.checkExistence()
     if (Buffer.isBuffer(this.operator)) {
       if (allocSize !== undefined) {
         const buf = this.operator.subarray(this.offset, this.offset + allocSize)
         this.offset += allocSize
-        return buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
+        const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
+        return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
       }
-      const buffer = this.operator.subarray(this.offset)
+      const buf = this.operator.subarray(this.offset)
       this.offset = 0
-      return buffer.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
+      const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
+      return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
     }
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
       this.offset += allocSize
-      return buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
+      const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
+      return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
     }
     allocSize = this.size - this.offset
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
-    return buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
+    const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
+    return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
   }
 
   /**

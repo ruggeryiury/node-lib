@@ -1,4 +1,4 @@
-import { formatNumberWithDots, isHexString, pathLikeToFilePath } from '../lib.exports'
+import { formatNumberWithDots, isHexString, padHexToLength, pathLikeToFilePath } from '../lib.exports'
 import type { BufferEncodingOrNull, FilePath, FilePathLikeTypes } from './FilePath'
 
 export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'utf8' | 'hex'
@@ -114,14 +114,14 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeHex(value: string, allocSize?: number): void {
-    if (!isHexString(value)) throw new Error(`Value must be a valid hexadecimal value.`)
+    if (!isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      buf.write(value, 'hex')
+      buf.write(padHexToLength(value, 1, false), 'hex')
       this.contents.push(buf)
       return
     }
-    this.contents.push(Buffer.from(value, 'hex'))
+    this.contents.push(Buffer.from(padHexToLength(value, 1, false), 'hex'))
     return
   }
 
@@ -145,7 +145,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt8(value: number): void {
-    if (value < 0 || value > 0xff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xff)}, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeUIntLE(value, 0, 1)
     this.contents.push(buf)
@@ -158,7 +158,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt16LE(value: number): void {
-    if (value < 0 || value > 0xffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntLE(value, 0, 2)
     this.contents.push(buf)
@@ -171,7 +171,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt16BE(value: number): void {
-    if (value < 0 || value > 65535) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 65535) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntBE(value, 0, 2)
     this.contents.push(buf)
@@ -184,7 +184,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt24LE(value: number): void {
-    if (value < 0 || value > 0xffffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeUIntLE(value, 0, 3)
     this.contents.push(buf)
@@ -197,7 +197,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt24BE(value: number): void {
-    if (value < 0 || value > 0xffffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeUIntBE(value, 0, 3)
     this.contents.push(buf)
@@ -210,7 +210,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt32LE(value: number): void {
-    if (value < 0 || value > 0xffffffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xffffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntLE(value, 0, 4)
     this.contents.push(buf)
@@ -223,7 +223,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeUInt32BE(value: number): void {
-    if (value < 0 || value > 0xffffffff) throw new Error(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
+    if (value < 0 || value > 0xffffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntBE(value, 0, 4)
     this.contents.push(buf)
@@ -236,7 +236,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeInt8(value: number): void {
-    if (value < -128 || value > 127) throw new Error(`Value must be between -128 and 127, provided ${formatNumberWithDots(value)}.`)
+    if (value < -128 || value > 127) throw new TypeError(`Value must be between -128 and 127, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeIntLE(value, 0, 1)
     this.contents.push(buf)
@@ -249,7 +249,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeInt16LE(value: number): void {
-    if (value < -32768 || value > 32767) throw new Error(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
+    if (value < -32768 || value > 32767) throw new TypeError(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntLE(value, 0, 2)
     this.contents.push(buf)
@@ -262,7 +262,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeInt16BE(value: number): void {
-    if (value < -32768 || value > 32767) throw new Error(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
+    if (value < -32768 || value > 32767) throw new TypeError(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntBE(value, 0, 2)
     this.contents.push(buf)
@@ -275,7 +275,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeInt24LE(value: number): void {
-    if (value < -8388608 || value > 8388607) throw new Error(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
+    if (value < -8388608 || value > 8388607) throw new TypeError(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeIntLE(value, 0, 3)
     this.contents.push(buf)
@@ -288,7 +288,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeInt24BE(value: number): void {
-    if (value < -8388608 || value > 8388607) throw new Error(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
+    if (value < -8388608 || value > 8388607) throw new TypeError(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeIntBE(value, 0, 3)
     this.contents.push(buf)
@@ -301,7 +301,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeInt32LE(value: number): void {
-    if (value < -2147483648 || value > 2147483647) throw new Error(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
+    if (value < -2147483648 || value > 2147483647) throw new TypeError(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeIntLE(value, 0, 4)
     this.contents.push(buf)
@@ -314,7 +314,7 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeInt32BE(value: number): void {
-    if (value < -2147483648 || value > 2147483647) throw new Error(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
+    if (value < -2147483648 || value > 2147483647) throw new TypeError(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeIntBE(value, 0, 4)
     this.contents.push(buf)
