@@ -1,4 +1,5 @@
-import { formatNumberWithDots, isHexString } from '../lib.exports'
+import { formatNumberWithDots, isHexString, pathLikeToFilePath } from '../lib.exports'
+import type { BufferEncodingOrNull, FilePath, FilePathLikeTypes } from './FilePath'
 
 export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'utf8' | 'hex'
 
@@ -463,12 +464,42 @@ export class BinaryWriter {
   }
 
   /**
-   * Creates a new `Buffer` object with all contents joined.
+   * Creates a new `Buffer` object with all contents written on this instance.
    * - - - -
    * @returns {Buffer}
    */
   toBuffer(): Buffer {
     return Buffer.concat(this.contents)
+  }
+
+  /**
+   * Asynchronously writes all contents written on this instance to a file, optionally replacing it if it already exists.
+   *
+   * Throws an error if the file exists and replace is set to false.
+   * - - - -
+   * @param {FilePathLikeTypes} path The path where the contents will be written.
+   * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` If `null`, writes as a `Buffer`.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
+   * @returns {Promise<FilePath>} A `Promise` that resolves to a `FilePath` instance of the file path where the contents will be written.
+   */
+  async toFile(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> {
+    const p = pathLikeToFilePath(path)
+    return await p.write(this.toBuffer(), encoding, replace)
+  }
+
+  /**
+   * Synchronously writes all contents written on this instance to a file, optionally replacing it if it already exists.
+   *
+   * Throws an error if the file exists and replace is set to false.
+   * - - - -
+   * @param {FilePathLikeTypes} path The path where the contents will be written.
+   * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` If `null`, writes as a `Buffer`.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
+   * @returns {Promise<FilePath>} A `FilePath` instance of the file path where the contents will be written.
+   */
+  toFileSync(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath {
+    const p = pathLikeToFilePath(path)
+    return p.writeSync(this.toBuffer(), encoding, replace)
   }
 
   /**

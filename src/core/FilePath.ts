@@ -49,17 +49,6 @@ export type FileSyncWriteDataTypes = string | NodeJS.ArrayBufferView
  */
 export type FilePathLikeTypes = string | FilePath | FilePathJSONRepresentation
 
-export interface FileWriteStreamReturnObject {
-  /**
-   * The writeable stream of the file.
-   */
-  stream: WriteStream
-  /**
-   * A `Promise` that will only be fullfilled when calling `stream.end()`.
-   */
-  once: Promise<unknown[]>
-}
-
 /**
  * A path utility suite that gathers several functions
  * related to a specific file path.
@@ -451,9 +440,9 @@ export class FilePath {
    * Optionally accepts an encoding; if `null` is passed, defaults to `utf8`.
    * - - - -
    * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The character encoding to use. If `null`, `utf8` is used.
-   * @returns {Promise<FileWriteStreamReturnObject>} A promise that resolves to an object containing the writable stream and a promise that resolves when the stream finishes writing.
+   * @returns {Promise<WriteStream>} An instance of `fs.WriteStream` that are created and returned using the `fs.createWriteStream` function.
    */
-  async createWriteStream(encoding?: BufferEncodingOrNull): Promise<FileWriteStreamReturnObject> {
+  async createWriteStream(encoding?: BufferEncodingOrNull): Promise<WriteStream> {
     return await createFileWriteStream(this.path, encoding)
   }
 
@@ -464,9 +453,9 @@ export class FilePath {
    * Optionally accepts an encoding; if `null` is passed, defaults to `'utf8'`.
    * - - - -
    * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The character encoding to use. If `null`, `'utf8'` is used.
-   * @returns {Promise<FileWriteStreamReturnObject>} An object containing the writable stream and a promise that resolves when the stream finishes writing.
+   * @returns {WriteStream} An instance of `fs.WriteStream` that are created and returned using the `fs.createWriteStream` function.
    */
-  createWriteStreamSync(encoding?: BufferEncodingOrNull): FileWriteStreamReturnObject {
+  createWriteStreamSync(encoding?: BufferEncodingOrNull): WriteStream {
     return createFileWriteStreamSync(this.path, encoding)
   }
 

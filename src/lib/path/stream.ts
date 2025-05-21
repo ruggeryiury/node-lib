@@ -1,6 +1,5 @@
-import { once } from 'node:events'
-import { createWriteStream } from 'node:fs'
-import type { BufferEncodingOrNull, FileWriteStreamReturnObject, FilePathLikeTypes } from '../../core.exports'
+import { createWriteStream, WriteStream } from 'node:fs'
+import type { BufferEncodingOrNull, FilePathLikeTypes } from '../../core.exports'
 import { deleteFile, deleteFileSync, exists, pathLikeToString } from '../../lib.exports'
 
 /**
@@ -11,16 +10,12 @@ import { deleteFile, deleteFileSync, exists, pathLikeToString } from '../../lib.
  * - - - -
  * @param {FilePathLikeTypes} path The path where the file should be written.
  * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The character encoding to use. If `null`, `utf8` is used.
- * @returns {Promise<FileWriteStreamReturnObject>} A promise that resolves to an object containing the writable stream and a promise that resolves when the stream finishes writing.
+ * @returns {Promise<WriteStream>} An instance of `fs.WriteStream` that are created and returned using the `fs.createWriteStream` function.
  */
-export const createFileWriteStream = async (path: FilePathLikeTypes, encoding?: BufferEncodingOrNull): Promise<FileWriteStreamReturnObject> => {
+export const createFileWriteStream = async (path: FilePathLikeTypes, encoding?: BufferEncodingOrNull): Promise<WriteStream> => {
   const p = pathLikeToString(path)
   if (exists(p)) await deleteFile(p)
-  const stream = createWriteStream(p, encoding === null ? 'utf8' : encoding)
-  return {
-    stream,
-    once: once(stream, 'finish'),
-  }
+  return createWriteStream(p, encoding === null ? 'utf8' : encoding)
 }
 
 /**
@@ -31,14 +26,10 @@ export const createFileWriteStream = async (path: FilePathLikeTypes, encoding?: 
  * - - - -
  * @param {FilePathLikeTypes} path The path where the file should be written.
  * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The character encoding to use. If `null`, `'utf8'` is used.
- * @returns {Promise<FileWriteStreamReturnObject>} An object containing the writable stream and a promise that resolves when the stream finishes writing.
+ * @returns {WriteStream} An instance of `fs.WriteStream` that are created and returned using the `fs.createWriteStream` function.
  */
-export const createFileWriteStreamSync = (path: FilePathLikeTypes, encoding?: BufferEncodingOrNull): FileWriteStreamReturnObject => {
+export const createFileWriteStreamSync = (path: FilePathLikeTypes, encoding?: BufferEncodingOrNull): WriteStream => {
   const p = pathLikeToString(path)
   if (exists(p)) deleteFileSync(p)
-  const stream = createWriteStream(p, encoding === null ? 'utf8' : encoding)
-  return {
-    stream,
-    once: once(stream, 'finish'),
-  }
+  return createWriteStream(p, encoding === null ? 'utf8' : encoding)
 }
