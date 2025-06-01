@@ -1,6 +1,5 @@
 import { type Stats } from 'node:fs'
 import { FilePath, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../core.exports'
-import type { PathError } from '../errors'
 import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, searchInFolder, searchInFolderSync, stat, statSync, writeFileOnDir, writeFileOnDirSync } from '../lib.exports'
 
 export interface DirPathJSONRepresentation {
@@ -165,7 +164,7 @@ export class DirPath {
    * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
    * @param {boolean} [recursive] `OPTIONAL` Recursively reads the folder. Default is `false`.
    * @returns {Promise<string[]>} A promise that resolves to an array of directory entries. Entries are either absolute paths or names depending on the flag.
-   * @throws {PathError} If the directory cannot be read or does not exist.
+   * @throws {Error} If the directory cannot be read or does not exist.
    */
   async readDir(asAbsolutePaths = true, recursive = false): Promise<string[]> {
     ensurePathIsDir(this.path, 'readDir')
@@ -181,7 +180,7 @@ export class DirPath {
    * - - - -
    * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
    * @returns {string[]} An array of directory entries. Entries are either absolute paths or names depending on the flag.
-   * @throws {PathError} If the directory cannot be read or does not exist.
+   * @throws {Error} If the directory cannot be read or does not exist.
    */
   readDirSync(asAbsolutePaths = true): string[] {
     ensurePathIsDir(this.path, 'readDir')
@@ -202,7 +201,7 @@ export class DirPath {
    * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The encoding used when writing the file. Default is `'utf8'`.
    * @param {boolean} [replace] Whether to replace the file if it already exists. Default is `true`.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the created file.
-   * @throws {PathError} If the file already exists and `replace` is `false`.
+   * @throws {Error} If the file already exists and `replace` is `false`.
    */
   async writeFileOnDir(fileName: string, data?: FileAsyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> {
     return await writeFileOnDir(this.path, fileName, data, encoding, replace)
@@ -219,7 +218,7 @@ export class DirPath {
    * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The encoding used when writing the file. Default is `'utf8'`.
    * @param {boolean} [replace] Whether to replace the file if it already exists. Default is `true`.
    * @returns {FilePath} A `FilePath` instance representing the created file.
-   * @throws {PathError} If the file already exists and `replace` is `false`.
+   * @throws {Error} If the file already exists and `replace` is `false`.
    */
   writeFileOnDirSync(fileName: string, data?: FileSyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace = true): FilePath {
     return writeFileOnDirSync(this.path, fileName, data, encoding, replace)

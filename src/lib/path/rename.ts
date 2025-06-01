@@ -1,7 +1,6 @@
 import { renameSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
 import { FilePath, type FilePathLikeTypes } from '../../core.exports'
-import { PathError } from '../../errors'
 import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToString, resolve } from '../../lib.exports'
 
 /**
@@ -17,7 +16,7 @@ import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToStri
  * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
  * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
- * @throws {PathError} If the destination file exists and `replace` is `false`.
+ * @throws {Error} If the destination file exists and `replace` is `false`.
  */
 export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace = false): Promise<FilePath> => {
   const p = pathLikeToString(oldPath)
@@ -30,7 +29,7 @@ export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLi
   if (!isAbsolute(np)) np = resolve(dirname(p), np)
 
   if (exists(np)) {
-    if (!replace) throw new PathError(`Provided path ${np} already exists. Please, choose another file name.`)
+    if (!replace) throw new Error(`Provided path ${np} already exists. Please, choose another file name.`)
     else await deleteFile(np)
   }
   await rename(p, np)
@@ -50,7 +49,7 @@ export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLi
  * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
  * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
  * @returns {Promise<FilePath>} A `FilePath` instance representing the new path of the renamed file.
- * @throws {PathError} If the destination file exists and `replace` is `false`.
+ * @throws {Error} If the destination file exists and `replace` is `false`.
  */
 export const renameFileSync = (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace = false): FilePath => {
   const op = pathLikeToString(oldPath)
@@ -63,7 +62,7 @@ export const renameFileSync = (oldPath: FilePathLikeTypes, newPath: FilePathLike
   if (!isAbsolute(np)) np = resolve(dirname(op), np)
 
   if (exists(np)) {
-    if (!replace) throw new PathError(`Provided path ${np} already exists. Please, choose another file name.`)
+    if (!replace) throw new Error(`Provided path ${np} already exists. Please, choose another file name.`)
     else deleteFileSync(np)
   }
   renameSync(op, np)

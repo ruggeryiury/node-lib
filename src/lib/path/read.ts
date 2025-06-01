@@ -1,7 +1,6 @@
 import { readFileSync as nodeReadFileSync, readdirSync } from 'node:fs'
 import { readFile as nodeReadFile, open, readdir } from 'node:fs/promises'
 import type { BufferEncodingOrNull, BufferEncodingText, FilePathLikeTypes, ReadFileReturnType } from '../../core.exports'
-import { PathError } from '../../errors'
 import { pathLikeToString, resolve } from '../../lib.exports'
 
 /**
@@ -70,12 +69,12 @@ export const readLinesSync = (path: FilePathLikeTypes, encoding: BufferEncodingT
  * Asynchronously reads a JSON file and parses it into an object.
  *
  * Attempts to decode the content using the provided encoding, then parses it using `JSON.parse`.
- * Throws a `PathError` if the JSON is invalid.
+ * Throws a `Error` if the JSON is invalid.
  * - - - -
  * @param {FilePathLikeTypes} path The path to the JSON file.
  * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
  * @returns {Promise<unknown>} A promise that resolves to the parsed JSON object.
- * @throws {PathError} If the file contains invalid JSON.
+ * @throws {Error} If the file contains invalid JSON.
  */
 export const readJSON = async (path: FilePathLikeTypes, encoding?: BufferEncodingText): Promise<unknown> => {
   const p = pathLikeToString(path)
@@ -83,7 +82,7 @@ export const readJSON = async (path: FilePathLikeTypes, encoding?: BufferEncodin
   try {
     return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents)
   } catch (err) {
-    if (err instanceof Error) throw new PathError(err.message)
+    if (err instanceof Error) throw new Error(err.message)
     else throw err
   }
 }
@@ -92,12 +91,12 @@ export const readJSON = async (path: FilePathLikeTypes, encoding?: BufferEncodin
  * Synchronously reads a JSON file and parses it into an object.
  *
  * Attempts to decode the content using the provided encoding, then parses it using `JSON.parse`.
- * Throws a `PathError` if the JSON is invalid.
+ * Throws a `Error` if the JSON is invalid.
  * - - - -
  * @param {FilePathLikeTypes} path The path to the JSON file.
  * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
  * @returns {unknown} A parsed JSON object.
- * @throws {PathError} If the file contains invalid JSON.
+ * @throws {Error} If the file contains invalid JSON.
  */
 export const readJSONSync = (path: FilePathLikeTypes, encoding?: BufferEncodingText): unknown => {
   const p = pathLikeToString(path)
@@ -105,7 +104,7 @@ export const readJSONSync = (path: FilePathLikeTypes, encoding?: BufferEncodingT
   try {
     return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents)
   } catch (err) {
-    if (err instanceof Error) throw new PathError(err.message)
+    if (err instanceof Error) throw new Error(err.message)
     else throw err
   }
 }
@@ -146,7 +145,7 @@ export const readFileOffset = async (path: FilePathLikeTypes, byteOffset: number
  * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names. Default is `true`.
  * @param {boolean} [recursive] `OPTIONAL` Recursively reads the folder. Default is `false`.
  * @returns {Promise<string[]>} A promise that resolves to an array of directory entries. Entries are either absolute paths or names depending on the flag.
- * @throws {PathError} If the directory cannot be read or does not exist.
+ * @throws {Error} If the directory cannot be read or does not exist.
  */
 export const readDir = async (dirPath: FilePathLikeTypes, asAbsolutePaths = true, recursive = false): Promise<string[]> => {
   const dp = pathLikeToString(dirPath)
@@ -163,7 +162,7 @@ export const readDir = async (dirPath: FilePathLikeTypes, asAbsolutePaths = true
  * @param {FilePathLikeTypes} dirPath The path to the directory to read.
  * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
  * @returns {string[]} An array of directory entries. Entries are either absolute paths or names depending on the flag.
- * @throws {PathError} If the directory cannot be read or does not exist.
+ * @throws {Error} If the directory cannot be read or does not exist.
  */
 export const readDirSync = (dirPath: FilePathLikeTypes, asAbsolutePaths = true): string[] => {
   const dp = pathLikeToString(dirPath)

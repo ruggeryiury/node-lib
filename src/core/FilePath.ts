@@ -2,7 +2,6 @@ import type { BinaryToTextEncoding } from 'node:crypto'
 import type { Stats, WriteStream } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
 import type { Stream } from 'node:stream'
-import type { PathError } from '../errors'
 import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, createHashFromFileSync } from '../lib.exports'
 import { DirPath } from './DirPath'
 
@@ -319,11 +318,11 @@ export class FilePath {
    * Asynchronously reads a JSON file and parses it into an object.
    *
    * Attempts to decode the content using the provided encoding, then parses it using `JSON.parse`.
-   * Throws a `PathError` if the JSON is invalid.
+   * Throws a `Error` if the JSON is invalid.
    * - - - -
    * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
    * @returns {Promise<unknown>} A promise that resolves to the parsed JSON object.
-   * @throws {PathError} If the file contains invalid JSON.
+   * @throws {Error} If the file contains invalid JSON.
    */
   async readJSON(encoding?: BufferEncodingText): Promise<unknown> {
     ensurePathIsFile(this.path, 'readJSON')
@@ -335,11 +334,11 @@ export class FilePath {
    * Synchronously reads a JSON file and parses it into an object.
    *
    * Attempts to decode the content using the provided encoding, then parses it using `JSON.parse`.
-   * Throws a `PathError` if the JSON is invalid.
+   * Throws a `Error` if the JSON is invalid.
    * - - - -
    * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
    * @returns {unknown} The parsed JSON object.
-   * @throws {PathError} If the file contains invalid JSON.
+   * @throws {Error} If the file contains invalid JSON.
    */
   readJSONSync(encoding?: BufferEncodingText): unknown {
     ensurePathIsFile(this.path, 'readJSONSync')
@@ -375,7 +374,7 @@ export class FilePath {
    * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` If `null`, writes as a `Buffer`.
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the written file.
-   * @throws {PathError} If the file exists and `replace` is `false`.
+   * @throws {Error} If the file exists and `replace` is `false`.
    */
   async write(data: FileAsyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> {
     return await writeFile(this.path, data, encoding, replace)
@@ -391,7 +390,7 @@ export class FilePath {
    * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` If `null`, writes as a `Buffer`.
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
    * @returns {FilePath} A `FilePath` instance representing the written file.
-   * @throws {PathError} If the file exists and `replace` is `false`.
+   * @throws {Error} If the file exists and `replace` is `false`.
    */
   writeSync(data: FileSyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath {
     return writeFileSync(this.path, data, encoding, replace)
@@ -409,7 +408,7 @@ export class FilePath {
    * @param {BufferEncodingBOM} [encoding] `OPTIONAL`Encoding to use, such as `'utf8-bom'`, `'utf16le'`, etc.
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the written file.
-   * @throws {PathError} If the file exists and `replace` is `false`.
+   * @throws {Error} If the file exists and `replace` is `false`.
    */
   async writeWithBOM(data: StringOrBuffer, encoding?: BufferEncodingBOM, replace = true): Promise<FilePath> {
     return await writeFileWithBOM(this.path, data, encoding, replace)
@@ -427,7 +426,7 @@ export class FilePath {
    * @param {BufferEncodingBOM} [encoding] `OPTIONAL`Encoding to use, such as `'utf8-bom'`, `'utf16le'`, etc.
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
    * @returns {FilePath} A `FilePath` instance representing the written file.
-   * @throws {PathError} If the file exists and `replace` is `false`.
+   * @throws {Error} If the file exists and `replace` is `false`.
    */
   writeWithBOMSync(data: StringOrBuffer, encoding?: BufferEncodingBOM, replace = true): FilePath {
     return writeFileWithBOMSync(this.path, data, encoding, replace)
@@ -473,9 +472,9 @@ export class FilePath {
    * @param {FilePathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
    * @param {boolean} [replace] `OPTIONAL` Whether to replace the destination file if it already exists.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance pointing to the newly copied file.
-   * @throws {PathError} If the destination file exists and `replace` is `false`.
+   * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  async copy(destPath: string, replace = false): Promise<FilePath> {
+  async copy(destPath: FilePathLikeTypes, replace = false): Promise<FilePath> {
     ensurePathIsFile(this.path, 'copy')
     ensurePathExistence(this.path, 'copy', 'file')
     return await copyFile(this.path, destPath, replace)
@@ -493,9 +492,9 @@ export class FilePath {
    * @param {FilePathLikeTypes} destPath The destination file path to copy to. Can be relative or absolute.
    * @param {boolean} [replace] `OPTIONAL` Whether to replace the destination file if it already exists.
    * @returns {Promise<FilePath>} A `FilePath` instance pointing to the newly copied file.
-   * @throws {PathError} If the destination file exists and `replace` is `false`.
+   * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  copySync(destPath: string, replace = false): FilePath {
+  copySync(destPath: FilePathLikeTypes, replace = false): FilePath {
     ensurePathIsFile(this.path, 'copySync')
     ensurePathExistence(this.path, 'copySync', 'file')
     return copyFileSync(this.path, destPath, replace)
@@ -515,9 +514,9 @@ export class FilePath {
    * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
-   * @throws {PathError} If the destination file exists and `replace` is `false`.
+   * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  async rename(newPath: string, replace = false): Promise<FilePath> {
+  async rename(newPath: FilePathLikeTypes, replace = false): Promise<FilePath> {
     ensurePathIsFile(this.path, 'rename')
     ensurePathExistence(this.path, 'rename', 'file')
     return await renameFile(this.path, newPath, replace)
@@ -535,9 +534,9 @@ export class FilePath {
    * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
    * @returns {Promise<FilePath>} A `FilePath` instance representing the new path of the renamed file.
-   * @throws {PathError} If the destination file exists and `replace` is `false`.
+   * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  renameSync(newPath: string, replace = false): FilePath {
+  renameSync(newPath: FilePathLikeTypes, replace = false): FilePath {
     ensurePathIsFile(this.path, 'renameSync')
     ensurePathExistence(this.path, 'renameSync', 'file')
     return renameFileSync(this.path, newPath, replace)

@@ -1,7 +1,6 @@
 import { mkdirSync, writeFileSync as nodeWriteFileSync } from 'node:fs'
 import { mkdir, writeFile as nodeWriteFile } from 'node:fs/promises'
 import { DirPath, FilePath, type BufferEncodingBOM, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes, type FilePathLikeTypes, type StringOrBuffer } from '../../core.exports'
-import { PathError } from '../../errors'
 import { exists, pathLikeToString, resolve } from '../../lib.exports'
 
 /**
@@ -15,11 +14,11 @@ import { exists, pathLikeToString, resolve } from '../../lib.exports'
  * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` If `null`, writes as a `Buffer`.
  * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the written file.
- * @throws {PathError} If the file exists and `replace` is `false`.
+ * @throws {Error} If the file exists and `replace` is `false`.
  */
 export const writeFile = async (path: FilePathLikeTypes, data: FileAsyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> => {
   const p = pathLikeToString(path)
-  if (exists(p) && !replace) throw new PathError(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
+  if (exists(p) && !replace) throw new Error(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
   await nodeWriteFile(p, data, encoding)
   return new FilePath(p)
 }
@@ -35,11 +34,11 @@ export const writeFile = async (path: FilePathLikeTypes, data: FileAsyncWriteDat
  * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` If `null`, writes as a `Buffer`.
  * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
  * @returns {FilePath} A `FilePath` instance representing the written file.
- * @throws {PathError} If the file exists and `replace` is `false`.
+ * @throws {Error} If the file exists and `replace` is `false`.
  */
 export const writeFileSync = (path: FilePathLikeTypes, data: FileSyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath => {
   const p = pathLikeToString(path)
-  if (exists(p) && !replace) throw new PathError(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
+  if (exists(p) && !replace) throw new Error(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
   nodeWriteFileSync(p, data, encoding)
   return new FilePath(p)
 }
@@ -57,11 +56,11 @@ export const writeFileSync = (path: FilePathLikeTypes, data: FileSyncWriteDataTy
  * @param {BufferEncodingBOM} [encoding] `OPTIONAL`Encoding to use, such as `'utf8-bom'`, `'utf16le'`, etc.
  * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the written file.
- * @throws {PathError} If the file exists and `replace` is `false`.
+ * @throws {Error} If the file exists and `replace` is `false`.
  */
 export const writeFileWithBOM = async (path: FilePathLikeTypes, data: StringOrBuffer, encoding?: BufferEncodingBOM, replace = true): Promise<FilePath> => {
   const p = pathLikeToString(path)
-  if (exists(p) && !replace) throw new PathError(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
+  if (exists(p) && !replace) throw new Error(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
   const content = '\ufeff' + (Buffer.isBuffer(data) ? data.toString() : data)
   if (encoding === 'utf-8-bom' || encoding === 'utf8-bom' || encoding === 'utf8bom' || !encoding) await writeFile(p, content)
   else await nodeWriteFile(p, content, 'utf16le')
@@ -81,11 +80,11 @@ export const writeFileWithBOM = async (path: FilePathLikeTypes, data: StringOrBu
  * @param {BufferEncodingBOM} [encoding] `OPTIONAL`Encoding to use, such as `'utf8-bom'`, `'utf16le'`, etc.
  * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
  * @returns {FilePath} A `FilePath` instance representing the written file.
- * @throws {PathError} If the file exists and `replace` is `false`.
+ * @throws {Error} If the file exists and `replace` is `false`.
  */
 export const writeFileWithBOMSync = (path: FilePathLikeTypes, data: StringOrBuffer, encoding?: BufferEncodingBOM, replace = true): FilePath => {
   const p = pathLikeToString(path)
-  if (exists(p) && !replace) throw new PathError(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
+  if (exists(p) && !replace) throw new Error(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
   const content = '\ufeff' + (Buffer.isBuffer(data) ? data.toString() : data)
   if (encoding === 'utf-8-bom' || encoding === 'utf8-bom' || encoding === 'utf8bom' || !encoding) writeFileSync(p, content)
   else nodeWriteFileSync(p, content, 'utf16le')
@@ -104,13 +103,13 @@ export const writeFileWithBOMSync = (path: FilePathLikeTypes, data: StringOrBuff
  * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The encoding used when writing the file. Default is `'utf8'`
  * @param {boolean} [replace] `OPTIONAL` Whether to replace the file if it already exists. Default is `true`.
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the created file.
- * @throws {PathError} If the file already exists and `replace` is `false`.
+ * @throws {Error} If the file already exists and `replace` is `false`.
  */
 export const writeFileOnDir = async (dirPath: FilePathLikeTypes, fileName: string, data?: FileAsyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> => {
   const dp = pathLikeToString(dirPath)
   const newFilePath = resolve(dp, fileName)
-  if (exists(newFilePath) && !replace) throw new PathError(`Provided file path ${newFilePath} already exists. To automatically replace the file, set the "replace" argument to true.`)
-  if (exists(newFilePath)) throw new PathError(`File on path "${newFilePath}" already exists.`)
+  if (exists(newFilePath) && !replace) throw new Error(`Provided file path ${newFilePath} already exists. To automatically replace the file, set the "replace" argument to true.`)
+  if (exists(newFilePath)) throw new Error(`File on path "${newFilePath}" already exists.`)
   await writeFile(newFilePath, data ?? '', encoding)
   return new FilePath(newFilePath)
 }
@@ -127,13 +126,13 @@ export const writeFileOnDir = async (dirPath: FilePathLikeTypes, fileName: strin
  * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The encoding used when writing the file. Default is `'utf8'`
  * @param {boolean} [replace] `OPTIONAL` Whether to replace the file if it already exists. Default is `true`.
  * @returns {FilePath} A `FilePath` instance representing the created file.
- * @throws {PathError} If the file already exists and `replace` is `false`.
+ * @throws {Error} If the file already exists and `replace` is `false`.
  */
 export const writeFileOnDirSync = (dirPath: FilePathLikeTypes, fileName: string, data?: FileSyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace = true): FilePath => {
   const dp = pathLikeToString(dirPath)
   const newFilePath = resolve(dp, fileName)
-  if (exists(newFilePath) && !replace) throw new PathError(`Provided file path ${newFilePath} already exists. To automatically replace the file, set the "replace" argument to true.`)
-  if (exists(newFilePath)) throw new PathError(`File on path "${newFilePath}" already exists.`)
+  if (exists(newFilePath) && !replace) throw new Error(`Provided file path ${newFilePath} already exists. To automatically replace the file, set the "replace" argument to true.`)
+  if (exists(newFilePath)) throw new Error(`File on path "${newFilePath}" already exists.`)
   writeFileSync(newFilePath, data ?? '', encoding)
   return new FilePath(newFilePath)
 }

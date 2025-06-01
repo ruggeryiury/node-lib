@@ -1,5 +1,6 @@
-import { formatNumberWithDots, isHexString, padHexToLength, pathLikeToFilePath } from '../lib.exports'
-import type { BufferEncodingOrNull, FilePath, FilePathLikeTypes } from './FilePath'
+import { type HexLikeValues, type BufferEncodingOrNull, FilePath, type FilePathLikeTypes, HexVal } from '../core.exports'
+import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
+// import type { BufferEncodingOrNull, FilePath, FilePathLikeTypes } from './FilePath'
 
 export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'utf8' | 'hex'
 
@@ -113,15 +114,15 @@ export class BinaryWriter {
    * the `Buffer` will have the same size of the string on its encoding method.
    * @returns {void}
    */
-  writeHex(value: string, allocSize?: number): void {
-    if (!isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
+  writeHex(value: HexLikeValues, allocSize?: number): void {
+    if (typeof value === 'string' && !HexVal.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      buf.write(padHexToLength(value, 1, false), 'hex')
+      buf.write(HexVal.processHex(value, { prefix: true }), 'hex')
       this.contents.push(buf)
       return
     }
-    this.contents.push(Buffer.from(padHexToLength(value, 1, false), 'hex'))
+    this.contents.push(Buffer.from(HexVal.processHex(value, { prefix: true }), 'hex'))
     return
   }
 
