@@ -1,4 +1,5 @@
-import { createWriteStream, WriteStream } from 'node:fs'
+import { createWriteStream } from 'node:fs'
+import type { WriteStream } from 'node:fs'
 import type { BufferEncodingOrNull, FilePathLikeTypes } from '../../core.exports'
 import { deleteFile, deleteFileSync, exists, pathLikeToString } from '../../lib.exports'
 

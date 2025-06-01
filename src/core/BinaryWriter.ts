@@ -1,6 +1,6 @@
-import { type HexLikeValues, type BufferEncodingOrNull, FilePath, type FilePathLikeTypes, HexVal } from '../core.exports'
+import { type HexLikeValues, type BufferEncodingOrNull, HexVal, type FilePathLikeTypes } from '../core.exports'
+import type { FilePath } from '../core.exports'
 import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
-// import type { BufferEncodingOrNull, FilePath, FilePathLikeTypes } from './FilePath'
 
 export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'utf8' | 'hex'
 
