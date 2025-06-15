@@ -118,11 +118,11 @@ export class BinaryWriter {
     if (typeof value === 'string' && !HexVal.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      buf.write(HexVal.processHex(value, { prefix: true }), 'hex')
+      buf.write(HexVal.processHex(value, { prefix: false }), 'hex')
       this.contents.push(buf)
       return
     }
-    this.contents.push(Buffer.from(HexVal.processHex(value, { prefix: true }), 'hex'))
+    this.contents.push(Buffer.from(HexVal.processHex(value, { prefix: false }), 'hex'))
     return
   }
 
