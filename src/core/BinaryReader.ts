@@ -17,7 +17,7 @@ export class BinaryReader {
   /**
    * The size of the file/buffer that the class is working upon.
    */
-  size: number
+  readonly length: number
   /**
    * The byte offset that all read methods will use.
    */
@@ -83,11 +83,11 @@ export class BinaryReader {
 
     if (Buffer.isBuffer(handlerOrBuffer)) {
       this.operator = handlerOrBuffer
-      this.size = handlerOrBuffer.length
+      this.length = handlerOrBuffer.length
     } else {
       this.operator = handlerOrBuffer
       if (!this.path) throw new Error('BinaryReader received "FileHandle" object to process, but no file path. This error must not happen!!! Contact if this error ever be thrown at you!!!')
-      this.size = this.path.statSync().size
+      this.length = this.path.statSync().size
     }
     this.offset = 0
   }
@@ -119,7 +119,7 @@ export class BinaryReader {
       this.offset += allocSize
       return buf
     }
-    allocSize = this.size - this.offset
+    allocSize = this.length - this.offset
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
@@ -151,7 +151,7 @@ export class BinaryReader {
       this.offset += allocSize
       return buf.toString('ascii').replace(new RegExp(`\x00`, 'g'), '')
     }
-    allocSize = this.size - this.offset
+    allocSize = this.length - this.offset
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
@@ -183,7 +183,7 @@ export class BinaryReader {
       this.offset += allocSize
       return buf.toString('latin1').replace(new RegExp(`\x00`, 'g'), '')
     }
-    allocSize = this.size - this.offset
+    allocSize = this.length - this.offset
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
@@ -215,7 +215,7 @@ export class BinaryReader {
       this.offset += allocSize
       return buf.toString('utf8').replace(new RegExp(`\x00`, 'g'), '')
     }
-    allocSize = this.size - this.offset
+    allocSize = this.length - this.offset
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
@@ -252,7 +252,7 @@ export class BinaryReader {
       const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
       return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
     }
-    allocSize = this.size - this.offset
+    allocSize = this.length - this.offset
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
@@ -701,7 +701,7 @@ export class BinaryReader {
       this.offset += allocSize
       return buf.toString(enc).replace(new RegExp(`\x00`, 'g'), '')
     }
-    allocSize = this.size - this.offset
+    allocSize = this.length - this.offset
     const buf = Buffer.alloc(allocSize)
     await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
     this.offset = 0
@@ -747,14 +747,5 @@ export class BinaryReader {
    */
   async close(): Promise<void> {
     if (!Buffer.isBuffer(this.operator)) await this.operator.close()
-  }
-
-  /**
-   * Returns the length of the content instantiated by this class.
-   * - - - -
-   * @returns {number}
-   */
-  get length(): number {
-    return this.size
   }
 }
