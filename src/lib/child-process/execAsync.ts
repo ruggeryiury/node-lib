@@ -1,9 +1,26 @@
-import { exec } from 'node:child_process'
-import { promisify } from 'node:util'
+import { exec, type ExecException, type ExecOptions } from 'node:child_process'
+import type { ObjectEncodingOptions } from 'node:fs'
+
+export type ExecAsyncOptions = ExecOptions & ObjectEncodingOptions
+export interface ExecAsyncReturnObject {
+  stderr?: ExecException
+  stdout: string
+}
 
 /**
  * A promisified version of Node.js `child_process.exec`.
+ *
+ * This function returns an object with errors that must be evaluated, and the output (if any).
  * - - - -
- * @see https://nodejs.org/api/child_process.html#child_processexeccommand-options-callback
+ * @param {string} command The command you want to execute.
+ * @param {ExecAsyncOptions} [options] `OPTIONAL`
+ * @returns {Promise<ExecAsyncReturnObject>}
  */
-export const execAsync = promisify(exec)
+export const execAsync = async (command: string, options?: ExecAsyncOptions): Promise<ExecAsyncReturnObject> =>
+  new Promise<{ stderr?: ExecException; stdout: string }>((resolve) => {
+    exec(command, options, (err, stdout) => {
+      if (err) resolve({ stderr: err, stdout: Buffer.isBuffer(stdout) ? stdout.toString() : stdout })
+
+      resolve({ stdout: Buffer.isBuffer(stdout) ? stdout.toString() : stdout })
+    })
+  })
