@@ -1,9 +1,9 @@
-import { exec, type ExecException, type ExecOptions } from 'node:child_process'
+import { exec, type ExecOptions } from 'node:child_process'
 import type { ObjectEncodingOptions } from 'node:fs'
 
 export type ExecAsyncOptions = ExecOptions & ObjectEncodingOptions
 export interface ExecAsyncReturnObject {
-  stderr?: ExecException
+  stderr?: string
   stdout: string
 }
 
@@ -17,9 +17,9 @@ export interface ExecAsyncReturnObject {
  * @returns {Promise<ExecAsyncReturnObject>}
  */
 export const execAsync = async (command: string, options?: ExecAsyncOptions): Promise<ExecAsyncReturnObject> =>
-  new Promise<{ stderr?: ExecException; stdout: string }>((resolve) => {
-    exec(command, options, (err, stdout) => {
-      if (err) resolve({ stderr: err, stdout: Buffer.isBuffer(stdout) ? stdout.toString() : stdout })
+  new Promise<ExecAsyncReturnObject>((resolve) => {
+    exec(command, options, (err, stdout, stderr) => {
+      if (err) resolve({ stderr: Buffer.isBuffer(stderr) ? stderr.toString() : stderr, stdout: Buffer.isBuffer(stdout) ? stdout.toString() : stdout })
 
       resolve({ stdout: Buffer.isBuffer(stdout) ? stdout.toString() : stdout })
     })
