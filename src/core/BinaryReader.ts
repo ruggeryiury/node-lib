@@ -2,6 +2,8 @@ import type { FileHandle } from 'fs/promises'
 import { type DirPath, FilePath, type BinaryWriteEncodings, type FilePathLikeTypes } from '../core.exports'
 import { pathLikeToString } from '../lib.exports'
 
+export type BinaryReaderSeekMethods = 'start' | 'current' | 'end'
+
 /**
  * A class to read binary files.
  */
@@ -731,13 +733,23 @@ export class BinaryReader {
   }
 
   /**
-   * Changes the byte offset used on this class.
+   * Moves the internal class offset to a new position. If the resulting offset exceeds the length,
+   * it wraps around to stay within bounds.
    * - - - -
-   * @param {number} offset The new byte offset.
+   * @param {number} offset The number of bytes to move the offset.
+   * @param {'start' | 'current' | 'end'} [method] `OPTIONAL` The reference point for the offset:
+   *
+   * - `'start'`: offset is set relative to the beginning of the stream.
+   * - `'current'`: offset is set relative to the current position.
+   * - `'end'`: offset is set relative to the end of the stream.
    * @returns {void}
    */
-  seek(offset: number) {
-    this.offset = offset
+  seek(offset: number, method: BinaryReaderSeekMethods = 'start'): void {
+    if (method === 'start') this.offset = offset
+    else if (method === 'current') this.offset = this.offset + offset
+    else this.offset = this.length + offset
+
+    if (this.offset > this.length) this.offset = this.offset - this.length
   }
 
   /**

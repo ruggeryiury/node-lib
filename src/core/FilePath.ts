@@ -1,7 +1,8 @@
 import type { BinaryToTextEncoding } from 'node:crypto'
 import type { Stats, WriteStream } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
-import type { Stream } from 'node:stream'
+import type { PipelineOptions, PipelineSource, Stream } from 'node:stream'
+import { pipeline } from 'node:stream/promises'
 import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, createHashFromFileSync } from '../lib.exports'
 import { DirPath } from './DirPath'
 
@@ -357,8 +358,8 @@ export class FilePath {
    * @returns {Promise<Buffer>} A promise that resolves to the requested buffer segment.
    */
   async readOffset(byteOffset: number, byteLength?: number): Promise<Buffer> {
-    ensurePathIsFile(this.path, 'readJSONSync')
-    ensurePathExistence(this.path, 'readJSONSync', 'file')
+    ensurePathIsFile(this.path, 'readOffset')
+    ensurePathExistence(this.path, 'readOffset', 'file')
     return await readFileOffset(this.path, byteOffset, byteLength)
   }
 
@@ -456,6 +457,19 @@ export class FilePath {
    */
   createWriteStreamSync(encoding?: BufferEncodingOrNull): WriteStream {
     return createFileWriteStreamSync(this.path, encoding)
+  }
+
+  /**
+   * Pipes the given source stream or iterable into an internal writable stream and
+   * returns a promise that resolves when the piping is complete or rejects on error.
+   * - - - -
+   * @template T The type of data emitted by the source.
+   * @param {PipelineSource<T>} source A readable stream, async iterable, or iterator to pipe from.
+   * @param {PipelineOptions} [options] `OPTIONAL` pipeline options such as signal for aborting.
+   * @returns {Promise<void>}
+   */
+  async pipe<T>(source: PipelineSource<T>, options?: PipelineOptions): Promise<void> {
+    await pipeline(source, await this.createWriteStream(), options)
   }
 
   // #region Copy Methods
