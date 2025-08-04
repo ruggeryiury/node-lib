@@ -1,22 +1,27 @@
-import { type HexLikeValues, type BufferEncodingOrNull, HexVal, type FilePathLikeTypes } from '../core.exports'
-import type { FilePath } from '../core.exports'
+import type { WriteStream } from 'node:fs'
+import { HexVal, type BinaryWriteEncodings, type FilePath, type FilePathLikeTypes, type HexLikeValues } from '../core.exports'
 import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
 
-export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'utf8' | 'hex'
+export class StreamWriter {
+  filePath: FilePath
+  stream: WriteStream
+  length: number
+  byteLength: number
 
-/**
- * A class to programatically create binary files.
- */
-export class BinaryWriter {
-  /**
-   * An array with `Buffer` objects that will be the content of the new binary file.
-   */
-  contents: Buffer[]
-  constructor() {
-    this.contents = []
+  constructor(filePath: FilePathLikeTypes) {
+    this.filePath = pathLikeToFilePath(filePath)
+    this.stream = this.filePath.createWriteStreamSync()
+    this.length = 0
+    this.byteLength = 0
   }
 
-  // #region String/Buffer
+  private _isClosed(): boolean {
+    return this.stream.closed
+  }
+
+  private _checkStreamStatus() {
+    if (this._isClosed()) throw new Error('Tried to use a writing method to a StreamWriter class which stream instance is already closed')
+  }
 
   /**
    * Writes raw `Buffer` or 'string' values on the binary file.
@@ -25,9 +30,10 @@ export class BinaryWriter {
    * @param {BinaryWriteEncodings} encoding `OPTIONAL` Used on string values. Default is `'utf8'`.
    * @returns {void}
    */
-  write(value: Buffer | string, encoding: BinaryWriteEncodings = 'utf8'): void {
+  write(value: Buffer | string, encoding: BinaryWriteEncodings = 'utf8') {
+    this._checkStreamStatus()
     if (Buffer.isBuffer(value)) {
-      this.contents.push(value)
+      this.stream.write(value)
       return
     }
     switch (encoding) {
@@ -61,10 +67,10 @@ export class BinaryWriter {
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'ascii')
-      this.contents.push(buf)
+      this.stream.write(buf)
       return
     }
-    this.contents.push(Buffer.from(value, 'ascii'))
+    this.stream.write(Buffer.from(value, 'ascii'))
     return
   }
 
@@ -80,10 +86,10 @@ export class BinaryWriter {
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'latin1')
-      this.contents.push(buf)
+      this.stream.write(buf)
       return
     }
-    this.contents.push(Buffer.from(value, 'latin1'))
+    this.stream.write(Buffer.from(value, 'latin1'))
     return
   }
 
@@ -99,10 +105,10 @@ export class BinaryWriter {
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'utf8')
-      this.contents.push(buf)
+      this.stream.write(buf)
       return
     }
-    this.contents.push(Buffer.from(value, 'utf8'))
+    this.stream.write(Buffer.from(value, 'utf8'))
     return
   }
 
@@ -119,10 +125,10 @@ export class BinaryWriter {
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(HexVal.processHex(value, { prefix: false }), 'hex')
-      this.contents.push(buf)
+      this.stream.write(buf)
       return
     }
-    this.contents.push(Buffer.from(HexVal.processHex(value, { prefix: false }), 'hex'))
+    this.stream.write(Buffer.from(HexVal.processHex(value, { prefix: false }), 'hex'))
     return
   }
 
@@ -134,7 +140,7 @@ export class BinaryWriter {
    */
   writePadding(paddingSize: number, fill = 0): void {
     const buf = Buffer.alloc(paddingSize).fill(fill)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   // #region Integer
@@ -149,7 +155,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeUIntLE(value, 0, 1)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -162,7 +168,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntLE(value, 0, 2)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -175,7 +181,7 @@ export class BinaryWriter {
     if (value < 0 || value > 65535) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntBE(value, 0, 2)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -188,7 +194,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeUIntLE(value, 0, 3)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -201,7 +207,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeUIntBE(value, 0, 3)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -214,7 +220,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntLE(value, 0, 4)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -227,7 +233,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntBE(value, 0, 4)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -240,7 +246,7 @@ export class BinaryWriter {
     if (value < -128 || value > 127) throw new TypeError(`Value must be between -128 and 127, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeIntLE(value, 0, 1)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -253,7 +259,7 @@ export class BinaryWriter {
     if (value < -32768 || value > 32767) throw new TypeError(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntLE(value, 0, 2)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -266,7 +272,7 @@ export class BinaryWriter {
     if (value < -32768 || value > 32767) throw new TypeError(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntBE(value, 0, 2)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -279,7 +285,7 @@ export class BinaryWriter {
     if (value < -8388608 || value > 8388607) throw new TypeError(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeIntLE(value, 0, 3)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -292,7 +298,7 @@ export class BinaryWriter {
     if (value < -8388608 || value > 8388607) throw new TypeError(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeIntBE(value, 0, 3)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -305,7 +311,7 @@ export class BinaryWriter {
     if (value < -2147483648 || value > 2147483647) throw new TypeError(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeIntLE(value, 0, 4)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -318,7 +324,7 @@ export class BinaryWriter {
     if (value < -2147483648 || value > 2147483647) throw new TypeError(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeIntBE(value, 0, 4)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   // #region Float/Double
@@ -332,7 +338,7 @@ export class BinaryWriter {
   writeFloatLE(value: number): void {
     const buf = Buffer.alloc(4)
     buf.writeFloatLE(value, 0)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -344,7 +350,7 @@ export class BinaryWriter {
   writeFloatBE(value: number): void {
     const buf = Buffer.alloc(4)
     buf.writeFloatBE(value, 0)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -356,7 +362,7 @@ export class BinaryWriter {
   writeDoubleLE(value: number): void {
     const buf = Buffer.alloc(8)
     buf.writeDoubleLE(value, 0)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -368,7 +374,7 @@ export class BinaryWriter {
   writeDoubleBE(value: number): void {
     const buf = Buffer.alloc(8)
     buf.writeDoubleBE(value, 0)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   // #region BigInt
@@ -382,7 +388,7 @@ export class BinaryWriter {
   writeUInt64LE(value: bigint): void {
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(value, 0)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -394,7 +400,7 @@ export class BinaryWriter {
   writeUInt64BE(value: bigint): void {
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64BE(value, 0)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -406,7 +412,7 @@ export class BinaryWriter {
   writeInt64LE(value: bigint): void {
     const buf = Buffer.alloc(8)
     buf.writeBigInt64LE(value, 0)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   /**
@@ -418,7 +424,7 @@ export class BinaryWriter {
   writeInt64BE(value: bigint): void {
     const buf = Buffer.alloc(8)
     buf.writeBigInt64BE(value, 0)
-    this.contents.push(buf)
+    this.stream.write(buf)
   }
 
   // #region Typos
@@ -464,66 +470,14 @@ export class BinaryWriter {
     this.writeUInt8(value ? 1 : 0)
   }
 
-  /**
-   * Creates a new `Buffer` object with all contents written on this instance.
-   * - - - -
-   * @returns {Buffer}
-   */
-  toBuffer(): Buffer {
-    return Buffer.concat(this.contents)
-  }
-
-  /**
-   * Asynchronously writes all contents written on this instance to a file, optionally replacing it if it already exists.
-   *
-   * Throws an error if the file exists and replace is set to false.
-   * - - - -
-   * @param {FilePathLikeTypes} path The path where the contents will be written.
-   * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` If `null`, writes as a `Buffer`.
-   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
-   * @returns {Promise<FilePath>} A `Promise` that resolves to a `FilePath` instance of the file path where the contents will be written.
-   */
-  async toFile(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> {
-    const p = pathLikeToFilePath(path)
-    return await p.write(this.toBuffer(), encoding, replace)
-  }
-
-  /**
-   * Synchronously writes all contents written on this instance to a file, optionally replacing it if it already exists.
-   *
-   * Throws an error if the file exists and replace is set to false.
-   * - - - -
-   * @param {FilePathLikeTypes} path The path where the contents will be written.
-   * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` If `null`, writes as a `Buffer`.
-   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
-   * @returns {Promise<FilePath>} A `FilePath` instance of the file path where the contents will be written.
-   */
-  toFileSync(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath {
-    const p = pathLikeToFilePath(path)
-    return p.writeSync(this.toBuffer(), encoding, replace)
-  }
-
-  /**
-   * Returns the length of the new binary file so far.
-   * - - - -
-   * @returns {number}
-   */
-  get length(): number {
-    const bufferLength = this.contents.reduce((prev, curr) => {
-      return prev + curr.length
-    }, 0)
-    return bufferLength
-  }
-
-  /**
-   * Returns the byte length of the new binary file so far.
-   * - - - -
-   * @returns {number}
-   */
-  get byteLength(): number {
-    const bufferLength = this.contents.reduce((prev, curr) => {
-      return prev + curr.byteLength
-    }, 0)
-    return bufferLength
+  close() {
+    if (this._isClosed()) return new Promise<void>((resolve) => resolve())
+    else
+      return new Promise<void>((resolve, reject) => {
+        this.stream.close((err) => {
+          if (err) reject(err)
+          resolve()
+        })
+      })
   }
 }

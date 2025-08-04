@@ -31,6 +31,7 @@ export default tseslint.config({
     '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
     '@typescript-eslint/no-unused-vars': 'warn',
     '@typescript-eslint/no-extraneous-class': 'off',
+    '@typescript-eslint/no-confusing-void-expression': 'off',
     'import/order': [
       'error',
       {

@@ -3,7 +3,7 @@ import type { Stats, WriteStream } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
 import type { PipelineOptions, PipelineSource, Stream } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
-import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, createHashFromFileSync } from '../lib.exports'
+import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms } from '../lib.exports'
 import { DirPath } from './DirPath'
 
 export interface FilePathJSONRepresentation {
@@ -135,17 +135,6 @@ export class FilePath {
    */
   async generateHash(algorithm: AllHashAlgorithms = 'sha256', digest: BinaryToTextEncoding = 'hex'): Promise<string> {
     return await createHashFromFile(this.path, algorithm, digest)
-  }
-
-  /**
-   * Synchronously computes a cryptographic hash from the contents of the file.
-   * - - - -
-   * @param {AllHashAlgorithms} [algorithm] The hash algorithm to use. Default is `'sha256'`.
-   * @param {BinaryToTextEncoding} [digest] The output encoding for the hash. Default is `'hex'`.
-   * @returns {Promise<string>} A promise that resolves to the resulting hash string.
-   */
-  generateHashSync(algorithm: AllHashAlgorithms = 'sha256', digest: BinaryToTextEncoding = 'hex'): string {
-    return createHashFromFileSync(this.path, algorithm, digest)
   }
 
   /**
