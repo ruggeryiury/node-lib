@@ -1,6 +1,6 @@
 {
   "name": "node-lib",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "description": "Useful and straightforward abstractions for many NodeJS internal methods.",
   "homepage": "https://github.com/ruggeryiury/node-lib#readme",
