@@ -1,5 +1,5 @@
 import { type HexLikeValues, type BufferEncodingOrNull, HexVal, type FilePathLikeTypes } from '../core.exports'
-import type { FilePath } from '../core.exports'
+import type { BitsBooleanArray, BitsArray, FilePath } from '../core.exports'
 import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
 
 export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'utf8' | 'hex'
@@ -421,7 +421,42 @@ export class BinaryWriter {
     this.contents.push(buf)
   }
 
-  // #region Typos
+  // #region Bits
+
+  /**
+   * Writes an 8-bit unsigned integer from an array of 8 bit values (0 or 1).
+   * - - - -
+   * @param {BitsArray} bitsArray Array of exactly 8 numbers (each 0 or 1), ordered from MSB to LSB.
+   */
+  writeUInt8FromBitsArray(bitsArray: BitsArray) {
+    let value = 0
+    for (let i = 0; i < 8; i++) {
+      value = (value << 1) | bitsArray[i]
+    }
+    this.writeUInt8(value)
+  }
+
+  /**
+   * Writes an 8-bit unsigned integer from an array of 8 boolean values.
+   * - - - -
+   * @param {BitsBooleanArray} booleanArray Array of exactly 8 boolean values, ordered from MSB to LSB.
+   */
+  writeUInt8FromBitsBooleanArray(booleanArray: BitsBooleanArray) {
+    const numArray = booleanArray.map((val) => (val ? 1 : 0)) as BitsArray
+    this.writeUInt8FromBitsArray(numArray)
+  }
+
+  /**
+   * Writes an 8-bit unsigned integer from a bit string.
+   * - - - -
+   * @param {string} bitString A string of exactly 8 characters, each either `'0'` or `'1'`.
+   */
+  writeUInt8FromBitString(bitString: string) {
+    if (!/^[01]{8}$/.test(bitString)) throw new RangeError("bitString must be exactly 8 characters of '0' or '1'")
+    this.writeUInt8(parseInt(bitString, 2))
+  }
+
+  // #region Others
 
   /**
    * _Alias to `write` with pre-defined utf-8 encoding value._
@@ -454,9 +489,7 @@ export class BinaryWriter {
   }
 
   /**
-   * _Alias to `writeUInt8`._
-   *
-   * Write boolean values as an 8-bit unsigned integer, from 0 (meaning false) to 1 (meaning true).
+   * Writes boolean values as an 8-bit unsigned integer, from 0 (meaning false) to 1 (meaning true).
    * - - - -
    * @param {boolean} value The boolean value to evaluate.
    */

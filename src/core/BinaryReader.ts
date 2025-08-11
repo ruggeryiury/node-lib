@@ -3,6 +3,8 @@ import { type DirPath, FilePath, type BinaryWriteEncodings, type FilePathLikeTyp
 import { pathLikeToString } from '../lib.exports'
 
 export type BinaryReaderSeekMethods = 'start' | 'current' | 'end'
+export type BitsArray = [0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1]
+export type BitsBooleanArray = [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean]
 
 /**
  * A class to read binary files.
@@ -97,7 +99,7 @@ export class BinaryReader {
   // #region String/Buffer
 
   /**
-   * Asynchronously reads the binary file and returns its contents as `Buffer`.
+   * Reads the binary file and returns its contents as `Buffer`.
    * - - - -
    * @param {number | undefined} [allocSize] `OPTIONAL` The allocation size of the desired bytes. If `undefined`, the reader will
    * return all bytes from the file, starting by the class `offset` value.
@@ -129,7 +131,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads the binary file and returns ASCII-decoded contents as `string`.
+   * Reads the binary file and returns ASCII-decoded contents as `string`.
    * - - - -
    * @param {number | undefined} [allocSize] `OPTIONAL` The allocation size of the desired bytes. If `undefined`, the reader will
    * return all bytes from the file, starting by the class `offset` value.
@@ -161,7 +163,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads the binary file and returns Latin1-decoded contents as `string`.
+   * Reads the binary file and returns Latin1-decoded contents as `string`.
    * - - - -
    * @param {number | undefined} [allocSize] `OPTIONAL` The allocation size of the desired bytes. If `undefined`, the reader will
    * return all bytes from the file, starting by the class `offset` value.
@@ -193,7 +195,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads the binary file and returns UTF8-decoded contents as `string`.
+   * Reads the binary file and returns UTF8-decoded contents as `string`.
    * - - - -
    * @param {number | undefined} [allocSize] `OPTIONAL` The allocation size of the desired bytes. If `undefined`, the reader will
    * return all bytes from the file, starting by the class `offset` value.
@@ -225,7 +227,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads the binary file and returns HEX-decoded contents as `string`.
+   * Reads the binary file and returns HEX-decoded contents as `string`.
    * - - - -
    * @param {number | undefined} [allocSize] `OPTIONAL` The allocation size of the desired bytes. If `undefined`, the reader will
    * return all bytes from the file, starting by the class `offset` value.
@@ -275,7 +277,7 @@ export class BinaryReader {
   // #region Integer
 
   /**
-   * Asynchronously reads an unsigned 8-bit integer.
+   * Reads an unsigned 8-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -293,7 +295,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, little-endian 16-bit integer.
+   * Reads an unsigned, little-endian 16-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -311,7 +313,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, big-endian 16-bit integer.
+   * Reads an unsigned, big-endian 16-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -329,7 +331,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, little-endian 24-bit integer.
+   * Reads an unsigned, little-endian 24-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -347,7 +349,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, big-endian 24-bit integer.
+   * Reads an unsigned, big-endian 24-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -365,7 +367,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, little-endian 32-bit integer.
+   * Reads an unsigned, little-endian 32-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -383,7 +385,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, big-endian 32-bit integer.
+   * Reads an unsigned, big-endian 32-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -401,7 +403,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a signed 8-bit integer.
+   * Reads a signed 8-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -419,7 +421,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a signed, little-endian 16-bit integer.
+   * Reads a signed, little-endian 16-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -437,7 +439,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a signed, big-endian 16-bit integer.
+   * Reads a signed, big-endian 16-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -455,7 +457,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a signed, little-endian 24-bit integer.
+   * Reads a signed, little-endian 24-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -473,7 +475,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a signed, big-endian 24-bit integer.
+   * Reads a signed, big-endian 24-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -491,7 +493,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a signed, little-endian 32-bit integer.
+   * Reads a signed, little-endian 32-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -509,7 +511,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a signed, big-endian 32-bit integer.
+   * Reads a signed, big-endian 32-bit integer.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -529,7 +531,7 @@ export class BinaryReader {
   // #region Float/Double
 
   /**
-   * Asynchronously reads a float number value (32-bit) in little-endian byte order.
+   * Reads a float number value (32-bit) in little-endian byte order.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -547,7 +549,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a float number value (32-bit) in big-endian byte order.
+   * Reads a float number value (32-bit) in big-endian byte order.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -565,7 +567,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a double float number value (64-bit) in little-endian byte order.
+   * Reads a double float number value (64-bit) in little-endian byte order.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -583,7 +585,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads a double float number value (64-bit) in big-endian byte order.
+   * Reads a double float number value (64-bit) in big-endian byte order.
    * - - - -
    * @returns {Promise<number>}
    */
@@ -601,7 +603,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, little-endian 64-bit integer.
+   * Reads an unsigned, little-endian 64-bit integer.
    * - - - -
    * @returns {Promise<bigint>}
    */
@@ -619,7 +621,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, big-endian 64-bit integer.
+   * Reads an unsigned, big-endian 64-bit integer.
    * - - - -
    * @returns {Promise<bigint>}
    */
@@ -637,7 +639,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, big-endian 64-bit integer.
+   * Reads an unsigned, big-endian 64-bit integer.
    * - - - -
    * @returns {Promise<bigint>}
    */
@@ -655,7 +657,7 @@ export class BinaryReader {
   }
 
   /**
-   * Asynchronously reads an unsigned, big-endian 64-bit integer.
+   * Reads an unsigned, big-endian 64-bit integer.
    * - - - -
    * @returns {Promise<bigint>}
    */
@@ -672,12 +674,74 @@ export class BinaryReader {
     return buf.readBigInt64BE()
   }
 
-  // #region Typos
+  // #region Byte
+
+  /**
+   * Reads an 8-bit value and returns its individual bits as an array of 0s and 1s.
+   * - - - -
+   * @returns {Promise<BitsArray>}
+   */
+  async readByteAsBitArray(): Promise<BitsArray> {
+    this.checkExistence()
+    const bits: number[] = []
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 1)
+      this.offset++
+      for (let i = 7; i >= 0; i--) {
+        bits.push((buffer[0] >> i) & 1)
+      }
+      return bits as BitsArray
+    }
+    const buf = Buffer.alloc(1)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 1 })
+    this.offset++
+    for (let i = 7; i >= 0; i--) {
+      bits.push((buf[0] >> i) & 1)
+    }
+    return bits as BitsArray
+  }
+
+  /**
+   * Reads an 8-bit value and returns its individual bits as an array of boolean values.
+   * - - - -
+   * @returns {Promise<BitsBooleanArray>}
+   */
+  async readByteAsBooleanArray(): Promise<BitsBooleanArray> {
+    this.checkExistence()
+    const bits: boolean[] = []
+    if (Buffer.isBuffer(this.operator)) {
+      const buffer = this.operator.subarray(this.offset, this.offset + 1)
+      this.offset++
+      for (let i = 7; i >= 0; i--) {
+        bits.push(((buffer[0] >> i) & 1) === 0 ? false : true)
+      }
+      return bits as BitsBooleanArray
+    }
+    const buf = Buffer.alloc(1)
+    await this.operator.read({ buffer: buf, position: this.offset, length: 1 })
+    this.offset++
+    for (let i = 7; i >= 0; i--) {
+      bits.push(((buf[0] >> i) & 1) === 0 ? false : true)
+    }
+    return bits as BitsBooleanArray
+  }
+
+  /**
+   * Reads a byte and returns its bits as a string.
+   * - - - -
+   * @returns {Promise<string>}
+   */
+  async readBitString(): Promise<string> {
+    const bits = await this.readByteAsBitArray()
+    return bits.join('')
+  }
+
+  // #region Others
 
   /**
    * _Alias to `read` with pre-defined utf-8 encoding value._
    *
-   * Asynchronously reads the binary file and returns decoded contents as `string` based on the provided encoding.
+   * Reads the binary file and returns decoded contents as `string` based on the provided encoding.
    * - - - -
    * @param {number | undefined} [allocSize] `OPTIONAL` The allocation size of the desired bytes. If `undefined`, the reader will
    * return all bytes from the file, starting by the class `offset` value.
@@ -711,9 +775,7 @@ export class BinaryReader {
   }
 
   /**
-   * _Alias to `readUInt8`._
-   *
-   * Asynchronously reads an unsigned 8-bit value, evaluated as `boolean`.
+   * Reads an 8-bit value, evaluated as `boolean`.
    * - - - -
    * @returns {Promise<boolean>}
    */

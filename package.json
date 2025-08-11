@@ -1,6 +1,6 @@
 {
   "name": "node-lib",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "private": true,
   "description": "Useful and straightforward abstractions for many NodeJS internal methods.",
   "homepage": "https://github.com/ruggeryiury/node-lib#readme",
@@ -47,6 +47,9 @@
       "import": "./dist/lib.exports.js",
       "require": "./dist/lib.exports.cjs"
     }
+  },
+  "dependencies": {
+    "iconv-lite": "^0.6.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
