@@ -15,12 +15,12 @@ export class StreamWriter {
     this.byteLength = 0
   }
 
-  private _isClosed(): boolean {
+  private get isClosed(): boolean {
     return this.stream.closed
   }
 
   private _checkStreamStatus() {
-    if (this._isClosed()) throw new Error('Tried to use a writing method to a StreamWriter class which stream instance is already closed')
+    if (this.isClosed) throw new Error('Tried to use a writing method to a StreamWriter class which stream instance is already closed')
   }
 
   /**
@@ -505,8 +505,13 @@ export class StreamWriter {
     this.writeUInt8(value ? 1 : 0)
   }
 
-  close() {
-    if (this._isClosed()) return new Promise<void>((resolve) => resolve())
+  /**
+   * Closes the writing stream instantiated by this class.
+   * - - - -
+   * @returns {Promise<void>}
+   */
+  close(): Promise<void> {
+    if (this.isClosed) return new Promise<void>((resolve) => resolve())
     else
       return new Promise<void>((resolve, reject) => {
         this.stream.close((err) => {

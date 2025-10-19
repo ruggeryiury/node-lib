@@ -1,18 +1,18 @@
 import { promisify } from 'util'
-import { brotliCompress, brotliDecompress } from 'zlib'
+import { brotliCompress, brotliDecompress, type BrotliOptions, type InputType } from 'zlib'
 
 /**
  * A promisified version of Node.js `zlib.brotliCompress`.
  * - - - -
  * @see https://nodejs.org/api/zlib.html#zlibbrotlicompressbuffer-options-callback
  */
-export const brotliCompressAsync = promisify(brotliCompress)
+export const brotliCompressAsync = async (buffer: InputType, options?: BrotliOptions): Promise<Buffer> => await promisify(brotliCompress)(buffer, options)
 /**
  * A promisified version of Node.js `zlib.brotliCompress`.
  * - - - -
  * @see https://nodejs.org/api/zlib.html#zlibbrotlidecompressbuffer-options-callback
  */
-export const brotliDecompressAsync = promisify(brotliDecompress)
+export const brotliDecompressAsync = async (buffer: InputType, options?: BrotliOptions): Promise<Buffer> => await promisify(brotliDecompress)(buffer, options)
 
 /**
  * Decompress Brotli-compressed data.

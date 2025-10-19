@@ -428,7 +428,7 @@ export class BinaryWriter {
    * - - - -
    * @param {BitsArray} bitsArray Array of exactly 8 numbers (each 0 or 1), ordered from MSB to LSB.
    */
-  writeUInt8FromBitsArray(bitsArray: BitsArray) {
+  writeUInt8FromBitsArray(bitsArray: BitsArray): void {
     let value = 0
     for (let i = 0; i < 8; i++) {
       value = (value << 1) | bitsArray[i]
@@ -441,7 +441,7 @@ export class BinaryWriter {
    * - - - -
    * @param {BitsBooleanArray} booleanArray Array of exactly 8 boolean values, ordered from MSB to LSB.
    */
-  writeUInt8FromBitsBooleanArray(booleanArray: BitsBooleanArray) {
+  writeUInt8FromBitsBooleanArray(booleanArray: BitsBooleanArray): void {
     const numArray = booleanArray.map((val) => (val ? 1 : 0)) as BitsArray
     this.writeUInt8FromBitsArray(numArray)
   }
@@ -451,7 +451,7 @@ export class BinaryWriter {
    * - - - -
    * @param {string} bitString A string of exactly 8 characters, each either `'0'` or `'1'`.
    */
-  writeUInt8FromBitString(bitString: string) {
+  writeUInt8FromBitString(bitString: string): void {
     if (!/^[01]{8}$/.test(bitString)) throw new RangeError("bitString must be exactly 8 characters of '0' or '1'")
     this.writeUInt8(parseInt(bitString, 2))
   }

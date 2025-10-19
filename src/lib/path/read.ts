@@ -120,7 +120,7 @@ export const readJSONSync = (path: FilePathLikeTypes, encoding?: BufferEncodingT
  * @param {number} [byteLength] `OPTIONAL` The number of bytes to read. If not provided, reads to the end of the file.
  * @returns {Promise<Buffer>} A promise that resolves to the requested buffer segment.
  */
-export const readFileOffset = async (path: FilePathLikeTypes, byteOffset: number, byteLength?: number) => {
+export const readFileOffset = async (path: FilePathLikeTypes, byteOffset: number, byteLength?: number): Promise<Buffer> => {
   const p = pathLikeToString(path)
   let buffer: Buffer
   if (byteLength !== undefined) {

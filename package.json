@@ -6,7 +6,7 @@
   "homepage": "https://github.com/ruggeryiury/node-lib#readme",
   "repository": "github:ruggeryiury/node-lib",
   "type": "module",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Ruggery Iury Corrêa <ruggeryiury@gmail.com>",
@@ -29,8 +29,11 @@
     "typescript",
     "typescript-library"
   ],
+  "engines": {
+    "node": ">=22.17.0"
+  },
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "clear": "rimraf dist",
     "dev": "tsx watch ./dev/main.ts",
     "format": "prettier --write src",
@@ -38,34 +41,24 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./lib": {
-      "types": "./dist/lib.exports.d.ts",
-      "import": "./dist/lib.exports.js",
-      "require": "./dist/lib.exports.cjs"
+      "types": "./dist/index.d.ts"
     }
   },
   "dependencies": {
     "iconv-lite": "^0.6.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.26.0",
-    "@types/node": "^22.15.3",
-    "esbuild-fix-imports-plugin": "^1.0.20",
-    "eslint": "^9.26.0",
-    "eslint-import-resolver-typescript": "^4.3.4",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jsdoc": "^50.6.11",
-    "eslint-plugin-n": "^17.17.0",
-    "globals": "^16.0.0",
-    "prettier": "^3.5.3",
-    "tsup": "^8.4.0",
-    "tsx": "^4.19.4",
-    "type-fest": "^4.40.1",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.31.1"
+    "@eslint/js": "^9.37.0",
+    "@types/node": "^24.8.1",
+    "eslint": "^9.37.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "tsdown": "^0.15.8",
+    "tsx": "^4.20.6",
+    "type-fest": "^5.1.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.1"
   }
 }
