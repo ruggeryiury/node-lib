@@ -4,7 +4,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "ESNext",
-    "module": "esnext",
+    "module": "ESNext",
     "resolveJsonModule": true,
     "noImplicitOverride": true,
     "moduleResolution": "bundler",
