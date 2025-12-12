@@ -6,14 +6,38 @@ export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'u
 
 /**
  * A class to programatically create binary files.
+ *
+ * _NOTE: This class holds all the written information into memory, so it must be better
+ * to use [StreamWriter](./StreamWriter.ts) while handling with big files writing._
  */
 export class BinaryWriter {
   /**
    * An array with `Buffer` objects that will be the content of the new binary file.
    */
-  contents: Buffer[]
+  private _contents: Buffer[]
+
   constructor() {
-    this.contents = []
+    this._contents = []
+  }
+
+  [Symbol.dispose](): void {
+    this._contents = []
+  }
+
+  /**
+   * Clears the contents that were stored to be written by the class.
+   */
+  clearContents(): void {
+    this._contents = []
+  }
+
+  /**
+   * Returns the length of the new binary file so far.
+   */
+  get length(): number {
+    return this._contents.reduce((prev, curr) => {
+      return prev + curr.length
+    }, 0)
   }
 
   // #region String/Buffer
@@ -27,7 +51,7 @@ export class BinaryWriter {
    */
   write(value: Buffer | string, encoding: BinaryWriteEncodings = 'utf8'): void {
     if (Buffer.isBuffer(value)) {
-      this.contents.push(value)
+      this._contents.push(value)
       return
     }
     switch (encoding) {
@@ -61,11 +85,10 @@ export class BinaryWriter {
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'ascii')
-      this.contents.push(buf)
+      this._contents.push(buf)
       return
     }
-    this.contents.push(Buffer.from(value, 'ascii'))
-    return
+    this._contents.push(Buffer.from(value, 'ascii'))
   }
 
   /**
@@ -80,11 +103,10 @@ export class BinaryWriter {
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'latin1')
-      this.contents.push(buf)
+      this._contents.push(buf)
       return
     }
-    this.contents.push(Buffer.from(value, 'latin1'))
-    return
+    this._contents.push(Buffer.from(value, 'latin1'))
   }
 
   /**
@@ -99,11 +121,10 @@ export class BinaryWriter {
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'utf8')
-      this.contents.push(buf)
+      this._contents.push(buf)
       return
     }
-    this.contents.push(Buffer.from(value, 'utf8'))
-    return
+    this._contents.push(Buffer.from(value, 'utf8'))
   }
 
   /**
@@ -119,11 +140,10 @@ export class BinaryWriter {
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(HexVal.processHex(value, { prefix: false }), 'hex')
-      this.contents.push(buf)
+      this._contents.push(buf)
       return
     }
-    this.contents.push(Buffer.from(HexVal.processHex(value, { prefix: false }), 'hex'))
-    return
+    this._contents.push(Buffer.from(HexVal.processHex(value, { prefix: false }), 'hex'))
   }
 
   /**
@@ -134,7 +154,7 @@ export class BinaryWriter {
    */
   writePadding(paddingSize: number, fill = 0): void {
     const buf = Buffer.alloc(paddingSize).fill(fill)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   // #region Integer
@@ -149,7 +169,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeUIntLE(value, 0, 1)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -162,7 +182,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntLE(value, 0, 2)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -175,7 +195,7 @@ export class BinaryWriter {
     if (value < 0 || value > 65535) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntBE(value, 0, 2)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -188,7 +208,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeUIntLE(value, 0, 3)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -201,7 +221,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeUIntBE(value, 0, 3)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -214,7 +234,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntLE(value, 0, 4)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -227,7 +247,7 @@ export class BinaryWriter {
     if (value < 0 || value > 0xffffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntBE(value, 0, 4)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -240,7 +260,7 @@ export class BinaryWriter {
     if (value < -128 || value > 127) throw new TypeError(`Value must be between -128 and 127, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeIntLE(value, 0, 1)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -253,7 +273,7 @@ export class BinaryWriter {
     if (value < -32768 || value > 32767) throw new TypeError(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntLE(value, 0, 2)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -266,7 +286,7 @@ export class BinaryWriter {
     if (value < -32768 || value > 32767) throw new TypeError(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntBE(value, 0, 2)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -279,7 +299,7 @@ export class BinaryWriter {
     if (value < -8388608 || value > 8388607) throw new TypeError(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeIntLE(value, 0, 3)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -292,7 +312,7 @@ export class BinaryWriter {
     if (value < -8388608 || value > 8388607) throw new TypeError(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeIntBE(value, 0, 3)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -305,7 +325,7 @@ export class BinaryWriter {
     if (value < -2147483648 || value > 2147483647) throw new TypeError(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeIntLE(value, 0, 4)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -318,7 +338,7 @@ export class BinaryWriter {
     if (value < -2147483648 || value > 2147483647) throw new TypeError(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeIntBE(value, 0, 4)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   // #region Float/Double
@@ -332,7 +352,7 @@ export class BinaryWriter {
   writeFloatLE(value: number): void {
     const buf = Buffer.alloc(4)
     buf.writeFloatLE(value, 0)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -344,7 +364,7 @@ export class BinaryWriter {
   writeFloatBE(value: number): void {
     const buf = Buffer.alloc(4)
     buf.writeFloatBE(value, 0)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -356,7 +376,7 @@ export class BinaryWriter {
   writeDoubleLE(value: number): void {
     const buf = Buffer.alloc(8)
     buf.writeDoubleLE(value, 0)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -368,7 +388,7 @@ export class BinaryWriter {
   writeDoubleBE(value: number): void {
     const buf = Buffer.alloc(8)
     buf.writeDoubleBE(value, 0)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   // #region BigInt
@@ -382,7 +402,7 @@ export class BinaryWriter {
   writeUInt64LE(value: bigint): void {
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(value, 0)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -394,7 +414,7 @@ export class BinaryWriter {
   writeUInt64BE(value: bigint): void {
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64BE(value, 0)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -406,7 +426,7 @@ export class BinaryWriter {
   writeInt64LE(value: bigint): void {
     const buf = Buffer.alloc(8)
     buf.writeBigInt64LE(value, 0)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   /**
@@ -418,7 +438,7 @@ export class BinaryWriter {
   writeInt64BE(value: bigint): void {
     const buf = Buffer.alloc(8)
     buf.writeBigInt64BE(value, 0)
-    this.contents.push(buf)
+    this._contents.push(buf)
   }
 
   // #region Bits
@@ -503,7 +523,7 @@ export class BinaryWriter {
    * @returns {Buffer}
    */
   toBuffer(): Buffer {
-    return Buffer.concat(this.contents)
+    return Buffer.concat(this._contents)
   }
 
   /**
@@ -534,29 +554,5 @@ export class BinaryWriter {
   toFileSync(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath {
     const p = pathLikeToFilePath(path)
     return p.writeSync(this.toBuffer(), encoding, replace)
-  }
-
-  /**
-   * Returns the length of the new binary file so far.
-   * - - - -
-   * @returns {number}
-   */
-  get length(): number {
-    const bufferLength = this.contents.reduce((prev, curr) => {
-      return prev + curr.length
-    }, 0)
-    return bufferLength
-  }
-
-  /**
-   * Returns the byte length of the new binary file so far.
-   * - - - -
-   * @returns {number}
-   */
-  get byteLength(): number {
-    const bufferLength = this.contents.reduce((prev, curr) => {
-      return prev + curr.byteLength
-    }, 0)
-    return bufferLength
   }
 }

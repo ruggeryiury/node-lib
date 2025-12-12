@@ -3,14 +3,20 @@ import type { ObjectEncodingOptions } from 'node:fs'
 
 export type ExecAsyncOptions = ExecOptions & ObjectEncodingOptions
 export interface ExecAsyncReturnObject {
+  /**
+   * The error output of the process.
+   */
   stderr?: string
+  /**
+   * The standard output of the process.
+   */
   stdout: string
 }
 
 /**
  * A promisified version of Node.js `child_process.exec`.
  *
- * This function returns an object with errors that must be evaluated, and the output (if any).
+ * This function can return an variable with errors that must be evaluated, and the output (if any).
  * - - - -
  * @param {string} command The command you want to execute.
  * @param {ExecAsyncOptions} [options] `OPTIONAL`

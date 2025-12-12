@@ -13,26 +13,30 @@ export class BinaryReader {
   /**
    * The path of the binary file that will be read. This is `undefined` when you initialize this class instance using the static `fromBuffer()` method.
    */
-  path: FilePath | null
+  readonly path: FilePath | null
   /**
    * Populated by either a `FileHandle` or `Buffer`, this is the main operator to read data.
    */
-  operator: FileHandle | Buffer
+  private _operator: FileHandle | Buffer
   /**
    * The size of the file/buffer that the class is working upon.
    */
-  readonly length: number
+  private _length: number
+  /**
+   * The size of the file/buffer that the class is working upon.
+   */
+  get length(): number {
+    return this._length
+  }
   /**
    * The byte offset that all read methods will use.
    */
-  private offset: number
+  private _offset: number
   /**
-   * Returns the byte offset used on this class.
-   * - - - -
-   * @returns {number}
+   * The byte offset that all read methods will use.
    */
-  get getOffset(): number {
-    return this.offset
+  get offset(): number {
+    return this._offset
   }
 
   /**
@@ -64,8 +68,8 @@ export class BinaryReader {
    * - - - -
    * @returns {boolean}
    */
-  private checkExistence(): boolean {
-    if (this.path && !Buffer.isBuffer(this.operator)) {
+  private _checkExistence(): boolean {
+    if (this.path && !Buffer.isBuffer(this._operator)) {
       const fileExists = this.path.exists
       if (!fileExists) throw new Error(`File "${this.path.path}" does not exists`)
       return true
@@ -86,14 +90,28 @@ export class BinaryReader {
     else this.path = path
 
     if (Buffer.isBuffer(handlerOrBuffer)) {
-      this.operator = handlerOrBuffer
-      this.length = handlerOrBuffer.length
+      this._operator = handlerOrBuffer
+      this._length = handlerOrBuffer.length
     } else {
-      this.operator = handlerOrBuffer
+      this._operator = handlerOrBuffer
       if (!this.path) throw new Error('BinaryReader received "FileHandle" object to process, but no file path. This error must not happen!!! Contact if this error ever be thrown at you!!!')
-      this.length = this.path.statSync().size
+      this._length = this.path.statSync().size
     }
-    this.offset = 0
+    this._offset = 0
+  }
+
+  /**
+   * Closes the `FileHandle` object instantiated by the class.
+   * - - - -
+   * @returns {Promise<void>}
+   */
+  async close(): Promise<void> {
+    if (!Buffer.isBuffer(this._operator)) await this._operator.close()
+    else this._operator = Buffer.alloc(0)
+  }
+
+  async [Symbol.asyncDispose](): Promise<void> {
+    await this.close()
   }
 
   // #region String/Buffer
@@ -106,27 +124,27 @@ export class BinaryReader {
    * @returns {Promise<Buffer>}
    */
   async read(allocSize?: number): Promise<Buffer> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
-        const buf = this.operator.subarray(this.offset, this.offset + allocSize)
-        this.offset += allocSize
+        const buf = this._operator.subarray(this._offset, this._offset + allocSize)
+        this._offset += allocSize
         return buf
       }
-      const buffer = this.operator.subarray(this.offset)
-      this.offset = 0
+      const buffer = this._operator.subarray(this._offset)
+      this._offset = 0
       return buffer
     }
     if (allocSize !== undefined) {
       const buf = Buffer.alloc(allocSize)
-      await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-      this.offset += allocSize
+      await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+      this._offset += allocSize
       return buf
     }
-    allocSize = this.length - this.offset
+    allocSize = this._length - this._offset
     const buf = Buffer.alloc(allocSize)
-    await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-    this.offset = 0
+    await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+    this._offset = 0
     return buf
   }
 
@@ -138,27 +156,27 @@ export class BinaryReader {
    * @returns {Promise<string>}
    */
   async readASCII(allocSize?: number): Promise<string> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
-        const buf = this.operator.subarray(this.offset, this.offset + allocSize)
-        this.offset += allocSize
+        const buf = this._operator.subarray(this._offset, this._offset + allocSize)
+        this._offset += allocSize
         return buf.toString('ascii').replace(new RegExp(`\x00`, 'g'), '')
       }
-      const buffer = this.operator.subarray(this.offset)
-      this.offset = 0
+      const buffer = this._operator.subarray(this._offset)
+      this._offset = 0
       return buffer.toString('ascii').replace(new RegExp(`\x00`, 'g'), '')
     }
     if (allocSize !== undefined) {
       const buf = Buffer.alloc(allocSize)
-      await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-      this.offset += allocSize
+      await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+      this._offset += allocSize
       return buf.toString('ascii').replace(new RegExp(`\x00`, 'g'), '')
     }
-    allocSize = this.length - this.offset
+    allocSize = this._length - this._offset
     const buf = Buffer.alloc(allocSize)
-    await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-    this.offset = 0
+    await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+    this._offset = 0
     return buf.toString('ascii').replace(new RegExp(`\x00`, 'g'), '')
   }
 
@@ -170,27 +188,27 @@ export class BinaryReader {
    * @returns {Promise<string>}
    */
   async readLatin1(allocSize?: number): Promise<string> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
-        const buf = this.operator.subarray(this.offset, this.offset + allocSize)
-        this.offset += allocSize
+        const buf = this._operator.subarray(this._offset, this._offset + allocSize)
+        this._offset += allocSize
         return buf.toString('latin1').replace(new RegExp(`\x00`, 'g'), '')
       }
-      const buffer = this.operator.subarray(this.offset)
-      this.offset = 0
+      const buffer = this._operator.subarray(this._offset)
+      this._offset = 0
       return buffer.toString('latin1').replace(new RegExp(`\x00`, 'g'), '')
     }
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-      this.offset += allocSize
+      await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+      this._offset += allocSize
       return buf.toString('latin1').replace(new RegExp(`\x00`, 'g'), '')
     }
-    allocSize = this.length - this.offset
+    allocSize = this._length - this._offset
     const buf = Buffer.alloc(allocSize)
-    await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-    this.offset = 0
+    await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+    this._offset = 0
     return buf.toString('latin1').replace(new RegExp(`\x00`, 'g'), '')
   }
 
@@ -202,27 +220,27 @@ export class BinaryReader {
    * @returns {Promise<string>}
    */
   async readUTF8(allocSize?: number): Promise<string> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
-        const buf = this.operator.subarray(this.offset, this.offset + allocSize)
-        this.offset += allocSize
+        const buf = this._operator.subarray(this._offset, this._offset + allocSize)
+        this._offset += allocSize
         return buf.toString('utf8').replace(new RegExp(`\x00`, 'g'), '')
       }
-      const buffer = this.operator.subarray(this.offset)
-      this.offset = 0
+      const buffer = this._operator.subarray(this._offset)
+      this._offset = 0
       return buffer.toString('utf8').replace(new RegExp(`\x00`, 'g'), '')
     }
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-      this.offset += allocSize
+      await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+      this._offset += allocSize
       return buf.toString('utf8').replace(new RegExp(`\x00`, 'g'), '')
     }
-    allocSize = this.length - this.offset
+    allocSize = this._length - this._offset
     const buf = Buffer.alloc(allocSize)
-    await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-    this.offset = 0
+    await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+    this._offset = 0
     return buf.toString('utf8').replace(new RegExp(`\x00`, 'g'), '')
   }
 
@@ -236,30 +254,30 @@ export class BinaryReader {
    * @returns {Promise<string>}
    */
   async readHex(allocSize?: number, prefix = true, uppercased = false): Promise<string> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
-        const buf = this.operator.subarray(this.offset, this.offset + allocSize)
-        this.offset += allocSize
+        const buf = this._operator.subarray(this._offset, this._offset + allocSize)
+        this._offset += allocSize
         const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
         return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
       }
-      const buf = this.operator.subarray(this.offset)
-      this.offset = 0
+      const buf = this._operator.subarray(this._offset)
+      this._offset = 0
       const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
       return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
     }
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-      this.offset += allocSize
+      await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+      this._offset += allocSize
       const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
       return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
     }
-    allocSize = this.length - this.offset
+    allocSize = this._length - this._offset
     const buf = Buffer.alloc(allocSize)
-    await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-    this.offset = 0
+    await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+    this._offset = 0
     const value = buf.toString('hex').replace(new RegExp(`\x00`, 'g'), '')
     return uppercased ? `${prefix ? '0x' : ''}${value.toUpperCase()}` : `${prefix ? '0x' : ''}${value}`
   }
@@ -271,7 +289,7 @@ export class BinaryReader {
    * @returns {void}
    */
   padding(allocSize = 1): void {
-    this.offset += allocSize
+    this._offset += allocSize
   }
 
   // #region Integer
@@ -282,15 +300,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readUInt8(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 1)
-      this.offset++
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 1)
+      this._offset++
       return buffer.readUInt8()
     }
     const buf = Buffer.alloc(1)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 1 })
-    this.offset++
+    await this._operator.read({ buffer: buf, position: this._offset, length: 1 })
+    this._offset++
     return buf.readUInt8()
   }
 
@@ -300,15 +318,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readUInt16LE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 2)
-      this.offset += 2
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 2)
+      this._offset += 2
       return buffer.readUInt16LE()
     }
     const buf = Buffer.alloc(2)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 2 })
-    this.offset += 2
+    await this._operator.read({ buffer: buf, position: this._offset, length: 2 })
+    this._offset += 2
     return buf.readUInt16LE()
   }
 
@@ -318,15 +336,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readUInt16BE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 2)
-      this.offset += 2
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 2)
+      this._offset += 2
       return buffer.readUInt16BE()
     }
     const buf = Buffer.alloc(2)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 2 })
-    this.offset += 2
+    await this._operator.read({ buffer: buf, position: this._offset, length: 2 })
+    this._offset += 2
     return buf.readUInt16BE()
   }
 
@@ -336,15 +354,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readUInt24LE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 3)
-      this.offset += 3
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 3)
+      this._offset += 3
       return buffer.readUIntLE(0, 3)
     }
     const buf = Buffer.alloc(3)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 3 })
-    this.offset += 3
+    await this._operator.read({ buffer: buf, position: this._offset, length: 3 })
+    this._offset += 3
     return buf.readUIntLE(0, 3)
   }
 
@@ -354,15 +372,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readUInt24BE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 3)
-      this.offset += 3
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 3)
+      this._offset += 3
       return buffer.readUIntBE(0, 3)
     }
     const buf = Buffer.alloc(3)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 3 })
-    this.offset += 3
+    await this._operator.read({ buffer: buf, position: this._offset, length: 3 })
+    this._offset += 3
     return buf.readUIntBE(0, 3)
   }
 
@@ -372,15 +390,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readUInt32LE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 4)
-      this.offset += 4
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 4)
+      this._offset += 4
       return buffer.readUInt32LE()
     }
     const buf = Buffer.alloc(4)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 4 })
-    this.offset += 4
+    await this._operator.read({ buffer: buf, position: this._offset, length: 4 })
+    this._offset += 4
     return buf.readUInt32LE()
   }
 
@@ -390,15 +408,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readUInt32BE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 4)
-      this.offset += 4
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 4)
+      this._offset += 4
       return buffer.readUInt32BE()
     }
     const buf = Buffer.alloc(4)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 4 })
-    this.offset += 4
+    await this._operator.read({ buffer: buf, position: this._offset, length: 4 })
+    this._offset += 4
     return buf.readUInt32BE()
   }
 
@@ -408,15 +426,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readInt8(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 1)
-      this.offset++
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 1)
+      this._offset++
       return buffer.readInt8()
     }
     const buf = Buffer.alloc(1)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 1 })
-    this.offset++
+    await this._operator.read({ buffer: buf, position: this._offset, length: 1 })
+    this._offset++
     return buf.readInt8()
   }
 
@@ -426,15 +444,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readInt16LE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 2)
-      this.offset += 2
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 2)
+      this._offset += 2
       return buffer.readInt16LE()
     }
     const buf = Buffer.alloc(2)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 2 })
-    this.offset += 2
+    await this._operator.read({ buffer: buf, position: this._offset, length: 2 })
+    this._offset += 2
     return buf.readInt16LE()
   }
 
@@ -444,15 +462,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readInt16BE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 2)
-      this.offset += 2
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 2)
+      this._offset += 2
       return buffer.readUInt16BE()
     }
     const buf = Buffer.alloc(2)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 2 })
-    this.offset += 2
+    await this._operator.read({ buffer: buf, position: this._offset, length: 2 })
+    this._offset += 2
     return buf.readInt16BE()
   }
 
@@ -462,15 +480,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readInt24LE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 3)
-      this.offset += 3
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 3)
+      this._offset += 3
       return buffer.readIntLE(0, 3)
     }
     const buf = Buffer.alloc(3)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 3 })
-    this.offset += 3
+    await this._operator.read({ buffer: buf, position: this._offset, length: 3 })
+    this._offset += 3
     return buf.readIntLE(0, 3)
   }
 
@@ -480,15 +498,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readInt24BE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 3)
-      this.offset += 3
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 3)
+      this._offset += 3
       return buffer.readUIntBE(0, 3)
     }
     const buf = Buffer.alloc(3)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 3 })
-    this.offset += 3
+    await this._operator.read({ buffer: buf, position: this._offset, length: 3 })
+    this._offset += 3
     return buf.readIntBE(0, 3)
   }
 
@@ -498,15 +516,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readInt32LE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 4)
-      this.offset += 4
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 4)
+      this._offset += 4
       return buffer.readUInt32LE()
     }
     const buf = Buffer.alloc(4)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 4 })
-    this.offset += 4
+    await this._operator.read({ buffer: buf, position: this._offset, length: 4 })
+    this._offset += 4
     return buf.readInt32LE()
   }
 
@@ -516,15 +534,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readInt32BE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 4)
-      this.offset += 4
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 4)
+      this._offset += 4
       return buffer.readUInt32BE()
     }
     const buf = Buffer.alloc(4)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 4 })
-    this.offset += 4
+    await this._operator.read({ buffer: buf, position: this._offset, length: 4 })
+    this._offset += 4
     return buf.readInt32BE()
   }
 
@@ -536,15 +554,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readFloatLE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 4)
-      this.offset += 4
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 4)
+      this._offset += 4
       return buffer.readFloatLE()
     }
     const buf = Buffer.alloc(4)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 4 })
-    this.offset += 4
+    await this._operator.read({ buffer: buf, position: this._offset, length: 4 })
+    this._offset += 4
     return buf.readFloatLE()
   }
 
@@ -554,15 +572,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readFloatBE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 4)
-      this.offset += 4
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 4)
+      this._offset += 4
       return buffer.readFloatBE()
     }
     const buf = Buffer.alloc(4)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 4 })
-    this.offset += 4
+    await this._operator.read({ buffer: buf, position: this._offset, length: 4 })
+    this._offset += 4
     return buf.readFloatBE()
   }
 
@@ -572,15 +590,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readDoubleLE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 8)
-      this.offset += 8
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 8)
+      this._offset += 8
       return buffer.readDoubleLE()
     }
     const buf = Buffer.alloc(8)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
-    this.offset += 8
+    await this._operator.read({ buffer: buf, position: this._offset, length: 8 })
+    this._offset += 8
     return buf.readDoubleLE()
   }
 
@@ -590,15 +608,15 @@ export class BinaryReader {
    * @returns {Promise<number>}
    */
   async readDoubleBE(): Promise<number> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 8)
-      this.offset += 8
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 8)
+      this._offset += 8
       return buffer.readDoubleBE()
     }
     const buf = Buffer.alloc(8)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
-    this.offset += 8
+    await this._operator.read({ buffer: buf, position: this._offset, length: 8 })
+    this._offset += 8
     return buf.readDoubleBE()
   }
 
@@ -608,15 +626,15 @@ export class BinaryReader {
    * @returns {Promise<bigint>}
    */
   async readUInt64LE(): Promise<bigint> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 8)
-      this.offset += 8
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 8)
+      this._offset += 8
       return buffer.readBigUInt64LE()
     }
     const buf = Buffer.alloc(8)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
-    this.offset += 8
+    await this._operator.read({ buffer: buf, position: this._offset, length: 8 })
+    this._offset += 8
     return buf.readBigUInt64LE()
   }
 
@@ -626,15 +644,15 @@ export class BinaryReader {
    * @returns {Promise<bigint>}
    */
   async readUInt64BE(): Promise<bigint> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 8)
-      this.offset += 8
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 8)
+      this._offset += 8
       return buffer.readBigUInt64BE()
     }
     const buf = Buffer.alloc(8)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
-    this.offset += 8
+    await this._operator.read({ buffer: buf, position: this._offset, length: 8 })
+    this._offset += 8
     return buf.readBigUInt64BE()
   }
 
@@ -644,15 +662,15 @@ export class BinaryReader {
    * @returns {Promise<bigint>}
    */
   async readInt64LE(): Promise<bigint> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 8)
-      this.offset += 8
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 8)
+      this._offset += 8
       return buffer.readBigInt64LE()
     }
     const buf = Buffer.alloc(8)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
-    this.offset += 8
+    await this._operator.read({ buffer: buf, position: this._offset, length: 8 })
+    this._offset += 8
     return buf.readBigInt64LE()
   }
 
@@ -662,15 +680,15 @@ export class BinaryReader {
    * @returns {Promise<bigint>}
    */
   async readInt64BE(): Promise<bigint> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 8)
-      this.offset += 8
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 8)
+      this._offset += 8
       return buffer.readBigInt64BE()
     }
     const buf = Buffer.alloc(8)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 8 })
-    this.offset += 8
+    await this._operator.read({ buffer: buf, position: this._offset, length: 8 })
+    this._offset += 8
     return buf.readBigInt64BE()
   }
 
@@ -682,19 +700,19 @@ export class BinaryReader {
    * @returns {Promise<BitsArray>}
    */
   async readByteAsBitArray(): Promise<BitsArray> {
-    this.checkExistence()
+    this._checkExistence()
     const bits: number[] = []
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 1)
-      this.offset++
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 1)
+      this._offset++
       for (let i = 7; i >= 0; i--) {
         bits.push((buffer[0] >> i) & 1)
       }
       return bits as BitsArray
     }
     const buf = Buffer.alloc(1)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 1 })
-    this.offset++
+    await this._operator.read({ buffer: buf, position: this._offset, length: 1 })
+    this._offset++
     for (let i = 7; i >= 0; i--) {
       bits.push((buf[0] >> i) & 1)
     }
@@ -707,19 +725,19 @@ export class BinaryReader {
    * @returns {Promise<BitsBooleanArray>}
    */
   async readByteAsBooleanArray(): Promise<BitsBooleanArray> {
-    this.checkExistence()
+    this._checkExistence()
     const bits: boolean[] = []
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 1)
-      this.offset++
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 1)
+      this._offset++
       for (let i = 7; i >= 0; i--) {
         bits.push(((buffer[0] >> i) & 1) === 0 ? false : true)
       }
       return bits as BitsBooleanArray
     }
     const buf = Buffer.alloc(1)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 1 })
-    this.offset++
+    await this._operator.read({ buffer: buf, position: this._offset, length: 1 })
+    this._offset++
     for (let i = 7; i >= 0; i--) {
       bits.push(((buf[0] >> i) & 1) === 0 ? false : true)
     }
@@ -750,27 +768,27 @@ export class BinaryReader {
    */
   async readString(allocSize?: number, encoding: BinaryWriteEncodings = 'utf8'): Promise<string> {
     const enc = encoding === 'latin-1' ? 'latin1' : encoding
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
-        const buf = this.operator.subarray(this.offset, this.offset + allocSize)
-        this.offset += allocSize
+        const buf = this._operator.subarray(this._offset, this._offset + allocSize)
+        this._offset += allocSize
         return buf.toString(enc).replace(new RegExp(`\x00`, 'g'), '')
       }
-      const buffer = this.operator.subarray(this.offset)
-      this.offset = 0
+      const buffer = this._operator.subarray(this._offset)
+      this._offset = 0
       return buffer.toString(enc).replace(new RegExp(`\x00`, 'g'), '')
     }
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-      this.offset += allocSize
+      await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+      this._offset += allocSize
       return buf.toString(enc).replace(new RegExp(`\x00`, 'g'), '')
     }
-    allocSize = this.length - this.offset
+    allocSize = this._length - this._offset
     const buf = Buffer.alloc(allocSize)
-    await this.operator.read({ buffer: buf, position: this.offset, length: allocSize })
-    this.offset = 0
+    await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
+    this._offset = 0
     return buf.toString(enc).replace(`\x00`, '')
   }
 
@@ -780,16 +798,16 @@ export class BinaryReader {
    * @returns {Promise<boolean>}
    */
   async readBoolean(): Promise<boolean> {
-    this.checkExistence()
-    if (Buffer.isBuffer(this.operator)) {
-      const buffer = this.operator.subarray(this.offset, this.offset + 1)
-      this.offset++
+    this._checkExistence()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 1)
+      this._offset++
       const value = Boolean(buffer.readUInt8())
       return value
     }
     const buf = Buffer.alloc(1)
-    await this.operator.read({ buffer: buf, position: this.offset, length: 1 })
-    this.offset++
+    await this._operator.read({ buffer: buf, position: this._offset, length: 1 })
+    this._offset++
     const value = Boolean(buf.readUInt8())
     return value
   }
@@ -807,19 +825,10 @@ export class BinaryReader {
    * @returns {void}
    */
   seek(offset: number, method: BinaryReaderSeekMethods = 'start'): void {
-    if (method === 'start') this.offset = offset
-    else if (method === 'current') this.offset = this.offset + offset
-    else this.offset = this.length + offset
+    if (method === 'start') this._offset = offset
+    else if (method === 'current') this._offset = this._offset + offset
+    else this._offset = this._length + offset
 
-    if (this.offset > this.length) this.offset = this.offset - this.length
-  }
-
-  /**
-   * Closes the `FileHandle` used on this class.
-   * - - - -
-   * @returns {Promise<void>}
-   */
-  async close(): Promise<void> {
-    if (!Buffer.isBuffer(this.operator)) await this.operator.close()
+    if (this._offset > this._length) this._offset = this._offset - this._length
   }
 }

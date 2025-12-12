@@ -14,7 +14,6 @@ export default defineConfig(
       parser: tseslint.parser,
       sourceType: 'module',
       parserOptions: {
-        project: 'tsconfig.json',
         projectService: true,
       },
       globals: {
