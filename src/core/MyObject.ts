@@ -1,16 +1,62 @@
-import type { LiteralUnion } from 'type-fest'
+import type { LiteralUnion, PartialDeep } from 'type-fest'
 
 /**
- * `MyObject` acts as a wrapper to a `Map`, with explicit conversion method to object.
+ * `MyObject` acts as a wrapper to a `Map`, with explicit conversion method to object and enforced typing.
+ * - - - -
  */
 export class MyObject<T> {
   /**
    * The `Map` class which the class' instance will work upon.
    */
-  private _map = new Map<keyof T, T[keyof T]>()
-  constructor() {}
-  clear(): void {
-    return this._map.clear()
+  private _map: Map<keyof T, T[keyof T]>
+
+  /**
+   * Iterates through all keys and values of an object and return them properly added to the return value itself.
+   * - - - -
+   * @param obj
+   * @returns {Record<string | number, unknown>}
+   */
+  private _iterateEachNestedObjKey(obj: Record<string | number, unknown>): Record<string | number, unknown> {
+    const nestedMap = new Map()
+    for (const key of Object.keys(obj)) {
+      if (typeof key === 'symbol') throw new Error('MyObject classes does not accept symbols for keys')
+      const val = obj[key]
+      if (typeof val === 'object' && val !== null) nestedMap.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>))
+      else nestedMap.set(key, val)
+    }
+
+    return Object.fromEntries(nestedMap.entries()) as Record<string | number, unknown>
+  }
+
+  /**
+   * Iterates through all keys and values of an object and adds them directly on the class' map object.
+   * - - - -
+   * @param {Record<keyof T, unknown>} obj
+   */
+  private _iterateEachRootObjKey(obj: Record<keyof T, unknown>): void {
+    for (const key of Object.keys(obj) as (keyof T)[]) {
+      if (typeof key === 'symbol') throw new Error('MyObject classes does not accept symbols for keys')
+      const val = obj[key] as T[keyof T]
+      if (typeof val === 'object' && val !== null) this._map.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
+      else this._map.set(key, val)
+    }
+  }
+
+  /**
+   * @param initial An object with initial values to be already added to the object map.
+   */
+  constructor(initial?: PartialDeep<T>) {
+    this._map = new Map<keyof T, T[keyof T]>()
+    if (initial) this._iterateEachRootObjKey(initial as Record<keyof T, unknown>)
+  }
+
+  /**
+   * Clears all values added to be map object and returns an object with all the old keys and values from the map object.
+   */
+  clear(): T {
+    const val = this.toObject()
+    this._map.clear()
+    return val
   }
 
   /**
@@ -62,6 +108,15 @@ export class MyObject<T> {
   set(key: LiteralUnion<keyof T, string | number>, value: unknown): Map<keyof T, T[keyof T]> {
     if (typeof key === 'symbol') throw new Error('MyObject classes does not accept symbols for keys')
     return this._map.set(key as keyof T, value as T[keyof T])
+  }
+
+  /**
+   * Adds new elements to the map object. If an element with the same key already exists, the element will be updated.
+   * - - - -
+   * @param {PartialDeep<T>} values An partial object which keys and values respect the type parameter initialized.
+   */
+  setMany(values: PartialDeep<T>): void {
+    this._iterateEachRootObjKey(values as Record<keyof T, unknown>)
   }
 
   /**
