@@ -5,7 +5,7 @@ import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
 export type BinaryWriteEncodings = 'ascii' | 'latin1' | 'latin-1' | 'utf-8' | 'utf8' | 'hex'
 
 /**
- * A class to programatically create binary files.
+ * A class with methods to write binary files programmatically.
  *
  * _NOTE: This class holds all the written information into memory, so it must be better
  * to use [StreamWriter](./StreamWriter.ts) while handling with big files writing._
