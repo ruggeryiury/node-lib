@@ -1,5 +1,5 @@
 import type { FileHandle } from 'fs/promises'
-import { type DirPath, FilePath, type BinaryWriteEncodings, type FilePathLikeTypes } from '../core.exports'
+import { type DirPath, FilePath, type BinaryWriteEncodings, type FilePathLikeTypes, BinaryWriter } from '../core.exports'
 import { pathLikeToString } from '../lib.exports'
 
 export type BinaryReaderSeekMethods = 'start' | 'current' | 'end'
@@ -762,28 +762,56 @@ export class BinaryReader {
    * Reads the binary file and returns decoded contents as `string` based on the provided encoding.
    * - - - -
    * @param {number | undefined} [allocSize] `OPTIONAL` The allocation size of the desired bytes. If `undefined`, the reader will
-   * return all bytes from the file, starting by the class `offset` value.
+   * return all bytes from the file, starting by the class `offset` value, if `null`, it will read until the first found NULL value (0x0).
    * @param {BinaryWriteEncodings} [encoding] `OPTIONAL` The encoding used to decode the buffer. If `undefined`, the reader will decode the buffer as `utf8`.
    * @returns {Promise<string>}
    */
-  async readString(allocSize?: number, encoding: BinaryWriteEncodings = 'utf8'): Promise<string> {
+  async readString(allocSize?: number | null, encoding: BinaryWriteEncodings = 'utf8'): Promise<string> {
     const enc = encoding === 'latin-1' ? 'latin1' : encoding
     this._checkExistence()
     if (Buffer.isBuffer(this._operator)) {
-      if (allocSize !== undefined) {
+      if (typeof allocSize === 'number') {
         const buf = this._operator.subarray(this._offset, this._offset + allocSize)
         this._offset += allocSize
         return buf.toString(enc).replace(new RegExp(`\x00`, 'g'), '')
+      } else if (allocSize === null) {
+        const writer = new BinaryWriter()
+        let foundNull = false
+        do {
+          const buffer = this._operator.subarray(this._offset, this._offset + 1)
+          this._offset++
+          if (buffer[0] === 0x0) {
+            foundNull = true
+          } else {
+            writer.write(buffer)
+          }
+        } while (foundNull === false)
+
+        return writer.toBuffer().toString(enc)
       }
       const buffer = this._operator.subarray(this._offset)
       this._offset = 0
       return buffer.toString(enc).replace(new RegExp(`\x00`, 'g'), '')
     }
-    if (allocSize) {
+    if (typeof allocSize === 'number') {
       const buf = Buffer.alloc(allocSize)
       await this._operator.read({ buffer: buf, position: this._offset, length: allocSize })
       this._offset += allocSize
       return buf.toString(enc).replace(new RegExp(`\x00`, 'g'), '')
+    } else if (allocSize === null) {
+      const writer = new BinaryWriter()
+      let foundNull = false
+      do {
+        const buffer = (await this._operator.read({ offset: this.offset, length: 1 })).buffer
+        this._offset++
+        if (buffer[0] === 0x0) {
+          foundNull = true
+        } else {
+          writer.write(buffer)
+        }
+      } while (foundNull === false)
+
+      return writer.toBuffer().toString(enc)
     }
     allocSize = this._length - this._offset
     const buf = Buffer.alloc(allocSize)
@@ -797,7 +825,7 @@ export class BinaryReader {
    * - - - -
    * @returns {Promise<boolean>}
    */
-  async readBoolean(): Promise<boolean> {
+  async readBooleanFromByte(): Promise<boolean> {
     this._checkExistence()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 1)
