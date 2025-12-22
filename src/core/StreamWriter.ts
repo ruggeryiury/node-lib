@@ -3,7 +3,7 @@ import { HexVal, type BinaryWriteEncodings, type BitsArray, type BitsBooleanArra
 import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
 
 /**
- * A class to programatically create streamable binary file writing processes.
+ * A class with methods to write binary files programmatically using `WriteStream` operators.
  */
 export class StreamWriter {
   /**

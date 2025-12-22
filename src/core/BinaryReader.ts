@@ -7,11 +7,11 @@ export type BitsArray = [0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1]
 export type BitsBooleanArray = [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean]
 
 /**
- * A class to read binary files.
+ * A class with methods to read binary files programmatically, using `FileHandle` operators (when pointing into an existing file) or reading from a `Buffer` object.
  */
 export class BinaryReader {
   /**
-   * The path of the binary file that will be read. This is `undefined` when you initialize this class instance using the static `fromBuffer()` method.
+   * The path of the binary file that will be read. This property is `null` when you initialize this class instance using the static `fromBuffer()` method.
    */
   readonly path: FilePath | null
   /**
@@ -619,6 +619,8 @@ export class BinaryReader {
     this._offset += 8
     return buf.readDoubleBE()
   }
+
+  // #region BigInts
 
   /**
    * Reads an unsigned, little-endian 64-bit integer.
