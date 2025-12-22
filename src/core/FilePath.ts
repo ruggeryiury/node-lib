@@ -3,7 +3,7 @@ import type { Stats, WriteStream } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
 import type { PipelineOptions, PipelineSource, Stream } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
-import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms } from '../lib.exports'
+import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, type ReadLinesOptions } from '../lib.exports'
 import { DirPath } from './DirPath'
 
 export interface FilePathJSONRepresentation {
@@ -58,7 +58,14 @@ export class FilePath {
   /**
    * The working path of this class instance.
    */
-  readonly path: string
+  private _path: string
+
+  /**
+   * The working path of this class instance.
+   */
+  get path(): string {
+    return this._path
+  }
 
   // #region Constructor
 
@@ -68,34 +75,40 @@ export class FilePath {
    * @see [Path-JS GitHub Repository](https://github.com/ruggeryiury/path-js).
    */
   constructor(...paths: string[]) {
-    this.path = resolve(...paths)
+    this._path = resolve(...paths)
   }
 
   // #region Getters
 
   /**
    * The root directory of the file where the path evaluates to.
+   * - - - -
    * @returns {string}
    */
   get root(): string {
     return dirname(this.path)
   }
+
   /**
    * The name of the file with extension (if any).
+   * - - - -
    * @returns {string}
    */
   get fullname(): string {
     return basename(this.path)
   }
+
   /**
    * The name of the file (without the extension).
+   * - - - -
    * @returns {string}
    */
   get name(): string {
     return basename(this.path, extname(this.path))
   }
+
   /**
-   * The extension of the file, returns an empty string if the
+   * The extension of the file (if any), returns an empty string if the
    * provided path evalutes to a directory.
    * @returns {string}
    */
@@ -174,6 +187,20 @@ export class FilePath {
   }
 
   /**
+   * Changes the file name of this `FilePath` instance.
+   * - - - -
+   * @param {string | null} fileName The new file name. You can provide `null` as argument to use
+   * `fileExt` parameter to change only the file's extension without changing the base name of the file.
+   * @param {string | undefined} [fileExt] `OPTIONAL` A new extension for the new file path.
+   * @returns {FilePath}
+   */
+  changeThisFileName(fileName: string | null, fileExt?: string): void {
+    const fn = fileName ?? this.name
+    const fext = fileExt?.startsWith('.') ? fileExt.slice(1) : (fileExt ?? this.ext.slice(1))
+    this._path = resolve(this.root, `${fn}.${fext}`)
+  }
+
+  /**
    * Changes the file extension of this `FilePath` and returns a new instantiated `FilePath` with the new file extension.
    * - - - -
    * @param {string} fileExt The new file extension.
@@ -182,6 +209,16 @@ export class FilePath {
   changeFileExt(fileExt: string): FilePath {
     const fext = fileExt.startsWith('.') ? fileExt.slice(1) : fileExt
     return new FilePath(this.root, `${this.name}.${fext}`)
+  }
+
+  /**
+   * Changes the file extension of this `FilePath` instance.
+   * - - - -
+   * @param {string} fileExt The new file extension.
+   */
+  changeThisFileExt(fileExt: string): void {
+    const fext = fileExt.startsWith('.') ? fileExt.slice(1) : fileExt
+    this._path = resolve(this.root, `${this.name}.${fext}`)
   }
 
   /**
@@ -276,32 +313,26 @@ export class FilePath {
 
   /**
    * Asynchronously reads a file as a list of lines.
-   *
-   * Automatically trims and splits the file content on newline characters.
-   * Assumes the file content is text (not binary).
    * - - - -
-   * @param {BufferEncodingText | undefined} [encoding] `OPTIONAL` The encoding to use. If not provided, defaults to `'utf8'`.
+   * @param {ReadLinesOptions | undefined} [options] `OPTIONAL` An object that changes the behavior of the reading and parsing process.
    * @returns {Promise<string[]>} A promise that resolves to an array of trimmed lines.
    */
-  async readLines(encoding: BufferEncodingText = 'utf8'): Promise<string[]> {
+  async readLines(options?: ReadLinesOptions): Promise<string[]> {
     ensurePathIsFile(this.path, 'readLines')
     ensurePathExistence(this.path, 'readLines', 'file')
-    return await readLines(this.path, encoding)
+    return await readLines(this.path, options)
   }
 
   /**
    * Synchronously reads a file as a list of lines.
-   *
-   * Automatically trims and splits the file content on newline characters.
-   * Assumes the file content is text (not binary).
    * - - - -
-   * @param {BufferEncodingText | undefined} [encoding] `OPTIONAL` The encoding to use. If not provided, defaults to `'utf8'`.
+   * @param {ReadLinesOptions | undefined} [options] `OPTIONAL` An object that changes the behavior of the reading and parsing process.
    * @returns {string[]} An array of trimmed lines.
    */
-  readLinesSync(encoding: BufferEncodingText = 'utf8'): string[] {
+  readLinesSync(options?: ReadLinesOptions): string[] {
     ensurePathIsFile(this.path, 'readLinesSync')
     ensurePathExistence(this.path, 'readLinesSync', 'file')
-    return readLinesSync(this.path, encoding)
+    return readLinesSync(this.path, options)
   }
 
   /**
@@ -311,13 +342,13 @@ export class FilePath {
    * Throws a `Error` if the JSON is invalid.
    * - - - -
    * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
-   * @returns {Promise<unknown>} A promise that resolves to the parsed JSON object.
+   * @returns {Promise<T>} A promise that resolves to the parsed JSON object.
    * @throws {Error} If the file contains invalid JSON.
    */
-  async readJSON(encoding?: BufferEncodingText): Promise<unknown> {
+  async readJSON<T>(encoding?: BufferEncodingText): Promise<T> {
     ensurePathIsFile(this.path, 'readJSON')
     ensurePathExistence(this.path, 'readJSON', 'file')
-    return await readJSON(this.path, encoding)
+    return await readJSON<T>(this.path, encoding)
   }
 
   /**
@@ -327,13 +358,13 @@ export class FilePath {
    * Throws a `Error` if the JSON is invalid.
    * - - - -
    * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
-   * @returns {unknown} The parsed JSON object.
+   * @returns {T} The parsed JSON object.
    * @throws {Error} If the file contains invalid JSON.
    */
-  readJSONSync(encoding?: BufferEncodingText): unknown {
+  readJSONSync<T>(encoding?: BufferEncodingText): T {
     ensurePathIsFile(this.path, 'readJSONSync')
     ensurePathExistence(this.path, 'readJSONSync', 'file')
-    return readJSONSync(this.path, encoding)
+    return readJSONSync<T>(this.path, encoding)
   }
 
   /**
@@ -526,6 +557,26 @@ export class FilePath {
   }
 
   /**
+   * _Alias to `rename()`._
+   *
+   * Asynchronously renames (or moves) a file from an old path to a new path.
+   *
+   * If the new path already exists:
+   * - Throws an error unless `replace` is `true`.
+   * - If `replace` is `true`, deletes the destination file before renaming.
+   *
+   * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
+   * - - - -
+   * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
+   * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
+   * @throws {Error} If the destination file exists and `replace` is `false`.
+   */
+  async move(newPath: FilePathLikeTypes, replace = false): Promise<FilePath> {
+    return await this.rename(newPath, replace)
+  }
+
+  /**
    * Synchronously renames (or moves) a file from an old path to a new path.
    *
    * If the new path already exists:
@@ -545,6 +596,26 @@ export class FilePath {
     return renameFileSync(this.path, newPath, replace)
   }
 
+  /**
+   * _Alias to `renameSync()`._
+   *
+   * Synchronously renames (or moves) a file from an old path to a new path.
+   *
+   * If the new path already exists:
+   * - Throws an error unless `replace` is `true`.
+   * - If `replace` is `true`, deletes the destination file before renaming.
+   *
+   * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
+   * - - - -
+   * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
+   * @returns {Promise<FilePath>} A `FilePath` instance representing the new path of the renamed file.
+   * @throws {Error} If the destination file exists and `replace` is `false`.
+   */
+  moveSync(newPath: FilePathLikeTypes, replace = false): FilePath {
+    return this.renameSync(newPath, replace)
+  }
+
   // #region Delete Methods
 
   /**
@@ -559,6 +630,19 @@ export class FilePath {
   }
 
   /**
+   * _Alias to `delete()`._
+   *
+   * Asynchronously deletes a file at the specified path if it exists.
+   *
+   * Resolves the given path and performs a safe check before deletion to avoid errors.
+   * - - - -
+   * @returns {Promise<void>}
+   */
+  async remove(): Promise<void> {
+    return await this.delete()
+  }
+
+  /**
    * Synchronously deletes a file at the specified path if it exists.
    *
    * Resolves the given path and performs a safe check before deletion to avoid errors.
@@ -567,5 +651,18 @@ export class FilePath {
    */
   deleteSync(): void {
     if (this.exists) deleteFileSync(this.path)
+  }
+
+  /**
+   * _Alias to `deleteSync()`._
+   *
+   * Synchronously deletes a file at the specified path if it exists.
+   *
+   * Resolves the given path and performs a safe check before deletion to avoid errors.
+   * - - - -
+   * @returns {void}
+   */
+  removeSync(): void {
+    return this.deleteSync()
   }
 }

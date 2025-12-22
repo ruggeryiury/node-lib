@@ -3,6 +3,17 @@ import { readFile as nodeReadFile, open, readdir } from 'node:fs/promises'
 import type { BufferEncodingOrNull, BufferEncodingText, FilePathLikeTypes, ReadFileReturnType } from '../../core.exports'
 import { pathLikeToString, resolve } from '../../lib.exports'
 
+export type NewLineSeparators = '\n' | '\r\n'
+
+export interface ReadLinesOptions {
+  /** The encoding used to decode the file `Buffer`. Default is `'utf8'`. */
+  encoding?: BufferEncodingText
+  /** Trims each line of the file. Default is `true`. */
+  trim?: boolean
+  /** The new line entity used on the file. Default is `'\n'` */
+  newLine?: NewLineSeparators
+}
+
 /**
  * Asynchronously reads the entire contents of a file.
  *
@@ -35,34 +46,44 @@ export const readFileSync = <T extends BufferEncodingOrNull = undefined>(path: F
 
 /**
  * Asynchronously reads a file as a list of lines.
- *
- * Automatically trims and splits the file content on newline characters.
- * Assumes the file content is text (not binary).
  * - - - -
  * @param {FilePathLikeTypes} path The path to the file.
- * @param {BufferEncodingText | undefined} [encoding] `OPTIONAL` The encoding to use. If not provided, defaults to `'utf8'`.
+ * @param {ReadLinesOptions | undefined} [options] `OPTIONAL` An object that changes the behavior of the reading and parsing process.
  * @returns {Promise<string[]>} A promise that resolves to an array of trimmed lines.
  */
-export const readLines = async (path: FilePathLikeTypes, encoding: BufferEncodingText = 'utf8'): Promise<string[]> => {
+export const readLines = async (path: FilePathLikeTypes, options?: ReadLinesOptions): Promise<string[]> => {
+  const { encoding, trim, newLine }: Required<ReadLinesOptions> = {
+    encoding: 'utf8',
+    trim: true,
+    newLine: '\n',
+    ...options,
+  }
   const p = pathLikeToString(path)
   const content = await readFile(p, encoding)
-  return Buffer.isBuffer(content) ? content.toString(encoding).trim().split('\n') : content.trim().split('\n')
+  let contentString = Buffer.isBuffer(content) ? content.toString(encoding) : content
+  if (trim) contentString = contentString.trim()
+  return contentString.split(newLine)
 }
 
 /**
  * Synchronously reads a file as a list of lines.
- *
- * Automatically trims and splits the file content on newline characters.
- * Assumes the file content is text (not binary).
  * - - - -
  * @param {FilePathLikeTypes} path The path to the file.
- * @param {BufferEncodingText | undefined} [encoding] `OPTIONAL` The encoding to use. If not provided, defaults to `'utf8'`.
+ * @param {ReadLinesOptions | undefined} [options] `OPTIONAL` An object that changes the behavior of the reading and parsing process.
  * @returns {string[]} An array of trimmed lines.
  */
-export const readLinesSync = (path: FilePathLikeTypes, encoding: BufferEncodingText = 'utf8'): string[] => {
+export const readLinesSync = (path: FilePathLikeTypes, options?: ReadLinesOptions): string[] => {
+  const { encoding, trim, newLine }: Required<ReadLinesOptions> = {
+    encoding: 'utf8',
+    trim: true,
+    newLine: '\n',
+    ...options,
+  }
   const p = pathLikeToString(path)
   const content = readFileSync(p, encoding)
-  return Buffer.isBuffer(content) ? content.toString(encoding).trim().split('\n') : content.trim().split('\n')
+  let contentString = Buffer.isBuffer(content) ? content.toString(encoding) : content
+  if (trim) contentString = contentString.trim()
+  return contentString.split(newLine)
 }
 
 /**
@@ -73,14 +94,14 @@ export const readLinesSync = (path: FilePathLikeTypes, encoding: BufferEncodingT
  * - - - -
  * @param {FilePathLikeTypes} path The path to the JSON file.
  * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
- * @returns {Promise<unknown>} A promise that resolves to the parsed JSON object.
+ * @returns {Promise<T>} A promise that resolves to the parsed JSON object.
  * @throws {Error} If the file contains invalid JSON.
  */
-export const readJSON = async (path: FilePathLikeTypes, encoding?: BufferEncodingText): Promise<unknown> => {
+export const readJSON = async <T>(path: FilePathLikeTypes, encoding?: BufferEncodingText): Promise<T> => {
   const p = pathLikeToString(path)
   const contents = await readFile(p, encoding)
   try {
-    return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents)
+    return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents) as T
   } catch (err) {
     if (err instanceof Error) throw new Error(err.message)
     else throw err
@@ -95,14 +116,14 @@ export const readJSON = async (path: FilePathLikeTypes, encoding?: BufferEncodin
  * - - - -
  * @param {FilePathLikeTypes} path The path to the JSON file.
  * @param {BufferEncodingText} [encoding] `OPTIONAL` The encoding to use when reading the file. Defaults to `'utf8'`.
- * @returns {unknown} A parsed JSON object.
+ * @returns {T} A parsed JSON object.
  * @throws {Error} If the file contains invalid JSON.
  */
-export const readJSONSync = (path: FilePathLikeTypes, encoding?: BufferEncodingText): unknown => {
+export const readJSONSync = <T>(path: FilePathLikeTypes, encoding?: BufferEncodingText): T => {
   const p = pathLikeToString(path)
   const contents = readFileSync(p, encoding)
   try {
-    return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents)
+    return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents) as T
   } catch (err) {
     if (err instanceof Error) throw new Error(err.message)
     else throw err
