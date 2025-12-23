@@ -2,6 +2,7 @@ import type { BinaryToTextEncoding } from 'node:crypto'
 import type { Stats, WriteStream } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
 import type { PipelineOptions, PipelineSource, Stream } from 'node:stream'
+import { inspect, styleText } from 'node:util'
 import { pipeline } from 'node:stream/promises'
 import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, type ReadLinesOptions } from '../lib.exports'
 import { DirPath } from './DirPath'
@@ -29,7 +30,7 @@ export interface FilePathJSONRepresentation {
   name: string
   /**
    * The extension of the file, returns an empty string if the
-   * provided path evalutes to a directory.
+   * provided path accidentally evalutes to a directory.
    */
   ext: string
 }
@@ -55,6 +56,8 @@ export type FilePathLikeTypes = string | FilePath | FilePathJSONRepresentation
  * - - - -
  */
 export class FilePath {
+  // #region Properties
+
   /**
    * The working path of this class instance.
    */
@@ -72,7 +75,6 @@ export class FilePath {
   /**
    * @param {string[]} paths A sequence of paths or path segments.
    * @returns {FilePath}
-   * @see [Path-JS GitHub Repository](https://github.com/ruggeryiury/path-js).
    */
   constructor(...paths: string[]) {
     this._path = resolve(...paths)
@@ -664,5 +666,11 @@ export class FilePath {
    */
   removeSync(): void {
     return this.deleteSync()
+  }
+
+  //#region Internal
+
+  [inspect.custom]() {
+    return `FilePath { ${styleText(['green'], `"${this._path}"`)} }`
   }
 }

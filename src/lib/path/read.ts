@@ -1,7 +1,7 @@
 import { readFileSync as nodeReadFileSync, readdirSync } from 'node:fs'
 import { readFile as nodeReadFile, open, readdir } from 'node:fs/promises'
-import type { BufferEncodingOrNull, BufferEncodingText, FilePathLikeTypes, ReadFileReturnType } from '../../core.exports'
-import { pathLikeToString, resolve } from '../../lib.exports'
+import { DirPath, FilePath, type BufferEncodingOrNull, type BufferEncodingText, type DirPathLikeTypes, type FilePathLikeTypes, type ReadFileReturnType } from '../../core.exports'
+import { isFile, pathLikeToString, resolve } from '../../lib.exports'
 
 export type NewLineSeparators = '\n' | '\r\n'
 
@@ -10,9 +10,13 @@ export interface ReadLinesOptions {
   encoding?: BufferEncodingText
   /** Trims each line of the file. Default is `true`. */
   trim?: boolean
-  /** The new line entity used on the file. Default is `'\n'` */
+  /** The new line entity used on the file as line separator. Default is `'\r\n'` */
   newLine?: NewLineSeparators
+  /** Removes empty lines from the array. Default is `true`. */
+  removeEmptyLines?: boolean
 }
+
+export type ReadDirReturnType<T extends boolean> = T extends true ? string[] : (FilePath | DirPath)[]
 
 /**
  * Asynchronously reads the entire contents of a file.
@@ -52,17 +56,19 @@ export const readFileSync = <T extends BufferEncodingOrNull = undefined>(path: F
  * @returns {Promise<string[]>} A promise that resolves to an array of trimmed lines.
  */
 export const readLines = async (path: FilePathLikeTypes, options?: ReadLinesOptions): Promise<string[]> => {
-  const { encoding, trim, newLine }: Required<ReadLinesOptions> = {
+  const { encoding, trim, newLine, removeEmptyLines }: Required<ReadLinesOptions> = {
     encoding: 'utf8',
     trim: true,
-    newLine: '\n',
+    newLine: '\r\n',
+    removeEmptyLines: true,
     ...options,
   }
   const p = pathLikeToString(path)
   const content = await readFile(p, encoding)
-  let contentString = Buffer.isBuffer(content) ? content.toString(encoding) : content
-  if (trim) contentString = contentString.trim()
-  return contentString.split(newLine)
+  const contentString = Buffer.isBuffer(content) ? content.toString(encoding) : content
+  const splitLines = contentString.split(newLine)
+  if (trim) splitLines.map((val) => val.trim())
+  return removeEmptyLines ? splitLines.filter((val) => Boolean(val.trim())) : splitLines
 }
 
 /**
@@ -73,17 +79,19 @@ export const readLines = async (path: FilePathLikeTypes, options?: ReadLinesOpti
  * @returns {string[]} An array of trimmed lines.
  */
 export const readLinesSync = (path: FilePathLikeTypes, options?: ReadLinesOptions): string[] => {
-  const { encoding, trim, newLine }: Required<ReadLinesOptions> = {
+  const { encoding, trim, newLine, removeEmptyLines }: Required<ReadLinesOptions> = {
     encoding: 'utf8',
     trim: true,
-    newLine: '\n',
+    newLine: '\r\n',
+    removeEmptyLines: true,
     ...options,
   }
   const p = pathLikeToString(path)
   const content = readFileSync(p, encoding)
-  let contentString = Buffer.isBuffer(content) ? content.toString(encoding) : content
-  if (trim) contentString = contentString.trim()
-  return contentString.split(newLine)
+  const contentString = Buffer.isBuffer(content) ? content.toString(encoding) : content
+  const splitLines = contentString.split(newLine)
+  if (trim) splitLines.map((val) => val.trim())
+  return removeEmptyLines ? splitLines.filter((val) => Boolean(val.trim())) : splitLines
 }
 
 /**
@@ -157,36 +165,35 @@ export const readFileOffset = async (path: FilePathLikeTypes, byteOffset: number
 }
 
 /**
- * Asynchronously reads the contents of a directory and returns a list of file and folder names.
- *
- * By default, returns absolute paths to each entry. You can change this behavior
- * by setting `asAbsolutePaths` to `false`, in which case it will return only the names.
+ * Asynchronously reads the contents of a directory and returns an array of file/directory paths.
  * - - - -
- * @param {FilePathLikeTypes} dirPath The path to the directory to read.
- * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names. Default is `true`.
+ * @param {DirPathLikeTypes} dirPath The path to the directory to read.
  * @param {boolean} [recursive] `OPTIONAL` Recursively reads the folder. Default is `false`.
- * @returns {Promise<string[]>} A promise that resolves to an array of directory entries. Entries are either absolute paths or names depending on the flag.
+ * @param {T} [returnValueAsStrings] `OPTIONAL` Whether to return `FilePath` / `DirPath` objects or absolute path strings. Default is `false`.
+ * @returns {Promise<string[]>} A promise that resolves to an array of file/directory entries. It can be `FilePath` / `DirPath` objects if `returnValueAsStrings` is set to `false`.
  * @throws {Error} If the directory cannot be read or does not exist.
  */
-export const readDir = async (dirPath: FilePathLikeTypes, asAbsolutePaths = true, recursive = false): Promise<string[]> => {
-  const dp = pathLikeToString(dirPath)
-  if (asAbsolutePaths) return (await readdir(dp, { recursive })).map((path) => resolve(dp, path))
-  else return await readdir(dp, { recursive })
+export const readDir = async <T extends boolean = false>(dirPath: DirPathLikeTypes, recursive = false, returnValueAsStrings: T = false as T): Promise<ReadDirReturnType<T>> => {
+  const path = pathLikeToString(dirPath)
+  const results = (await readdir(path, { recursive })).map((val) => resolve(path, val))
+
+  if (returnValueAsStrings) return results as ReadDirReturnType<T>
+  return results.map((val) => (isFile(val) ? FilePath.of(val) : DirPath.of(val))) as ReadDirReturnType<T>
 }
 
 /**
- * Synchronously reads the contents of a directory and returns a list of file and folder names.
- *
- * By default, returns absolute paths to each entry. You can change this behavior
- * by setting `asAbsolutePaths` to `false`, in which case it will return only the names.
+ * Synchronously reads the contents of a directory and returns an array of file/directory paths.
  * - - - -
- * @param {FilePathLikeTypes} dirPath The path to the directory to read.
- * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
- * @returns {string[]} An array of directory entries. Entries are either absolute paths or names depending on the flag.
+ * @param {DirPathLikeTypes} dirPath The path to the directory to read.
+ * @param {boolean} [recursive] `OPTIONAL` Recursively reads the folder. Default is `false`.
+ * @param {T} [returnValueAsStrings] `OPTIONAL` Whether to return `FilePath` / `DirPath` objects or absolute path strings. Default is `false`.
+ * @returns {Promise<string[]>} A promise that resolves to an array of file/directory entries. It can be `FilePath` / `DirPath` objects if `returnValueAsStrings` is set to `false`.
  * @throws {Error} If the directory cannot be read or does not exist.
  */
-export const readDirSync = (dirPath: FilePathLikeTypes, asAbsolutePaths = true): string[] => {
-  const dp = pathLikeToString(dirPath)
-  if (asAbsolutePaths) return readdirSync(dp).map((path) => resolve(dp, path))
-  else return readdirSync(dp)
+export const readDirSync = <T extends boolean = false>(dirPath: DirPathLikeTypes, recursive = false, returnValueAsStrings: T = false as T): ReadDirReturnType<T> => {
+  const path = pathLikeToString(dirPath)
+  const results = readdirSync(path, { recursive }).map((val) => (typeof val === 'string' ? resolve(path, val) : resolve(path, val.toString())))
+
+  if (returnValueAsStrings) return results as ReadDirReturnType<T>
+  return results.map((val) => (isFile(val) ? FilePath.of(val) : DirPath.of(val))) as ReadDirReturnType<T>
 }

@@ -17,6 +17,8 @@
     - [File reading methods](#file-reading-methods)
     - [File writing methods](#file-writing-methods)
     - [Other methods](#other-methods)
+  - [`DirPath`](#dirpath)
+    - [Class properties](#class-properties-1)
 
 # About
 
@@ -33,9 +35,9 @@
 
 ## `FilePath`
 
-Using `FilePath` made file path handling easy as it could be!
+`FilePath` makes file path handling easy as it could be!
 
-You can initialize a FilePath instance with the class constructor
+You can initialize a `FilePath` instance with the class constructor
 
 ```ts
 import { FilePath } from 'node-lib'
@@ -63,7 +65,7 @@ const file: FilePath = FilePath.of(fp)
 | _root_     | The root directory of the file where the path evaluates to.                                               |
 | _fullname_ | The name of the file with extension (if any).                                                             |
 | _name_     | The name of the file (without the extension).                                                             |
-| _ext_      | The extension of the file (if any), returns an empty string if the provided path evalutes to a directory. |
+| _ext_      | The extension of the file (if any), returns an empty string if the provided path accidentally evalutes to a directory. |
 
 You can also retrieve all these properties at once as an object using `FilePath.toJSON()` method.
 
@@ -156,7 +158,6 @@ console.log(file.exists) // <- false
   - If `replace` is `true`, deletes the destination file before renaming.
 
   Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
-
 - `renameSync(newPath: FilePathLikeTypes, replace?: boolean)` &mdash; Synchronous version of `copy()`.
 - `move(newPath: FilePathLikeTypes, replace?: boolean)` &mdash; Alias to `rename()`.
 - `moveSync(newPath: FilePathLikeTypes, replace?: boolean)` &mdash; Alias to `renameSync()`.
@@ -171,3 +172,34 @@ console.log(file.exists) // <- false
 ---
 
 - `generateHash(algorithm: AllHashAlgorithms, digest: BinaryToTextEncoding)` &mdash; Asynchronously computes a cryptographic hash from the contents of the file.
+
+## `DirPath`
+
+You can initialize a `DirPath` instance with the class constructor
+
+```ts
+import { DirPath } from 'node-lib'
+
+const fp: string = 'path/to/directory'
+const file: DirPath = new DirPath(fp)
+```
+
+or using the static method `DirPath.of()`.
+
+```ts
+import { DirPath } from 'node-lib'
+
+const fp: string = 'path/to/directory'
+const file: DirPath = DirPath.of(fp)
+```
+
+`DirPath` accepts both absolute and relative paths. Relative paths will be resolved from the project working directory your initial script will be called upon.
+
+### Class properties
+
+| Property   | Description                                                                                               |
+| ---------- | --------------------------------------------------------------------------------------------------------- |
+| _path_     | The working path of this class instance.                                                                  |
+| _root_     | The root directory of the file where the path evaluates to.                                               |
+| _name_     | The name of the file (without the extension).                                                             |
+

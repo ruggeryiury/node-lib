@@ -1,6 +1,7 @@
 import { type Stats } from 'node:fs'
 import { FilePath, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../core.exports'
-import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, searchInFolder, searchInFolderSync, stat, statSync, writeFileOnDir, writeFileOnDirSync } from '../lib.exports'
+import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, searchInFolder, searchInFolderSync, stat, statSync, writeFileOnDir, writeFileOnDirSync, type ReadDirReturnType } from '../lib.exports'
+import { inspect, styleText } from 'node:util'
 
 export interface DirPathJSONRepresentation {
   /**
@@ -35,7 +36,14 @@ export class DirPath {
   /**
    * The working path of this class instance.
    */
-  readonly path: string
+  private _path: string
+
+  /**
+   * The working path of this class instance.
+   */
+  get path(): string {
+    return this._path
+  }
 
   // #region Constructor
 
@@ -45,7 +53,7 @@ export class DirPath {
    * @see [Path-JS GitHub Repository](https://github.com/ruggeryiury/path-js).
    */
   constructor(...paths: string[]) {
-    this.path = resolve(...paths)
+    this._path = resolve(...paths)
   }
 
   // #region Getters
@@ -156,36 +164,30 @@ export class DirPath {
   // #region Read Methods
 
   /**
-   * Asynchronously reads the contents of a directory and returns a list of file and folder names.
-   *
-   * By default, returns absolute paths to each entry. You can change this behavior
-   * by setting `asAbsolutePaths` to `false`, in which case it will return only the names.
+   * Asynchronously reads the contents of a directory and returns an array of file/directory paths.
    * - - - -
-   * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
    * @param {boolean} [recursive] `OPTIONAL` Recursively reads the folder. Default is `false`.
-   * @returns {Promise<string[]>} A promise that resolves to an array of directory entries. Entries are either absolute paths or names depending on the flag.
+   * @param {T} [returnValueAsStrings] `OPTIONAL` Whether to return `FilePath` / `DirPath` objects or absolute path strings. Default is `false`.
+   * @returns {Promise<string[]>} A promise that resolves to an array of file/directory entries. It can be `FilePath` / `DirPath` objects if `returnValueAsStrings` is set to `false`.
    * @throws {Error} If the directory cannot be read or does not exist.
    */
-  async readDir(asAbsolutePaths = true, recursive = false): Promise<string[]> {
+  async readDir<T extends boolean = false>(recursive = false, returnValueAsStrings: T = false as T): Promise<ReadDirReturnType<T>> {
     ensurePathIsDir(this.path, 'readDir')
     ensurePathExistence(this.path, 'readDir', 'directory')
-    return await readDir(this.path, asAbsolutePaths, recursive)
+    return await readDir(this.path, recursive, returnValueAsStrings)
   }
-
   /**
-   * Synchronously reads the contents of a directory and returns a list of file and folder names.
-   *
-   * By default, returns absolute paths to each entry. You can change this behavior
-   * by setting `asAbsolutePaths` to `false`, in which case it will return only the names.
+   * Asynchronously reads the contents of a directory and returns an array of file/directory paths.
    * - - - -
-   * @param {boolean} [asAbsolutePaths] `OPTIONAL` Whether to return absolute paths or just entry names.
-   * @returns {string[]} An array of directory entries. Entries are either absolute paths or names depending on the flag.
+   * @param {boolean} [recursive] `OPTIONAL` Recursively reads the folder. Default is `false`.
+   * @param {T} [returnValueAsStrings] `OPTIONAL` Whether to return `FilePath` / `DirPath` objects or absolute path strings. Default is `false`.
+   * @returns {Promise<string[]>} A promise that resolves to an array of file/directory entries. It can be `FilePath` / `DirPath` objects if `returnValueAsStrings` is set to `false`.
    * @throws {Error} If the directory cannot be read or does not exist.
    */
-  readDirSync(asAbsolutePaths = true): string[] {
+  readDirSync<T extends boolean = false>(recursive = false, returnValueAsStrings: T = false as T): ReadDirReturnType<T> {
     ensurePathIsDir(this.path, 'readDir')
     ensurePathExistence(this.path, 'readDir', 'directory')
-    return readDirSync(this.path, asAbsolutePaths)
+    return readDirSync(this.path, recursive, returnValueAsStrings)
   }
 
   // #region Create Methods
@@ -295,5 +297,11 @@ export class DirPath {
    */
   searchDirSync(pattern: RegExp | string | (RegExp | string)[] = '', recursive = true): string[] {
     return searchInFolderSync(this.path, pattern, recursive)
+  }
+
+  //#region Internal
+
+  [inspect.custom]() {
+    return `DirPath { ${styleText(['green'], `"${this._path}"`)} }`
   }
 }
