@@ -1,5 +1,5 @@
 import type { BinaryToTextEncoding } from 'node:crypto'
-import type { Stats, WriteStream } from 'node:fs'
+import { createWriteStream, type Stats, type WriteStream } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
 import type { PipelineOptions, PipelineSource, Stream } from 'node:stream'
 import { inspect, styleText } from 'node:util'
@@ -490,7 +490,7 @@ export class FilePath {
    * @returns {Promise<void>}
    */
   async pipe<T>(source: PipelineSource<T>, options?: PipelineOptions): Promise<void> {
-    await pipeline(source, this.createWriteStreamSync(), options)
+    return await pipeline(source, createWriteStream(this.path), options)
   }
 
   // #region Copy Methods
