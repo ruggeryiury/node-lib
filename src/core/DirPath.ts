@@ -99,12 +99,12 @@ export class DirPath {
   /**
    * Returns a new instantiated `DirPath`, resolving the path to a new directory relative from this directory path.
    * - - - -
-   * @param {string} directoryName The directory name.
+   * @param {string} dirName The directory name.
    * @returns {DirPath}
    */
-  gotoDir(directoryName: string): DirPath {
-    if (isAbsolute(directoryName)) return DirPath.of(directoryName)
-    return DirPath.of(this.path, directoryName)
+  gotoDir(dirName: string): DirPath {
+    if (isAbsolute(dirName)) return DirPath.of(dirName)
+    return DirPath.of(this.path, dirName)
   }
 
   /**
@@ -116,6 +116,26 @@ export class DirPath {
   gotoFile(fileName: string): FilePath {
     if (isAbsolute(fileName)) return FilePath.of(fileName)
     return FilePath.of(this.path, fileName)
+  }
+
+  /**
+   * Changes the directory name of this `DirPath` and returns a new instantiated `DirPath` with the new directory name.
+   * - - - -
+   * @param {string} dirName The new directory name.
+   * @returns {DirPath}
+   */
+  changeDirName(dirName: string): DirPath {
+    return new DirPath(this.root, dirName)
+  }
+
+  /**
+   * Changes the directory name of this `DirPath` instance.
+   * - - - -
+   * @param {string} dirName The new directory name.
+   * @returns {void}
+   */
+  changeThisDirName(dirName: string): void {
+    this._path = resolve(this.root, dirName)
   }
 
   /**
@@ -296,6 +316,8 @@ export class DirPath {
    * @returns {string[]} An array of absolute paths that match the pattern.
    */
   searchDirSync(pattern: RegExp | string | (RegExp | string)[] = '', recursive = true): string[] {
+    ensurePathIsDir(this.path, 'searchDir')
+    ensurePathExistence(this.path, 'searchDir', 'directory')
     return searchInFolderSync(this.path, pattern, recursive)
   }
 

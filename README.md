@@ -12,6 +12,7 @@
 - [Basic usage](#basic-usage)
   - [`FilePath`](#filepath)
     - [Class properties](#class-properties)
+    - [File stats](#file-stats)
     - [Path manipulation methods](#path-manipulation-methods)
     - [Checking file existence](#checking-file-existence)
     - [File reading methods](#file-reading-methods)
@@ -19,6 +20,9 @@
     - [Other methods](#other-methods)
   - [`DirPath`](#dirpath)
     - [Class properties](#class-properties-1)
+    - [Directory stats](#directory-stats)
+    - [Path manipulation methods](#path-manipulation-methods-1)
+    - [Checking directory existence](#checking-directory-existence)
 
 # About
 
@@ -28,7 +32,7 @@
 
 - `FilePath` | `DirPath`: Handle file and directory paths easily with built-in handling methods to read, write, copy, modify, and others.
 - `BinaryReader` | `BinaryWriter` | `StreamWriter`: Parse and write binary files easily with several format parsing and writing methods.
-- `HexVal`: Processes hex string with ease.
+- `HexStr`: Processes hex string with ease.
 - `MyObject`: Create object maps with type assertion, with built-in methods to convert them to JavaScript object or serialized JSON string.
 
 # Basic usage
@@ -42,8 +46,8 @@ You can initialize a `FilePath` instance with the class constructor
 ```ts
 import { FilePath } from 'node-lib'
 
-const fp: string = 'path/to/file.bin'
-const file: FilePath = new FilePath(fp)
+const path = 'path/to/file.bin'
+const file = new FilePath(path)
 ```
 
 or using the static method `FilePath.of()`.
@@ -51,23 +55,27 @@ or using the static method `FilePath.of()`.
 ```ts
 import { FilePath } from 'node-lib'
 
-const fp: string = 'path/to/file.bin'
-const file: FilePath = FilePath.of(fp)
+const path = 'path/to/file.bin'
+const file = FilePath.of(path)
 ```
 
 `FilePath` accepts both absolute and relative paths. Relative paths will be resolved from the project working directory your initial script will be called upon.
 
 ### Class properties
 
-| Property   | Description                                                                                               |
-| ---------- | --------------------------------------------------------------------------------------------------------- |
-| _path_     | The working path of this class instance.                                                                  |
-| _root_     | The root directory of the file where the path evaluates to.                                               |
-| _fullname_ | The name of the file with extension (if any).                                                             |
-| _name_     | The name of the file (without the extension).                                                             |
+| Property   | Description                                                                                                            |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------- |
+| _path_     | The working path of this class instance.                                                                               |
+| _root_     | The root directory of the file where the path evaluates to.                                                            |
+| _fullname_ | The name of the file with extension (if any).                                                                          |
+| _name_     | The name of the file (without the extension).                                                                          |
 | _ext_      | The extension of the file (if any), returns an empty string if the provided path accidentally evalutes to a directory. |
 
 You can also retrieve all these properties at once as an object using `FilePath.toJSON()` method.
+
+### File stats
+
+You can get systems stats of a file as an object using the `FilePath.stat()` (async) or the `FilePath.statSync()` (sync) method.
 
 ### Path manipulation methods
 
@@ -91,8 +99,8 @@ You can use the property `FilePath.exists` to check the file existence. `FilePat
 ```ts
 import { FilePath } from 'node-lib'
 
-const fp: string = 'path/to/file.bin'
-const file: FilePath = FilePath.of(fp)
+const path: string = 'path/to/file.bin'
+const file: FilePath = FilePath.of(path)
 console.log(file.exists) // <- true
 
 await file.deleteFile()
@@ -158,6 +166,7 @@ console.log(file.exists) // <- false
   - If `replace` is `true`, deletes the destination file before renaming.
 
   Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
+
 - `renameSync(newPath: FilePathLikeTypes, replace?: boolean)` &mdash; Synchronous version of `copy()`.
 - `move(newPath: FilePathLikeTypes, replace?: boolean)` &mdash; Alias to `rename()`.
 - `moveSync(newPath: FilePathLikeTypes, replace?: boolean)` &mdash; Alias to `renameSync()`.
@@ -180,8 +189,8 @@ You can initialize a `DirPath` instance with the class constructor
 ```ts
 import { DirPath } from 'node-lib'
 
-const fp: string = 'path/to/directory'
-const file: DirPath = new DirPath(fp)
+const path = 'path/to/directory'
+const dir = new DirPath(path)
 ```
 
 or using the static method `DirPath.of()`.
@@ -189,17 +198,47 @@ or using the static method `DirPath.of()`.
 ```ts
 import { DirPath } from 'node-lib'
 
-const fp: string = 'path/to/directory'
-const file: DirPath = DirPath.of(fp)
+const path = 'path/to/directory'
+const dir = DirPath.of(path)
 ```
 
 `DirPath` accepts both absolute and relative paths. Relative paths will be resolved from the project working directory your initial script will be called upon.
 
 ### Class properties
 
-| Property   | Description                                                                                               |
-| ---------- | --------------------------------------------------------------------------------------------------------- |
-| _path_     | The working path of this class instance.                                                                  |
-| _root_     | The root directory of the file where the path evaluates to.                                               |
-| _name_     | The name of the file (without the extension).                                                             |
+| Property | Description                                                 |
+| -------- | ----------------------------------------------------------- |
+| _path_   | The working path of this class instance.                    |
+| _root_   | The root directory of the file where the path evaluates to. |
+| _name_   | The name of the file (without the extension).               |
 
+You can also retrieve all these properties at once as an object using `DirPath.toJSON()` method.
+
+### Directory stats
+
+You can get systems stats of a directory as an object using the `DirPath.stat()` (async) or the `DirPath.statSync()` (sync) method.
+
+### Path manipulation methods
+
+- `changeDirName(dirName: string)` &mdash; Changes the directory name of this `DirPath` and returns a new instantiated `DirPath` with the new directory name.
+- `changeThisDirName(dirName: string)` &mdash; Changes the directory name of this `DirPath` instance.
+
+---
+
+- `gotoDir(directoryName: string)` &mdash; Returns a new instantiated `DirPath`, resolving the path to a new directory relative from this directory path.
+- `gotoFile(fileName: string)` &mdash; Returns a new instantiated `DirPath`, resolving the path to a new directory relative from this directory path.
+
+### Checking directory existence
+
+You can use the property `DirPath.exists` to check the directory existence. `DirPath.exists` is a getter that will always check once it's referenced.
+
+```ts
+import { DirPath } from 'node-lib'
+
+const path = 'path/to/directory'
+const dir = DirPath.of(path)
+console.log(dir.exists) // <- true
+
+await dir.deleteDir()
+console.log(dir.exists) // <- false
+```

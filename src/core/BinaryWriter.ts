@@ -1,4 +1,5 @@
-import { type HexLikeValues, type BufferEncodingOrNull, HexVal, type FilePathLikeTypes } from '../core.exports'
+import { inspect } from 'node:util'
+import { type HexStringLikeValues, type BufferEncodingOrNull, HexStr, type FilePathLikeTypes } from '../core.exports'
 import type { BitsBooleanArray, BitsArray, FilePath } from '../core.exports'
 import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
 
@@ -17,10 +18,6 @@ export class BinaryWriter {
   private _contents: Buffer[]
 
   constructor() {
-    this._contents = []
-  }
-
-  [Symbol.dispose](): void {
     this._contents = []
   }
 
@@ -135,15 +132,15 @@ export class BinaryWriter {
    * the `Buffer` will have the same size of the string on its encoding method.
    * @returns {void}
    */
-  writeHex(value: HexLikeValues, allocSize?: number): void {
-    if (typeof value === 'string' && !HexVal.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
+  writeHex(value: HexStringLikeValues, allocSize?: number): void {
+    if (typeof value === 'string' && !HexStr.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      buf.write(HexVal.processHex(value, { prefix: false }), 'hex')
+      buf.write(HexStr.processHex(value, { prefix: false }), 'hex')
       this._contents.push(buf)
       return
     }
-    this._contents.push(Buffer.from(HexVal.processHex(value, { prefix: false }), 'hex'))
+    this._contents.push(Buffer.from(HexStr.processHex(value, { prefix: false }), 'hex'))
   }
 
   /**
@@ -554,5 +551,15 @@ export class BinaryWriter {
   toFileSync(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath {
     const p = pathLikeToFilePath(path)
     return p.writeSync(this.toBuffer(), encoding, replace)
+  }
+
+  // #region Internal
+
+  [Symbol.dispose](): void {
+    this.clearContents()
+  }
+
+  [inspect.custom]() {
+    return `BinaryWriter { ${this._contents.reduce((prev, curr) => prev + curr.length, 0)} Bytes Written }`
   }
 }

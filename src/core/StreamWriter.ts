@@ -1,5 +1,5 @@
 import type { WriteStream } from 'node:fs'
-import { HexVal, type BinaryWriteEncodings, type BitsArray, type BitsBooleanArray, type FilePath, type FilePathLikeTypes, type HexLikeValues } from '../core.exports'
+import { HexStr, type BinaryWriteEncodings, type BitsArray, type BitsBooleanArray, type FilePath, type FilePathLikeTypes, type HexStringLikeValues } from '../core.exports'
 import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
 
 /**
@@ -163,16 +163,16 @@ export class StreamWriter {
    * the `Buffer` will have the same size of the string on its encoding method.
    * @returns {void}
    */
-  writeHex(value: HexLikeValues, allocSize?: number): void {
-    if (typeof value === 'string' && !HexVal.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
+  writeHex(value: HexStringLikeValues, allocSize?: number): void {
+    if (typeof value === 'string' && !HexStr.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      buf.write(HexVal.processHex(value, { prefix: false }), 'hex')
+      buf.write(HexStr.processHex(value, { prefix: false }), 'hex')
       this._operator.write(buf)
       this._length += buf.length
       return
     }
-    const buf = Buffer.from(HexVal.processHex(value, { prefix: false }), 'hex')
+    const buf = Buffer.from(HexStr.processHex(value, { prefix: false }), 'hex')
     this._operator.write(buf)
     this._length += buf.length
   }

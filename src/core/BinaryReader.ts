@@ -1,6 +1,7 @@
 import type { FileHandle } from 'fs/promises'
 import { type DirPath, FilePath, type BinaryWriteEncodings, type FilePathLikeTypes, BinaryWriter } from '../core.exports'
 import { pathLikeToString } from '../lib.exports'
+import { inspect } from 'util'
 
 export type BinaryReaderSeekMethods = 'start' | 'current' | 'end'
 export type BitsArray = [0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1]
@@ -108,10 +109,6 @@ export class BinaryReader {
   async close(): Promise<void> {
     if (!Buffer.isBuffer(this._operator)) await this._operator.close()
     else this._operator = Buffer.alloc(0)
-  }
-
-  async [Symbol.asyncDispose](): Promise<void> {
-    await this.close()
   }
 
   // #region String/Buffer
@@ -860,5 +857,15 @@ export class BinaryReader {
     else this._offset = this._length + offset
 
     if (this._offset > this._length) this._offset = this._offset - this._length
+  }
+
+  // #region Internal
+
+  async [Symbol.asyncDispose](): Promise<void> {
+    await this.close()
+  }
+
+  [inspect.custom]() {
+    return `BinaryReader { ${Buffer.isBuffer(this._operator) ? 'Buffer' : 'FileHandle'} }`
   }
 }

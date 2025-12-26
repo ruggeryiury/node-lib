@@ -194,7 +194,6 @@ export class FilePath {
    * @param {string | null} fileName The new file name. You can provide `null` as argument to use
    * `fileExt` parameter to change only the file's extension without changing the base name of the file.
    * @param {string | undefined} [fileExt] `OPTIONAL` A new extension for the new file path.
-   * @returns {FilePath}
    */
   changeThisFileName(fileName: string | null, fileExt?: string): void {
     const fn = fileName ?? this.name
@@ -491,7 +490,7 @@ export class FilePath {
    * @returns {Promise<void>}
    */
   async pipe<T>(source: PipelineSource<T>, options?: PipelineOptions): Promise<void> {
-    await pipeline(source, await this.createWriteStream(), options)
+    await pipeline(source, this.createWriteStreamSync(), options)
   }
 
   // #region Copy Methods
