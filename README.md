@@ -8,8 +8,8 @@
 </div>
 
 - [About](#about)
-- [Core modules](#core-modules)
-- [Basic usage](#basic-usage)
+- [Package modules overview](#package-modules-overview)
+- [API](#api)
   - [`FilePath`](#filepath)
     - [Class properties](#class-properties)
     - [File stats](#file-stats)
@@ -23,19 +23,23 @@
     - [Directory stats](#directory-stats)
     - [Path manipulation methods](#path-manipulation-methods-1)
     - [Checking directory existence](#checking-directory-existence)
+    - [Directory reading methods](#directory-reading-methods)
+    - [Directory writing/creating methods](#directory-writingcreating-methods)
+    - [Other methods](#other-methods-1)
+  - [`MyObject`](#myobject)
 
 # About
 
 `node-lib` is a package that abstracts many internal NodeJS functions into user-friendly, intuitive class subdivisions. With `node-lib`, things like file and directory path handling, and binary data writing becomes easier to do!
 
-# Core modules
+# Package modules overview
 
 - `FilePath` | `DirPath`: Handle file and directory paths easily with built-in handling methods to read, write, copy, modify, and others.
 - `BinaryReader` | `BinaryWriter` | `StreamWriter`: Parse and write binary files easily with several format parsing and writing methods.
 - `HexStr`: Processes hex string with ease.
 - `MyObject`: Create object maps with type assertion, with built-in methods to convert them to JavaScript object or serialized JSON string.
 
-# Basic usage
+# API
 
 ## `FilePath`
 
@@ -242,3 +246,32 @@ console.log(dir.exists) // <- true
 await dir.deleteDir()
 console.log(dir.exists) // <- false
 ```
+
+### Directory reading methods
+
+- `readDir(recursive?: boolean, returnValueAsStrings?: boolean)` &mdash; Reads the contents of a directory and returns an array of file/directory paths.
+- `readDirSync(recursive?: boolean, returnValueAsStrings?: boolean)` &mdash; Synchronous version of `readDir()`.
+
+### Directory writing/creating methods
+
+- `writeFileOnDir(fileName: string, data?: FileAsyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace?: boolean)` &mdash; Writes a file inside a specified directory. Automatically resolves the full file path by combining the directory path and the file name. If the file already exists and `replace` is false, an error is thrown.
+- `writeFileOnDirSync(fileName: string, data?: FileSyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace?: boolean)` &mdash; Synchronous version of `writeFileOnDir()`.
+
+---
+
+- `mkDir(recursive?: boolean)` &mdash; Creates a directory at the specified path. By default, does not create parent directories unless `recursive` is set to `true`.
+- `mkDirSync(recursive?: boolean)` &mdash; Synchronous version of `mkDir()`.
+
+### Other methods
+
+- `deleteDir(recursive?: boolean)` &mdash; Deletes a directory at the specified path. By default, deletes the directory recursively (including its contents).
+- `deleteDir(recursive?: boolean)` &mdash; Synchronous version of `deleteDir()`.
+
+---
+
+- `searchDir(pattern?: RegExp | string | (RegExp | string)[], recursive?: boolean)` &mdash; Searches for files and directories in a folder that match a given pattern.
+- `searchDirSync(pattern?: RegExp | string | (RegExp | string)[], recursive?: boolean)` &mdash; Synchronous version of `searchDir()`.
+
+## `MyObject`
+
+`MyObject` acts as a wrapper to a `Map`, with explicit conversion method to object and enforced typing.

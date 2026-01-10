@@ -1,10 +1,10 @@
-import type { LiteralUnion, PartialDeep } from 'type-fest'
+import type { PartialDeep } from 'type-fest'
 
 /**
  * `MyObject` acts as a wrapper to a `Map`, with explicit conversion method to object and enforced typing.
  * - - - -
  */
-export class MyObject<T> {
+export class MyObject<T extends object = Record<string, any>> {
   /**
    * The `Map` class which the class' instance will work upon.
    */
@@ -19,7 +19,6 @@ export class MyObject<T> {
   private _iterateEachNestedObjKey(obj: Record<string | number, unknown>): Record<string | number, unknown> {
     const nestedMap = new Map()
     for (const key of Object.keys(obj)) {
-      if (typeof key === 'symbol') throw new Error('MyObject classes does not accept symbols for keys')
       const val = obj[key]
       if (typeof val === 'object' && val !== null) nestedMap.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>))
       else nestedMap.set(key, val)
@@ -35,7 +34,6 @@ export class MyObject<T> {
    */
   private _iterateEachRootObjKey(obj: Record<keyof T, unknown>): void {
     for (const key of Object.keys(obj) as (keyof T)[]) {
-      if (typeof key === 'symbol') throw new Error('MyObject classes does not accept symbols for keys')
       const val = obj[key] as T[keyof T]
       if (typeof val === 'object' && val !== null) this._map.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
       else this._map.set(key, val)
@@ -43,7 +41,7 @@ export class MyObject<T> {
   }
 
   /**
-   * @param initial An object with initial values to be already added to the object map.
+   * @param {PartialDeep<T>} initial An object with initial values to be already added to the object map.
    */
   constructor(initial?: PartialDeep<T>) {
     this._map = new Map<keyof T, T[keyof T]>()
@@ -54,7 +52,7 @@ export class MyObject<T> {
    * Clears all values added to be map object and returns an object with all the old keys and values from the map object.
    */
   clear(): T {
-    const val = this.toObject()
+    const val = this.toJSON()
     this._map.clear()
     return val
   }
@@ -75,8 +73,8 @@ export class MyObject<T> {
    * @param {keyof T} key The key name.
    * @returns {T[keyof T] | undefined} Returns the element associated with the specified key. If no element is associated with the specified key, `undefined` is returned.
    */
-  get(key: keyof T): T[keyof T] | undefined {
-    return this._map.get(key)
+  get<K extends keyof T>(key: K): T[K] | undefined {
+    return this._map.get(key) as T[K] | undefined
   }
 
   /**
@@ -105,7 +103,7 @@ export class MyObject<T> {
    * @param {unknown} value The key value to be assigned.
    * @returns {Map<keyof T, T[keyof T]>}
    */
-  set(key: LiteralUnion<keyof T, string | number>, value: unknown): Map<keyof T, T[keyof T]> {
+  set<K extends keyof T>(key: K, value: T[K]): Map<keyof T, T[keyof T]> {
     if (typeof key === 'symbol') throw new Error('MyObject classes does not accept symbols for keys')
     return this._map.set(key as keyof T, value as T[keyof T])
   }
@@ -120,11 +118,11 @@ export class MyObject<T> {
   }
 
   /**
-   * Converts the map to an object.
+   * Converts the instantiated map to JavaScript object.
    * - - - -
    * @returns {T}
    */
-  toObject(): T {
+  toJSON(): T {
     return Object.fromEntries(this._map.entries()) as T
   }
 
@@ -134,7 +132,7 @@ export class MyObject<T> {
    * @param {string | number} [space] Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
    * @returns {string}
    */
-  stringify(space?: string | number): string {
-    return JSON.stringify(this.toObject(), null, space)
+  toString(space?: string | number): string {
+    return JSON.stringify(this.toJSON(), null, space)
   }
 }
