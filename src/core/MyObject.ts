@@ -20,7 +20,9 @@ export class MyObject<T extends object = Record<string, any>> {
     const nestedMap = new Map()
     for (const key of Object.keys(obj)) {
       const val = obj[key]
-      if (typeof val === 'object' && val !== null) nestedMap.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>))
+      if (Array.isArray(val)) this._map.set(key as keyof T, val as T[keyof T])
+      else if (Buffer.isBuffer(val)) this._map.set(key as keyof T, val as T[keyof T])
+      else if (typeof val === 'object' && val !== null) nestedMap.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>))
       else nestedMap.set(key, val)
     }
 
@@ -35,7 +37,9 @@ export class MyObject<T extends object = Record<string, any>> {
   private _iterateEachRootObjKey(obj: Record<keyof T, unknown>): void {
     for (const key of Object.keys(obj) as (keyof T)[]) {
       const val = obj[key] as T[keyof T]
-      if (typeof val === 'object' && val !== null) this._map.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
+      if (Array.isArray(val)) this._map.set(key, val)
+      else if (Buffer.isBuffer(val)) this._map.set(key, val)
+      else if (typeof val === 'object' && val !== null) this._map.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
       else this._map.set(key, val)
     }
   }
