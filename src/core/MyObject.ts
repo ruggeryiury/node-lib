@@ -20,10 +20,10 @@ export class MyObject<T extends object = Record<string, any>> {
     const nestedMap = new Map()
     for (const key of Object.keys(obj)) {
       const val = obj[key]
-      if (Array.isArray(val)) this._map.set(key as keyof T, val as T[keyof T])
-      else if (Buffer.isBuffer(val)) this._map.set(key as keyof T, val as T[keyof T])
-      else if (typeof val === 'object' && val !== null) nestedMap.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>))
-      else nestedMap.set(key, val)
+      if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) this._map.set(key as keyof T, val as T[keyof T])
+      else if (typeof val === 'object' && val !== null && Symbol.iterator in val && typeof val[Symbol.iterator] === 'function') this._map.set(key as keyof T, val as T[keyof T])
+      else if (typeof val === 'object' && val !== null) this._map.set(key as keyof T, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
+      else this._map.set(key as keyof T, val as T[keyof T])
     }
 
     return Object.fromEntries(nestedMap.entries()) as Record<string | number, unknown>
@@ -37,19 +37,19 @@ export class MyObject<T extends object = Record<string, any>> {
   private _iterateEachRootObjKey(obj: Record<keyof T, unknown>): void {
     for (const key of Object.keys(obj) as (keyof T)[]) {
       const val = obj[key] as T[keyof T]
-      if (Array.isArray(val)) this._map.set(key, val)
-      else if (Buffer.isBuffer(val)) this._map.set(key, val)
+      if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) this._map.set(key, val)
+      else if (typeof val === 'object' && val !== null && Symbol.iterator in val && typeof val[Symbol.iterator] === 'function') this._map.set(key, val)
       else if (typeof val === 'object' && val !== null) this._map.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
       else this._map.set(key, val)
     }
   }
 
   /**
-   * @param {PartialDeep<T>} initial An object with initial values to be already added to the object map.
+   * @param {PartialDeep<T>} initialValues An object with initial values to be already added to the object map.
    */
-  constructor(initial?: PartialDeep<T>) {
+  constructor(initialValues?: PartialDeep<T>) {
     this._map = new Map<keyof T, T[keyof T]>()
-    if (initial) this._iterateEachRootObjKey(initial as Record<keyof T, unknown>)
+    if (initialValues) this._iterateEachRootObjKey(initialValues as Record<keyof T, unknown>)
   }
 
   /**
