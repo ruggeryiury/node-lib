@@ -1,9 +1,9 @@
 import type { BinaryToTextEncoding } from 'node:crypto'
 import { createWriteStream, type Stats, type WriteStream } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
-import type { PipelineOptions, PipelineSource, Stream } from 'node:stream'
+import type { PipelineSource, Stream } from 'node:stream'
 import { inspect, styleText } from 'node:util'
-import { pipeline } from 'node:stream/promises'
+import { pipeline, type PipelineOptions } from 'node:stream/promises'
 import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, type ReadLinesOptions } from '../lib.exports'
 import { DirPath } from './DirPath'
 

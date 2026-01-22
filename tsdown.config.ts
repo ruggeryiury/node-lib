@@ -6,4 +6,5 @@ export default defineConfig({
   fixedExtension: false,
   minify: true,
   unbundle: true,
+  external: ['type-fest'],
 })
