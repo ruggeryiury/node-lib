@@ -3,7 +3,7 @@ import { createReadStream } from 'node:fs'
 import type { FilePathLikeTypes } from '../../core.exports'
 import { pathLikeToFilePath } from '../../lib.exports'
 
-export type AllHashAlgorithms = 'md4' | 'md5' | 'mdc2' | 'ripemd160' | 'rmd160' | 'sha1' | 'sha224' | 'sha256' | 'sha384' | 'sha512' | 'sha3-224' | 'sha3-256' | 'sha3-384' | 'sha3-512' | 'shake128' | 'shake256' | 'sm3' | 'whirlpool' | 'blake2b512' | 'blake2s256' | 'ssl3-md5' | 'ssl3-sha1'
+export type AllHashAlgorithms = 'md5' | 'ripemd160' | 'rmd160' | 'sha1' | 'sha224' | 'sha256' | 'sha384' | 'sha512' | 'sha3-224' | 'sha3-256' | 'sha3-384' | 'sha3-512' | 'shake128' | 'shake256' | 'sm3' | 'blake2b512' | 'blake2s256' | 'ssl3-md5' | 'ssl3-sha1'
 
 /**
  * Generates a hash from the input string/Buffer using the specified algorithm.
