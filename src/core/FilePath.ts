@@ -6,6 +6,8 @@ import { inspect, styleText } from 'node:util'
 import { pipeline, type PipelineOptions } from 'node:stream/promises'
 import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, type ReadLinesOptions } from '../lib.exports'
 import { DirPath } from './DirPath'
+import { BinaryReader } from './BinaryReader'
+import { StreamWriter } from './StreamWriter'
 
 export interface FilePathJSONRepresentation {
   /**
@@ -666,8 +668,29 @@ export class FilePath {
   removeSync(): void {
     return this.deleteSync()
   }
+  // #region Others
 
-  //#region Internal
+  /**
+   * Opens a `BinaryReader` class for the instantiated file path.
+   * - - - -
+   * @returns {Promise<BinaryReader>}
+   */
+  async openReader(): Promise<BinaryReader> {
+    return await BinaryReader.fromFile(this.path)
+  }
+
+  /**
+   * Opens a `StreamWriter` class for the instantiated file path.
+   * - - - -
+   * @param {boolean} [replace] `OPTIONAL` If `false`, the function will throw an Error. Default is `true`.
+   * @throws {Error} When replace is set to `false` and the file already exists.
+   * @returns {Promise<StreamWriter>}
+   */
+  async openStreamWriter(replace: boolean = true): Promise<StreamWriter> {
+    return await StreamWriter.toFile(this.path, replace)
+  }
+
+  // #region Internal
 
   [inspect.custom]() {
     return `FilePath { ${styleText(['green'], `"${this._path}"`)} }`

@@ -39,6 +39,16 @@ export class BinaryReader {
   get offset(): number {
     return this._offset
   }
+  /**
+   * True is the file handle has already been closed, otherwise false.
+   */
+  private _isClosed: boolean = false
+  /**
+   * True is the file handle has already been closed, otherwise false.
+   */
+  get isClosed(): boolean {
+    return this._isClosed
+  }
 
   /**
    * Asynchronously opens a `FileHandle` to a specific file path and use it to read bytes throughout this initialized class instance.
@@ -79,6 +89,14 @@ export class BinaryReader {
   }
 
   /**
+   * Checks if the `FileHandle` object has already been closed.
+   */
+  private _checkIfFileHandleIsClosed(): boolean {
+    if (this.isClosed) throw new Error('FileHandle object used by BinaryReader has already been closed.')
+    return true
+  }
+
+  /**
    * Creates a `BinaryReader` class instance.
    * - - - -
    * @param {Exclude<FilePathLikeTypes, DirPath> | null} path The path of any binary file to be read. The `null` value can be used to manipulate `Buffer` objects.
@@ -107,8 +125,12 @@ export class BinaryReader {
    * @returns {Promise<void>}
    */
   async close(): Promise<void> {
-    if (!Buffer.isBuffer(this._operator)) await this._operator.close()
-    else this._operator = Buffer.alloc(0)
+    if (!this._isClosed) {
+      if (!Buffer.isBuffer(this._operator)) await this._operator.close()
+      else this._operator = Buffer.alloc(0)
+    }
+
+    this._isClosed = true
   }
 
   // #region String/Buffer
@@ -122,6 +144,8 @@ export class BinaryReader {
    */
   async read(allocSize?: number): Promise<Buffer> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
+    if (this.isClosed) throw new Error('File Handle is already closed')
     if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
         const buf = this._operator.subarray(this._offset, this._offset + allocSize)
@@ -154,6 +178,7 @@ export class BinaryReader {
    */
   async readASCII(allocSize?: number): Promise<string> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
         const buf = this._operator.subarray(this._offset, this._offset + allocSize)
@@ -186,6 +211,7 @@ export class BinaryReader {
    */
   async readLatin1(allocSize?: number): Promise<string> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
         const buf = this._operator.subarray(this._offset, this._offset + allocSize)
@@ -218,6 +244,7 @@ export class BinaryReader {
    */
   async readUTF8(allocSize?: number): Promise<string> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
         const buf = this._operator.subarray(this._offset, this._offset + allocSize)
@@ -252,6 +279,7 @@ export class BinaryReader {
    */
   async readHex(allocSize?: number, prefix = true, uppercased = false): Promise<string> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       if (allocSize !== undefined) {
         const buf = this._operator.subarray(this._offset, this._offset + allocSize)
@@ -298,6 +326,7 @@ export class BinaryReader {
    */
   async readUInt8(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 1)
       this._offset++
@@ -316,6 +345,7 @@ export class BinaryReader {
    */
   async readUInt16LE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 2)
       this._offset += 2
@@ -334,6 +364,7 @@ export class BinaryReader {
    */
   async readUInt16BE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 2)
       this._offset += 2
@@ -352,6 +383,7 @@ export class BinaryReader {
    */
   async readUInt24LE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 3)
       this._offset += 3
@@ -370,6 +402,7 @@ export class BinaryReader {
    */
   async readUInt24BE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 3)
       this._offset += 3
@@ -388,6 +421,7 @@ export class BinaryReader {
    */
   async readUInt32LE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 4)
       this._offset += 4
@@ -406,6 +440,7 @@ export class BinaryReader {
    */
   async readUInt32BE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 4)
       this._offset += 4
@@ -424,6 +459,7 @@ export class BinaryReader {
    */
   async readInt8(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 1)
       this._offset++
@@ -442,6 +478,7 @@ export class BinaryReader {
    */
   async readInt16LE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 2)
       this._offset += 2
@@ -460,6 +497,7 @@ export class BinaryReader {
    */
   async readInt16BE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 2)
       this._offset += 2
@@ -478,6 +516,7 @@ export class BinaryReader {
    */
   async readInt24LE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 3)
       this._offset += 3
@@ -496,6 +535,7 @@ export class BinaryReader {
    */
   async readInt24BE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 3)
       this._offset += 3
@@ -514,6 +554,7 @@ export class BinaryReader {
    */
   async readInt32LE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 4)
       this._offset += 4
@@ -532,6 +573,7 @@ export class BinaryReader {
    */
   async readInt32BE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 4)
       this._offset += 4
@@ -552,6 +594,7 @@ export class BinaryReader {
    */
   async readFloatLE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 4)
       this._offset += 4
@@ -570,6 +613,7 @@ export class BinaryReader {
    */
   async readFloatBE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 4)
       this._offset += 4
@@ -588,6 +632,7 @@ export class BinaryReader {
    */
   async readDoubleLE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 8)
       this._offset += 8
@@ -606,6 +651,7 @@ export class BinaryReader {
    */
   async readDoubleBE(): Promise<number> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 8)
       this._offset += 8
@@ -626,6 +672,7 @@ export class BinaryReader {
    */
   async readUInt64LE(): Promise<bigint> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 8)
       this._offset += 8
@@ -644,6 +691,7 @@ export class BinaryReader {
    */
   async readUInt64BE(): Promise<bigint> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 8)
       this._offset += 8
@@ -662,6 +710,7 @@ export class BinaryReader {
    */
   async readInt64LE(): Promise<bigint> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 8)
       this._offset += 8
@@ -680,6 +729,7 @@ export class BinaryReader {
    */
   async readInt64BE(): Promise<bigint> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 8)
       this._offset += 8
@@ -700,6 +750,7 @@ export class BinaryReader {
    */
   async readByteAsBitArray(): Promise<BitsArray> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     const bits: number[] = []
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 1)
@@ -725,6 +776,7 @@ export class BinaryReader {
    */
   async readByteAsBooleanArray(): Promise<BitsBooleanArray> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     const bits: boolean[] = []
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 1)
@@ -768,6 +820,7 @@ export class BinaryReader {
   async readString(allocSize?: number | null, encoding: BinaryWriteEncodings = 'utf8'): Promise<string> {
     const enc = encoding === 'latin-1' ? 'latin1' : encoding
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       if (typeof allocSize === 'number') {
         const buf = this._operator.subarray(this._offset, this._offset + allocSize)
@@ -826,6 +879,7 @@ export class BinaryReader {
    */
   async readBooleanFromByte(): Promise<boolean> {
     this._checkExistence()
+    this._checkIfFileHandleIsClosed()
     if (Buffer.isBuffer(this._operator)) {
       const buffer = this._operator.subarray(this._offset, this._offset + 1)
       this._offset++
@@ -860,10 +914,6 @@ export class BinaryReader {
   }
 
   // #region Internal
-
-  async [Symbol.asyncDispose](): Promise<void> {
-    await this.close()
-  }
 
   [inspect.custom]() {
     return `BinaryReader { ${Buffer.isBuffer(this._operator) ? 'Buffer' : 'FileHandle'} }`

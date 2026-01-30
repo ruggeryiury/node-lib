@@ -16,7 +16,12 @@ export class StreamWriter {
   private _operator: WriteStream
   private _length: number
 
-  constructor(filePath: FilePathLikeTypes) {
+  /**
+   * A class with methods to write binary files programmatically using `WriteStream` operators.
+   * - - - -
+   * @param {FilePathLikeTypes} filePath The file path you want to stream write into.
+   */
+  private constructor(filePath: FilePathLikeTypes) {
     this.filePath = pathLikeToFilePath(filePath)
     this._operator = this.filePath.createWriteStreamSync()
     this._length = 0
@@ -55,6 +60,23 @@ export class StreamWriter {
           resolve()
         })
       })
+  }
+
+  // #region Static Methods
+  /**
+   *
+   * @param {FilePathLikeTypes} filePath The file path you want to stream write into.
+   * @param {boolean} [replace] `OPTIONAL` If `false`, the function will throw an Error. Default is `true`.
+   * @throws {Error} When replace is set to `false` and the file already exists.
+   */
+  static async toFile(filePath: FilePathLikeTypes, replace: boolean = true): Promise<StreamWriter> {
+    const file = pathLikeToFilePath(filePath)
+    if (file.exists) {
+      if (!replace) throw new Error(`Provided file path value for StreamWriter "${file.path}" already exists`)
+      await file.delete()
+    }
+
+    return new StreamWriter(file)
   }
 
   // #region String/Buffer
