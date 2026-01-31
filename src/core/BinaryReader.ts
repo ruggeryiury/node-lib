@@ -6,6 +6,7 @@ import { inspect } from 'util'
 export type BinaryReaderSeekMethods = 'start' | 'current' | 'end'
 export type BitsArray = [0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1]
 export type BitsBooleanArray = [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean]
+export type BinaryReaderOperator = 'fileHandle' | 'buffer'
 
 /**
  * A class with methods to read binary files programmatically, using `FileHandle` operators (when pointing into an existing file) or reading from a `Buffer` object.
@@ -30,13 +31,21 @@ export class BinaryReader {
     return this._length
   }
   /**
-   * The byte offset that all read methods will use.
+   * The byte offset that all read methods will start reading from.
    */
   private _offset: number
   /**
-   * The byte offset that all read methods will use.
+   * The byte offset that all read methods will start reading from.
    */
   get offset(): number {
+    return this._offset
+  }
+  /**
+   * The byte offset that all read methods will start reading from.
+   *
+   * _Functional alias to `BinaryReader.offset()`._
+   */
+  tell(): number {
     return this._offset
   }
   /**
@@ -48,6 +57,16 @@ export class BinaryReader {
    */
   get isClosed(): boolean {
     return this._isClosed
+  }
+
+  /**
+   * Returns the operator type of this class instance.
+   * - - - -
+   * @returns {BinaryReaderOperator}
+   */
+  getOperatorType(): BinaryReaderOperator {
+    if (Buffer.isBuffer(this._operator)) return 'buffer'
+    return 'fileHandle'
   }
 
   /**
@@ -917,5 +936,9 @@ export class BinaryReader {
 
   [inspect.custom]() {
     return `BinaryReader { ${Buffer.isBuffer(this._operator) ? 'Buffer' : 'FileHandle'} }`
+  }
+
+  async [Symbol.asyncDispose](): Promise<void> {
+    await this.close()
   }
 }

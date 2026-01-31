@@ -37,9 +37,13 @@ export class MyObject<T extends object = Record<string, any>> {
   private _iterateEachRootObjKey(obj: Record<keyof T, unknown>): void {
     for (const key of Object.keys(obj) as (keyof T)[]) {
       const val = obj[key] as T[keyof T]
+      // Arrays, Buffers, and null values
       if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) this._map.set(key, val)
+      // Iterable object type
       else if (typeof val === 'object' && val !== null && Symbol.iterator in val && typeof val[Symbol.iterator] === 'function') this._map.set(key, val)
-      else if (typeof val === 'object' && val !== null) this._map.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
+      // Any other generic object type
+      else if (typeof val === 'object' && val !== null && Object.getPrototypeOf(val) === Object.prototype) this._map.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
+      // Any other value
       else this._map.set(key, val)
     }
   }

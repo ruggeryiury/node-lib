@@ -14,6 +14,10 @@ export class StreamWriter {
    * The stream operator object of the file.
    */
   private _operator: WriteStream
+
+  /**
+   * Returns the length of the new binary file so far.
+   */
   private _length: number
 
   /**
@@ -34,10 +38,9 @@ export class StreamWriter {
     return this._length
   }
 
-  async [Symbol.asyncDispose](): Promise<void> {
-    await this.close()
-  }
-
+  /**
+   * Returns a value that flags if the writing operation of this class instance was closed or not.
+   */
   get isClosed(): boolean {
     return this._operator.closed
   }
@@ -123,6 +126,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeASCII(value: string, allocSize?: number): void {
+    this._checkStreamStatus()
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'ascii')
@@ -144,6 +148,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeLatin1(value: string, allocSize?: number): void {
+    this._checkStreamStatus()
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'latin1')
@@ -165,6 +170,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUTF8(value: string, allocSize?: number): void {
+    this._checkStreamStatus()
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
       buf.write(value, 'utf8')
@@ -186,6 +192,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeHex(value: HexStringLikeValues, allocSize?: number): void {
+    this._checkStreamStatus()
     if (typeof value === 'string' && !HexStr.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
@@ -206,6 +213,7 @@ export class StreamWriter {
    * @param {number} fill `OPTIONAL` The value you want to fill the padding. Default is `0`.
    */
   writePadding(paddingSize: number, fill = 0): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(paddingSize).fill(fill)
     this._operator.write(buf)
     this._length += buf.length
@@ -220,6 +228,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt8(value: number): void {
+    this._checkStreamStatus()
     if (value < 0 || value > 0xff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeUIntLE(value, 0, 1)
@@ -234,6 +243,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt16LE(value: number): void {
+    this._checkStreamStatus()
     if (value < 0 || value > 0xffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntLE(value, 0, 2)
@@ -248,6 +258,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt16BE(value: number): void {
+    this._checkStreamStatus()
     if (value < 0 || value > 65535) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeUIntBE(value, 0, 2)
@@ -262,6 +273,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt24LE(value: number): void {
+    this._checkStreamStatus()
     if (value < 0 || value > 0xffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeUIntLE(value, 0, 3)
@@ -276,6 +288,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt24BE(value: number): void {
+    this._checkStreamStatus()
     if (value < 0 || value > 0xffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeUIntBE(value, 0, 3)
@@ -290,6 +303,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt32LE(value: number): void {
+    this._checkStreamStatus()
     if (value < 0 || value > 0xffffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntLE(value, 0, 4)
@@ -304,6 +318,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt32BE(value: number): void {
+    this._checkStreamStatus()
     if (value < 0 || value > 0xffffffff) throw new TypeError(`Value must be between 0 and ${formatNumberWithDots(0xffffffff)}, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeUIntBE(value, 0, 4)
@@ -318,6 +333,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt8(value: number): void {
+    this._checkStreamStatus()
     if (value < -128 || value > 127) throw new TypeError(`Value must be between -128 and 127, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(1)
     buf.writeIntLE(value, 0, 1)
@@ -332,6 +348,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt16LE(value: number): void {
+    this._checkStreamStatus()
     if (value < -32768 || value > 32767) throw new TypeError(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntLE(value, 0, 2)
@@ -346,6 +363,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt16BE(value: number): void {
+    this._checkStreamStatus()
     if (value < -32768 || value > 32767) throw new TypeError(`Value must be between -32.768 and 32.767, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(2)
     buf.writeIntBE(value, 0, 2)
@@ -360,6 +378,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt24LE(value: number): void {
+    this._checkStreamStatus()
     if (value < -8388608 || value > 8388607) throw new TypeError(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeIntLE(value, 0, 3)
@@ -374,6 +393,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt24BE(value: number): void {
+    this._checkStreamStatus()
     if (value < -8388608 || value > 8388607) throw new TypeError(`Value must be between -8,388,608 and 8,388,607, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(3)
     buf.writeIntBE(value, 0, 3)
@@ -388,6 +408,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt32LE(value: number): void {
+    this._checkStreamStatus()
     if (value < -2147483648 || value > 2147483647) throw new TypeError(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeIntLE(value, 0, 4)
@@ -402,6 +423,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt32BE(value: number): void {
+    this._checkStreamStatus()
     if (value < -2147483648 || value > 2147483647) throw new TypeError(`Value must be between -2.147.483.648 and 2.147.483.647, provided ${formatNumberWithDots(value)}.`)
     const buf = Buffer.alloc(4)
     buf.writeIntBE(value, 0, 4)
@@ -418,6 +440,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeFloatLE(value: number): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(4)
     buf.writeFloatLE(value, 0)
     this._operator.write(buf)
@@ -431,6 +454,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeFloatBE(value: number): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(4)
     buf.writeFloatBE(value, 0)
     this._operator.write(buf)
@@ -444,6 +468,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeDoubleLE(value: number): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(8)
     buf.writeDoubleLE(value, 0)
     this._operator.write(buf)
@@ -457,6 +482,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeDoubleBE(value: number): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(8)
     buf.writeDoubleBE(value, 0)
     this._operator.write(buf)
@@ -472,6 +498,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt64LE(value: bigint): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(value, 0)
     this._operator.write(buf)
@@ -485,6 +512,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeUInt64BE(value: bigint): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64BE(value, 0)
     this._operator.write(buf)
@@ -498,6 +526,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt64LE(value: bigint): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(8)
     buf.writeBigInt64LE(value, 0)
     this._operator.write(buf)
@@ -511,6 +540,7 @@ export class StreamWriter {
    * @returns {void}
    */
   writeInt64BE(value: bigint): void {
+    this._checkStreamStatus()
     const buf = Buffer.alloc(8)
     buf.writeBigInt64BE(value, 0)
     this._operator.write(buf)
@@ -594,5 +624,10 @@ export class StreamWriter {
    */
   writeBoolean(value: boolean): void {
     this.writeUInt8(value ? 1 : 0)
+  }
+
+  // #region Internal
+  async [Symbol.asyncDispose](): Promise<void> {
+    await this.close()
   }
 }
