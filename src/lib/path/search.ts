@@ -1,6 +1,5 @@
-import { readdirSync } from 'node:fs'
-import type { Dirent } from 'node:fs'
 import { readdir } from 'node:fs/promises'
+import { readdirSync, type Dirent } from 'node:fs'
 import type { DirPathLikeTypes } from '../../core.exports'
 import { pathLikeToString, resolve } from '../../lib.exports'
 

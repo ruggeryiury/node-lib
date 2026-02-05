@@ -1,7 +1,7 @@
 import { renameSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
-import { FilePath, type FilePathLikeTypes } from '../../core.exports'
 import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToString, resolve } from '../../lib.exports'
+import { type FilePathLikeTypes, FilePath } from '../../core.exports'
 
 /**
  * Asynchronously renames (or moves) a file from an old path to a new path.
@@ -18,7 +18,7 @@ import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToStri
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
  * @throws {Error} If the destination file exists and `replace` is `false`.
  */
-export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace = false): Promise<FilePath> => {
+export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace: boolean = false): Promise<FilePath> => {
   const p = pathLikeToString(oldPath)
   let np = ''
   if (typeof newPath === 'object' && 'path' in newPath) {
@@ -51,7 +51,7 @@ export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLi
  * @returns {Promise<FilePath>} A `FilePath` instance representing the new path of the renamed file.
  * @throws {Error} If the destination file exists and `replace` is `false`.
  */
-export const renameFileSync = (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace = false): FilePath => {
+export const renameFileSync = (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace: boolean = false): FilePath => {
   const op = pathLikeToString(oldPath)
   let np = ''
   if (typeof newPath === 'object' && 'path' in newPath) {
