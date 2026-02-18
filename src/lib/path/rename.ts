@@ -14,7 +14,7 @@ import { type FilePathLikeTypes, FilePath } from '../../core.exports'
  * - - - -
  * @param {FilePathLikeTypes} oldPath The current file path.
  * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
- * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
+ * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists. Default is `false`.
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
  * @throws {Error} If the destination file exists and `replace` is `false`.
  */

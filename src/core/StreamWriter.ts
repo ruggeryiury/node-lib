@@ -212,7 +212,7 @@ export class StreamWriter {
    * @param {number} paddingSize The size of the padding.
    * @param {number} fill `OPTIONAL` The value you want to fill the padding. Default is `0`.
    */
-  writePadding(paddingSize: number, fill = 0): void {
+  writePadding(paddingSize: number, fill: number = 0): void {
     this._checkStreamStatus()
     const buf = Buffer.alloc(paddingSize).fill(fill)
     this._operator.write(buf)

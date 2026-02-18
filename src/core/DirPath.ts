@@ -191,7 +191,7 @@ export class DirPath {
    * @returns {Promise<string[]>} A promise that resolves to an array of file/directory entries. It can be `FilePath` / `DirPath` objects if `returnValueAsStrings` is set to `false`.
    * @throws {Error} If the directory cannot be read or does not exist.
    */
-  async readDir<T extends boolean = false>(recursive = false, returnValueAsStrings: T = false as T): Promise<ReadDirReturnType<T>> {
+  async readDir<T extends boolean = false>(recursive: boolean = false, returnValueAsStrings: T = false as T): Promise<ReadDirReturnType<T>> {
     ensurePathIsDir(this.path, 'readDir')
     ensurePathExistence(this.path, 'readDir', 'directory')
     return await readDir(this.path, recursive, returnValueAsStrings)
@@ -204,7 +204,7 @@ export class DirPath {
    * @returns {Promise<string[]>} A promise that resolves to an array of file/directory entries. It can be `FilePath` / `DirPath` objects if `returnValueAsStrings` is set to `false`.
    * @throws {Error} If the directory cannot be read or does not exist.
    */
-  readDirSync<T extends boolean = false>(recursive = false, returnValueAsStrings: T = false as T): ReadDirReturnType<T> {
+  readDirSync<T extends boolean = false>(recursive: boolean = false, returnValueAsStrings: T = false as T): ReadDirReturnType<T> {
     ensurePathIsDir(this.path, 'readDir')
     ensurePathExistence(this.path, 'readDir', 'directory')
     return readDirSync(this.path, recursive, returnValueAsStrings)
@@ -225,7 +225,7 @@ export class DirPath {
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the created file.
    * @throws {Error} If the file already exists and `replace` is `false`.
    */
-  async writeFileOnDir(fileName: string, data?: FileAsyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> {
+  async writeFileOnDir(fileName: string, data?: FileAsyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace: boolean = true): Promise<FilePath> {
     return await writeFileOnDir(this.path, fileName, data, encoding, replace)
   }
 
@@ -242,7 +242,7 @@ export class DirPath {
    * @returns {FilePath} A `FilePath` instance representing the created file.
    * @throws {Error} If the file already exists and `replace` is `false`.
    */
-  writeFileOnDirSync(fileName: string, data?: FileSyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace = true): FilePath {
+  writeFileOnDirSync(fileName: string, data?: FileSyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace: boolean = true): FilePath {
     return writeFileOnDirSync(this.path, fileName, data, encoding, replace)
   }
 
@@ -254,7 +254,7 @@ export class DirPath {
    * @param {boolean} [recursive] `OPTIONAL` Whether to create parent directories if they do not exist. Default is `false`.
    * @returns {Promise<DirPath>} A promise that resolves to a `DirPath` instance representing the created directory.
    */
-  async mkDir(recursive = false): Promise<DirPath> {
+  async mkDir(recursive: boolean = false): Promise<DirPath> {
     return await mkDir(this.path, recursive)
   }
   /**
@@ -265,7 +265,7 @@ export class DirPath {
    * @param {boolean} [recursive] `OPTIONAL` Whether to create parent directories if they do not exist. Default is `false`.
    * @returns {DirPath} A `DirPath` instance representing the created directory.
    */
-  mkDirSync(recursive = false): DirPath {
+  mkDirSync(recursive: boolean = false): DirPath {
     return mkDirSync(this.path, recursive)
   }
 
@@ -279,7 +279,7 @@ export class DirPath {
    * @param {boolean} [recursive] `OPTIONAL` Whether to delete the contents of the directory recursively. Default is `true`.
    * @returns {Promise<void>} Resolves when the directory has been removed.
    */
-  async deleteDir(recursive = true): Promise<void> {
+  async deleteDir(recursive: boolean = true): Promise<void> {
     if (this.exists) await deleteDir(this.path, recursive)
   }
   /**
@@ -290,7 +290,7 @@ export class DirPath {
    * @param {boolean} [recursive] `OPTIONAL` Whether to delete the contents of the directory recursively. Default is `true`.
    * @returns {void} Resolves when the directory has been removed.
    */
-  deleteDirSync(recursive = true): void {
+  deleteDirSync(recursive: boolean = true): void {
     if (this.exists) deleteDirSync(this.path, recursive)
   }
 
@@ -302,7 +302,7 @@ export class DirPath {
    * @param {boolean} [recursive] `OPTIONAL` Whether to search recursively. Defaults to `true`.
    * @returns {Promise<string[]>} An array of absolute paths that match the pattern.
    */
-  async searchDir(pattern: RegExp | string | (RegExp | string)[] = '', recursive = true): Promise<string[]> {
+  async searchDir(pattern: RegExp | string | (RegExp | string)[] = '', recursive: boolean = true): Promise<string[]> {
     ensurePathIsDir(this.path, 'searchDir')
     ensurePathExistence(this.path, 'searchDir', 'directory')
     return await searchInFolder(this.path, pattern, recursive)
@@ -315,7 +315,7 @@ export class DirPath {
    * @param {boolean} [recursive] `OPTIONAL` Whether to search recursively. Defaults to `true`.
    * @returns {string[]} An array of absolute paths that match the pattern.
    */
-  searchDirSync(pattern: RegExp | string | (RegExp | string)[] = '', recursive = true): string[] {
+  searchDirSync(pattern: RegExp | string | (RegExp | string)[] = '', recursive: boolean = true): string[] {
     ensurePathIsDir(this.path, 'searchDir')
     ensurePathExistence(this.path, 'searchDir', 'directory')
     return searchInFolderSync(this.path, pattern, recursive)

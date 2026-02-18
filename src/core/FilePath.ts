@@ -400,7 +400,7 @@ export class FilePath {
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the written file.
    * @throws {Error} If the file exists and `replace` is `false`.
    */
-  async write(data: FileAsyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> {
+  async write(data: FileAsyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace: boolean = true): Promise<FilePath> {
     return await writeFile(this.path, data, encoding, replace)
   }
 
@@ -416,7 +416,7 @@ export class FilePath {
    * @returns {FilePath} A `FilePath` instance representing the written file.
    * @throws {Error} If the file exists and `replace` is `false`.
    */
-  writeSync(data: FileSyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath {
+  writeSync(data: FileSyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace: boolean = true): FilePath {
     return writeFileSync(this.path, data, encoding, replace)
   }
 
@@ -434,7 +434,7 @@ export class FilePath {
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the written file.
    * @throws {Error} If the file exists and `replace` is `false`.
    */
-  async writeWithBOM(data: StringOrBuffer, encoding?: BufferEncodingBOM, replace = true): Promise<FilePath> {
+  async writeWithBOM(data: StringOrBuffer, encoding?: BufferEncodingBOM, replace: boolean = true): Promise<FilePath> {
     return await writeFileWithBOM(this.path, data, encoding, replace)
   }
 
@@ -452,7 +452,7 @@ export class FilePath {
    * @returns {FilePath} A `FilePath` instance representing the written file.
    * @throws {Error} If the file exists and `replace` is `false`.
    */
-  writeWithBOMSync(data: StringOrBuffer, encoding?: BufferEncodingBOM, replace = true): FilePath {
+  writeWithBOMSync(data: StringOrBuffer, encoding?: BufferEncodingBOM, replace: boolean = true): FilePath {
     return writeFileWithBOMSync(this.path, data, encoding, replace)
   }
 
@@ -511,7 +511,7 @@ export class FilePath {
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance pointing to the newly copied file.
    * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  async copy(destPath: FilePathLikeTypes, replace = false): Promise<FilePath> {
+  async copy(destPath: FilePathLikeTypes, replace: boolean = false): Promise<FilePath> {
     ensurePathIsFile(this.path, 'copy')
     ensurePathExistence(this.path, 'copy', 'file')
     return await copyFile(this.path, destPath, replace)
@@ -531,7 +531,7 @@ export class FilePath {
    * @returns {Promise<FilePath>} A `FilePath` instance pointing to the newly copied file.
    * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  copySync(destPath: FilePathLikeTypes, replace = false): FilePath {
+  copySync(destPath: FilePathLikeTypes, replace: boolean = false): FilePath {
     ensurePathIsFile(this.path, 'copySync')
     ensurePathExistence(this.path, 'copySync', 'file')
     return copyFileSync(this.path, destPath, replace)
@@ -549,11 +549,11 @@ export class FilePath {
    * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
    * - - - -
    * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
-   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists. Default is `false`.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
    * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  async rename(newPath: FilePathLikeTypes, replace = false): Promise<FilePath> {
+  async rename(newPath: FilePathLikeTypes, replace: boolean = false): Promise<FilePath> {
     ensurePathIsFile(this.path, 'rename')
     ensurePathExistence(this.path, 'rename', 'file')
     return await renameFile(this.path, newPath, replace)
@@ -571,11 +571,11 @@ export class FilePath {
    * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
    * - - - -
    * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
-   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists. Default is `false`.
    * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the new path of the renamed file.
    * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  async move(newPath: FilePathLikeTypes, replace = false): Promise<FilePath> {
+  async move(newPath: FilePathLikeTypes, replace: boolean = false): Promise<FilePath> {
     return await this.rename(newPath, replace)
   }
 
@@ -589,11 +589,11 @@ export class FilePath {
    * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
    * - - - -
    * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
-   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists. Default is `false`.
    * @returns {Promise<FilePath>} A `FilePath` instance representing the new path of the renamed file.
    * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  renameSync(newPath: FilePathLikeTypes, replace = false): FilePath {
+  renameSync(newPath: FilePathLikeTypes, replace: boolean = false): FilePath {
     ensurePathIsFile(this.path, 'renameSync')
     ensurePathExistence(this.path, 'renameSync', 'file')
     return renameFileSync(this.path, newPath, replace)
@@ -611,11 +611,11 @@ export class FilePath {
    * Automatically resolves relative `newPath` values based on the directory of the `oldPath`.
    * - - - -
    * @param {FilePathLikeTypes} newPath The new file path. Can be relative or absolute.
-   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file at the destination if it exists. Default is `false`.
    * @returns {Promise<FilePath>} A `FilePath` instance representing the new path of the renamed file.
    * @throws {Error} If the destination file exists and `replace` is `false`.
    */
-  moveSync(newPath: FilePathLikeTypes, replace = false): FilePath {
+  moveSync(newPath: FilePathLikeTypes, replace: boolean = false): FilePath {
     return this.renameSync(newPath, replace)
   }
 
