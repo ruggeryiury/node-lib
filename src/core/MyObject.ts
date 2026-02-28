@@ -16,14 +16,17 @@ export class MyObject<T extends object = Record<string, any>> {
    * @param obj
    * @returns {Record<string | number, unknown>}
    */
-  private _iterateEachNestedObjKey(obj: Record<string | number, unknown>): Record<string | number, unknown> {
+  static iterateEachNestedObjKey(obj: Record<string | number, unknown>): Record<string | number, unknown> {
     const nestedMap = new Map()
-    for (const key of Object.keys(obj)) {
-      const val = obj[key]
-      if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) this._map.set(key as keyof T, val as T[keyof T])
-      else if (typeof val === 'object' && val !== null && Symbol.iterator in val && typeof val[Symbol.iterator] === 'function') this._map.set(key as keyof T, val as T[keyof T])
-      else if (typeof val === 'object' && val !== null) this._map.set(key as keyof T, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
-      else this._map.set(key as keyof T, val as T[keyof T])
+    for (const key of Object.keys(obj) as (keyof typeof obj)[]) {
+      const val = obj[key] as (typeof obj)[keyof typeof obj]
+      // Arrays, Buffers, and null values
+      if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) nestedMap.set(key, val)
+      // Iterable object type
+      else if (typeof val === 'object' && val !== null && Symbol.iterator in val && typeof val[Symbol.iterator] === 'function') nestedMap.set(key, val)
+      // Any other generic object type
+      else if (typeof val === 'object' && val !== null && Object.getPrototypeOf(val) === Object.prototype) nestedMap.set(key, this.iterateEachNestedObjKey(val as Record<string | number, unknown>))
+      else nestedMap.set(key, val)
     }
 
     return Object.fromEntries(nestedMap.entries()) as Record<string | number, unknown>
@@ -32,28 +35,29 @@ export class MyObject<T extends object = Record<string, any>> {
   /**
    * Iterates through all keys and values of an object and adds them directly on the class' map object.
    * - - - -
-   * @param {Record<keyof T, unknown>} obj
+   * @param {Record<string | number, unknown>} obj
    */
-  private _iterateEachRootObjKey(obj: Record<keyof T, unknown>): void {
-    for (const key of Object.keys(obj) as (keyof T)[]) {
-      const val = obj[key] as T[keyof T]
+  static iterateEachRootObjKey<T>(obj: Record<string | number, unknown>, map: Map<keyof T, T[keyof T]>): void {
+    for (const key of Object.keys(obj) as (keyof typeof obj)[]) {
+      const val = obj[key] as (typeof obj)[keyof typeof obj]
+
       // Arrays, Buffers, and null values
-      if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) this._map.set(key, val)
+      if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) map.set(key as keyof T, val as T[keyof T])
       // Iterable object type
-      else if (typeof val === 'object' && val !== null && Symbol.iterator in val && typeof val[Symbol.iterator] === 'function') this._map.set(key, val)
+      else if (typeof val === 'object' && val !== null && Symbol.iterator in val && typeof val[Symbol.iterator] === 'function') map.set(key as keyof T, val as T[keyof T])
       // Any other generic object type
-      else if (typeof val === 'object' && val !== null && Object.getPrototypeOf(val) === Object.prototype) this._map.set(key, this._iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
+      else if (typeof val === 'object' && val !== null && Object.getPrototypeOf(val) === Object.prototype) map.set(key as keyof T, MyObject.iterateEachNestedObjKey(val as Record<string | number, unknown>) as T[keyof T])
       // Any other value
-      else this._map.set(key, val)
+      else map.set(key as keyof T, val as T[keyof T])
     }
   }
 
   /**
-   * @param {PartialDeep<T>} initialValues An object with initial values to be already added to the object map.
+   * @param {Partial<T>} initialValues An object with initial values to be already added to the object map.
    */
-  constructor(initialValues?: PartialDeep<T>) {
+  constructor(initialValues?: Partial<T>) {
     this._map = new Map<keyof T, T[keyof T]>()
-    if (initialValues) this._iterateEachRootObjKey(initialValues as Record<keyof T, unknown>)
+    if (initialValues) MyObject.iterateEachRootObjKey<T>(initialValues as Record<keyof T, unknown>, this._map)
   }
 
   /**
@@ -122,7 +126,7 @@ export class MyObject<T extends object = Record<string, any>> {
    * @param {PartialDeep<T>} values An partial object which keys and values respect the type parameter initialized.
    */
   setMany(values: PartialDeep<T>): void {
-    this._iterateEachRootObjKey(values as Record<keyof T, unknown>)
+    MyObject.iterateEachRootObjKey(values as Record<keyof T, unknown>, this._map)
   }
 
   /**
