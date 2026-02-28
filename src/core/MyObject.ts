@@ -19,7 +19,7 @@ export class MyObject<T extends object = Record<string, any>> {
   static iterateEachNestedObjKey(obj: Record<string | number, unknown>): Record<string | number, unknown> {
     const nestedMap = new Map()
     for (const key of Object.keys(obj) as (keyof typeof obj)[]) {
-      const val = obj[key] as (typeof obj)[keyof typeof obj]
+      const val = obj[key]
       // Arrays, Buffers, and null values
       if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) nestedMap.set(key, val)
       // Iterable object type
@@ -39,7 +39,7 @@ export class MyObject<T extends object = Record<string, any>> {
    */
   static iterateEachRootObjKey<T>(obj: Record<string | number, unknown>, map: Map<keyof T, T[keyof T]>): void {
     for (const key of Object.keys(obj) as (keyof typeof obj)[]) {
-      const val = obj[key] as (typeof obj)[keyof typeof obj]
+      const val = obj[key]
 
       // Arrays, Buffers, and null values
       if (Array.isArray(val) || Buffer.isBuffer(val) || (typeof val === 'object' && val === null)) map.set(key as keyof T, val as T[keyof T])
