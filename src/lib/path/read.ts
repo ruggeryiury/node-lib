@@ -108,12 +108,7 @@ export const readLinesSync = (path: FilePathLikeTypes, options?: ReadLinesOption
 export const readJSON = async <T>(path: FilePathLikeTypes, encoding?: BufferEncodingText): Promise<T> => {
   const p = pathLikeToString(path)
   const contents = await readFile(p, encoding)
-  try {
-    return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents) as T
-  } catch (err) {
-    if (err instanceof Error) throw new Error(err.message)
-    else throw err
-  }
+  return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents) as T
 }
 
 /**
@@ -130,12 +125,7 @@ export const readJSON = async <T>(path: FilePathLikeTypes, encoding?: BufferEnco
 export const readJSONSync = <T>(path: FilePathLikeTypes, encoding?: BufferEncodingText): T => {
   const p = pathLikeToString(path)
   const contents = readFileSync(p, encoding)
-  try {
-    return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents) as T
-  } catch (err) {
-    if (err instanceof Error) throw new Error(err.message)
-    else throw err
-  }
+  return JSON.parse(Buffer.isBuffer(contents) ? contents.toString(encoding) : contents) as T
 }
 
 /**

@@ -20,6 +20,7 @@ import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToStri
  */
 export const copyFile = async (srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, replace = false): Promise<FilePath> => {
   const sp = pathLikeToString(srcPath)
+  // eslint-disable-next-line no-useless-assignment
   let dp = ''
   if (typeof destPath === 'object' && 'path' in destPath) {
     if (destPath instanceof FilePath) dp = destPath.path
@@ -53,6 +54,7 @@ export const copyFile = async (srcPath: FilePathLikeTypes, destPath: FilePathLik
  */
 export const copyFileSync = (srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, replace = false): FilePath => {
   const sp = pathLikeToString(srcPath)
+  // eslint-disable-next-line no-useless-assignment
   let dp = ''
   if (typeof destPath === 'object' && 'path' in destPath) {
     if (destPath instanceof FilePath) dp = destPath.path

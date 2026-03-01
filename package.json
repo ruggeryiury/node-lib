@@ -1,6 +1,6 @@
 {
   "name": "node-lib",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "private": true,
   "description": "Useful and straightforward abstractions for many NodeJS internal methods.",
   "homepage": "https://github.com/ruggeryiury/node-lib#readme",
@@ -46,16 +46,16 @@
     }
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@types/node": "^25.0.10",
-    "eslint": "^9.39.2",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.3",
+    "eslint": "^10.0.2",
     "eslint-import-resolver-typescript": "^4.4.4",
-    "globals": "^17.0.0",
+    "globals": "^17.4.0",
     "prettier": "^3.8.1",
-    "tsdown": "^0.20.0",
+    "tsdown": "0.21.0-beta.2",
     "tsx": "^4.21.0",
-    "type-fest": "^5.4.1",
+    "type-fest": "^5.4.4",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.1"
+    "typescript-eslint": "^8.56.1"
   }
 }
