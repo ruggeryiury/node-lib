@@ -38,7 +38,7 @@ export const deleteFileSync = (path: FilePathLikeTypes): void => {
  * @param {boolean} [recursive] `OPTIONAL` Whether to delete the contents of the directory recursively. Default is `true`.
  * @returns {Promise<void>} Resolves when the directory has been removed.
  */
-export const deleteDir = async (dirPath: FilePathLikeTypes, recursive = true): Promise<void> => {
+export const deleteDir = async (dirPath: FilePathLikeTypes, recursive: boolean = true): Promise<void> => {
   const dp = pathLikeToString(dirPath)
   await rm(dp, { recursive })
 }

@@ -23,5 +23,6 @@ export default defineConfig(
     },
   },
   eslint.configs.recommended,
-  tseslint.configs.recommendedTypeCheckedOnly
+  tseslint.configs.recommendedTypeCheckedOnly,
+  { rules: { 'no-useless-assignment': 'off' } }
 )

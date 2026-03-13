@@ -11,7 +11,7 @@ import { pathLikeToString, resolve } from '../../lib.exports'
  * @param {boolean} [recursive] `OPTIONAL` Whether to search recursively. Defaults to `true`.
  * @returns {string[]} An array of absolute paths that match the pattern.
  */
-export const searchInFolderSync = (dirPath: DirPathLikeTypes, pattern: RegExp | string | (RegExp | string)[] = '', recursive = true): string[] => {
+export const searchInFolderSync = (dirPath: DirPathLikeTypes, pattern: RegExp | string | (RegExp | string)[] = '', recursive: boolean = true): string[] => {
   const results: string[] = []
   const regex = pattern ? (Array.isArray(pattern) ? pattern.map((p) => (typeof p === 'string' ? new RegExp(p) : p)) : typeof pattern === 'string' ? new RegExp(pattern) : pattern) : null
 
@@ -55,7 +55,7 @@ export const searchInFolderSync = (dirPath: DirPathLikeTypes, pattern: RegExp | 
  * @param {boolean} [recursive] `OPTIONAL` Whether to search recursively. Defaults to `true`.
  * @returns {Promise<string[]>} An array of absolute paths that match the pattern.
  */
-export const searchInFolder = async (dirPath: DirPathLikeTypes, pattern: RegExp | string | (RegExp | string)[] = '', recursive = true): Promise<string[]> => {
+export const searchInFolder = async (dirPath: DirPathLikeTypes, pattern: RegExp | string | (RegExp | string)[] = '', recursive: boolean = true): Promise<string[]> => {
   const results: string[] = []
   const regex = pattern ? (Array.isArray(pattern) ? pattern.map((p) => (typeof p === 'string' ? new RegExp(p) : p)) : typeof pattern === 'string' ? new RegExp(pattern) : pattern) : null
 

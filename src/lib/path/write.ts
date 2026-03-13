@@ -16,7 +16,7 @@ import { exists, pathLikeToString, resolve } from '../../lib.exports'
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the written file.
  * @throws {Error} If the file exists and `replace` is `false`.
  */
-export const writeFile = async (path: FilePathLikeTypes, data: FileAsyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> => {
+export const writeFile = async (path: FilePathLikeTypes, data: FileAsyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace: boolean = true): Promise<FilePath> => {
   const p = pathLikeToString(path)
   if (exists(p) && !replace) throw new Error(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
   await nodeWriteFile(p, data, encoding)
@@ -36,7 +36,7 @@ export const writeFile = async (path: FilePathLikeTypes, data: FileAsyncWriteDat
  * @returns {FilePath} A `FilePath` instance representing the written file.
  * @throws {Error} If the file exists and `replace` is `false`.
  */
-export const writeFileSync = (path: FilePathLikeTypes, data: FileSyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath => {
+export const writeFileSync = (path: FilePathLikeTypes, data: FileSyncWriteDataTypes, encoding?: BufferEncodingOrNull, replace: boolean = true): FilePath => {
   const p = pathLikeToString(path)
   if (exists(p) && !replace) throw new Error(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
   nodeWriteFileSync(p, data, encoding)
@@ -58,7 +58,7 @@ export const writeFileSync = (path: FilePathLikeTypes, data: FileSyncWriteDataTy
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the written file.
  * @throws {Error} If the file exists and `replace` is `false`.
  */
-export const writeFileWithBOM = async (path: FilePathLikeTypes, data: StringOrBuffer, encoding?: BufferEncodingBOM, replace = true): Promise<FilePath> => {
+export const writeFileWithBOM = async (path: FilePathLikeTypes, data: StringOrBuffer, encoding?: BufferEncodingBOM, replace: boolean = true): Promise<FilePath> => {
   const p = pathLikeToString(path)
   if (exists(p) && !replace) throw new Error(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
   const content = '\ufeff' + (Buffer.isBuffer(data) ? data.toString() : data)
@@ -82,7 +82,7 @@ export const writeFileWithBOM = async (path: FilePathLikeTypes, data: StringOrBu
  * @returns {FilePath} A `FilePath` instance representing the written file.
  * @throws {Error} If the file exists and `replace` is `false`.
  */
-export const writeFileWithBOMSync = (path: FilePathLikeTypes, data: StringOrBuffer, encoding?: BufferEncodingBOM, replace = true): FilePath => {
+export const writeFileWithBOMSync = (path: FilePathLikeTypes, data: StringOrBuffer, encoding?: BufferEncodingBOM, replace: boolean = true): FilePath => {
   const p = pathLikeToString(path)
   if (exists(p) && !replace) throw new Error(`Provided file path ${p} already exists. To automatically replace the file, set the "replace" argument to true.`)
   const content = '\ufeff' + (Buffer.isBuffer(data) ? data.toString() : data)
@@ -105,7 +105,7 @@ export const writeFileWithBOMSync = (path: FilePathLikeTypes, data: StringOrBuff
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance representing the created file.
  * @throws {Error} If the file already exists and `replace` is `false`.
  */
-export const writeFileOnDir = async (dirPath: FilePathLikeTypes, fileName: string, data?: FileAsyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> => {
+export const writeFileOnDir = async (dirPath: FilePathLikeTypes, fileName: string, data?: FileAsyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace: boolean = true): Promise<FilePath> => {
   const dp = pathLikeToString(dirPath)
   const newFilePath = resolve(dp, fileName)
   if (exists(newFilePath) && !replace) throw new Error(`Provided file path ${newFilePath} already exists. To automatically replace the file, set the "replace" argument to true.`)
@@ -128,7 +128,7 @@ export const writeFileOnDir = async (dirPath: FilePathLikeTypes, fileName: strin
  * @returns {FilePath} A `FilePath` instance representing the created file.
  * @throws {Error} If the file already exists and `replace` is `false`.
  */
-export const writeFileOnDirSync = (dirPath: FilePathLikeTypes, fileName: string, data?: FileSyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace = true): FilePath => {
+export const writeFileOnDirSync = (dirPath: FilePathLikeTypes, fileName: string, data?: FileSyncWriteDataTypes | null, encoding?: BufferEncodingOrNull, replace: boolean = true): FilePath => {
   const dp = pathLikeToString(dirPath)
   const newFilePath = resolve(dp, fileName)
   if (exists(newFilePath) && !replace) throw new Error(`Provided file path ${newFilePath} already exists. To automatically replace the file, set the "replace" argument to true.`)
@@ -146,7 +146,7 @@ export const writeFileOnDirSync = (dirPath: FilePathLikeTypes, fileName: string,
  * @param {boolean} [recursive] `OPTIONAL` Whether to create parent directories if they do not exist. Default is `false`.
  * @returns {Promise<DirPath>} A promise that resolves to a `DirPath` instance representing the created directory.
  */
-export const mkDir = async (dirPath: FilePathLikeTypes, recursive = false): Promise<DirPath> => {
+export const mkDir = async (dirPath: FilePathLikeTypes, recursive: boolean = false): Promise<DirPath> => {
   const dp = pathLikeToString(dirPath)
   await mkdir(dp, { recursive })
   return new DirPath(dp)
@@ -161,7 +161,7 @@ export const mkDir = async (dirPath: FilePathLikeTypes, recursive = false): Prom
  * @param {boolean} [recursive] `OPTIONAL` Whether to create parent directories if they do not exist. Default is `false`.
  * @returns {DirPath} A `DirPath` instance representing the created directory.
  */
-export const mkDirSync = (dirPath: FilePathLikeTypes, recursive = false): DirPath => {
+export const mkDirSync = (dirPath: FilePathLikeTypes, recursive: boolean = false): DirPath => {
   const dp = pathLikeToString(dirPath)
   mkdirSync(dp, { recursive })
   return new DirPath(dp)

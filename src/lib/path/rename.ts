@@ -20,7 +20,6 @@ import { type FilePathLikeTypes, FilePath } from '../../core.exports'
  */
 export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace: boolean = false): Promise<FilePath> => {
   const p = pathLikeToString(oldPath)
-  // eslint-disable-next-line no-useless-assignment
   let np = ''
   if (typeof newPath === 'object' && 'path' in newPath) {
     if (newPath instanceof FilePath) np = newPath.path
@@ -54,7 +53,6 @@ export const renameFile = async (oldPath: FilePathLikeTypes, newPath: FilePathLi
  */
 export const renameFileSync = (oldPath: FilePathLikeTypes, newPath: FilePathLikeTypes, replace: boolean = false): FilePath => {
   const op = pathLikeToString(oldPath)
-  // eslint-disable-next-line no-useless-assignment
   let np = ''
   if (typeof newPath === 'object' && 'path' in newPath) {
     if (newPath instanceof FilePath) np = newPath.path

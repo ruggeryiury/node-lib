@@ -18,9 +18,8 @@ import { deleteFile, deleteFileSync, dirname, exists, isAbsolute, pathLikeToStri
  * @returns {Promise<FilePath>} A promise that resolves to a `FilePath` instance pointing to the newly copied file.
  * @throws {Error} If the destination file exists and `replace` is `false`.
  */
-export const copyFile = async (srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, replace = false): Promise<FilePath> => {
+export const copyFile = async (srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, replace: boolean = false): Promise<FilePath> => {
   const sp = pathLikeToString(srcPath)
-  // eslint-disable-next-line no-useless-assignment
   let dp = ''
   if (typeof destPath === 'object' && 'path' in destPath) {
     if (destPath instanceof FilePath) dp = destPath.path
@@ -52,9 +51,8 @@ export const copyFile = async (srcPath: FilePathLikeTypes, destPath: FilePathLik
  * @returns {Promise<FilePath>} A `FilePath` instance pointing to the newly copied file.
  * @throws {Error} If the destination file exists and `replace` is `false`.
  */
-export const copyFileSync = (srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, replace = false): FilePath => {
+export const copyFileSync = (srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, replace: boolean = false): FilePath => {
   const sp = pathLikeToString(srcPath)
-  // eslint-disable-next-line no-useless-assignment
   let dp = ''
   if (typeof destPath === 'object' && 'path' in destPath) {
     if (destPath instanceof FilePath) dp = destPath.path

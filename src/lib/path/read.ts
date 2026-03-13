@@ -163,7 +163,7 @@ export const readFileOffset = async (path: FilePathLikeTypes, byteOffset: number
  * @returns {Promise<string[]>} A promise that resolves to an array of file/directory entries. It can be `FilePath` / `DirPath` objects if `returnValueAsStrings` is set to `false`.
  * @throws {Error} If the directory cannot be read or does not exist.
  */
-export const readDir = async <T extends boolean = false>(dirPath: DirPathLikeTypes, recursive = false, returnValueAsStrings: T = false as T): Promise<ReadDirReturnType<T>> => {
+export const readDir = async <T extends boolean = false>(dirPath: DirPathLikeTypes, recursive: boolean = false, returnValueAsStrings: T = false as T): Promise<ReadDirReturnType<T>> => {
   const path = pathLikeToString(dirPath)
   const results = (await readdir(path, { recursive })).map((val) => resolve(path, val))
 
@@ -180,7 +180,7 @@ export const readDir = async <T extends boolean = false>(dirPath: DirPathLikeTyp
  * @returns {Promise<string[]>} A promise that resolves to an array of file/directory entries. It can be `FilePath` / `DirPath` objects if `returnValueAsStrings` is set to `false`.
  * @throws {Error} If the directory cannot be read or does not exist.
  */
-export const readDirSync = <T extends boolean = false>(dirPath: DirPathLikeTypes, recursive = false, returnValueAsStrings: T = false as T): ReadDirReturnType<T> => {
+export const readDirSync = <T extends boolean = false>(dirPath: DirPathLikeTypes, recursive: boolean = false, returnValueAsStrings: T = false as T): ReadDirReturnType<T> => {
   const path = pathLikeToString(dirPath)
   const results = readdirSync(path, { recursive }).map((val) => (typeof val === 'string' ? resolve(path, val) : resolve(path, val.toString())))
 
