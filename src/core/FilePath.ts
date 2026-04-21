@@ -646,6 +646,19 @@ export class FilePath {
   }
 
   /**
+   * _Alias to `delete()`._
+   *
+   * Asynchronously deletes a file at the specified path if it exists.
+   *
+   * Resolves the given path and performs a safe check before deletion to avoid errors.
+   * - - - -
+   * @returns {Promise<void>}
+   */
+  async unlink(): Promise<void> {
+    return await this.delete()
+  }
+
+  /**
    * Synchronously deletes a file at the specified path if it exists.
    *
    * Resolves the given path and performs a safe check before deletion to avoid errors.
@@ -666,6 +679,19 @@ export class FilePath {
    * @returns {void}
    */
   removeSync(): void {
+    return this.deleteSync()
+  }
+
+  /**
+   * _Alias to `deleteSync()`._
+   *
+   * Synchronously deletes a file at the specified path if it exists.
+   *
+   * Resolves the given path and performs a safe check before deletion to avoid errors.
+   * - - - -
+   * @returns {void}
+   */
+  unlinkSync(): void {
     return this.deleteSync()
   }
   // #region Others
