@@ -1,6 +1,6 @@
 import { type Stats } from 'node:fs'
 import { FilePath, type BufferEncodingOrNull, type FileAsyncWriteDataTypes, type FileSyncWriteDataTypes } from '../core.exports'
-import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, resolve, searchInFolder, searchInFolderSync, stat, statSync, writeFileOnDir, writeFileOnDirSync, type ReadDirReturnType } from '../lib.exports'
+import { basename, deleteDir, deleteDirSync, dirname, ensurePathExistence, ensurePathIsDir, exists, isAbsolute, mkDir, mkDirSync, readDir, readDirSync, renameDir, renameDirSync, resolve, searchInFolder, searchInFolderSync, stat, statSync, writeFileOnDir, writeFileOnDirSync, type ReadDirReturnType } from '../lib.exports'
 import { inspect, styleText } from 'node:util'
 
 export interface DirPathJSONRepresentation {
@@ -267,6 +267,88 @@ export class DirPath {
    */
   mkDirSync(recursive: boolean = false): DirPath {
     return mkDirSync(this.path, recursive)
+  }
+
+  // #region Rename Methods
+
+  /**
+   * Asynchronously renames (or moves) a directory from an old path to a new path.
+   *
+   * If the new path already exists:
+   * - Throws an error unless `replace` is `true`.
+   * - If `replace` is `true`, deletes the destination folder before renaming.
+   *
+   * Automatically resolves relative `newPath` values based on the `oldPath`.
+   * - - - -
+   * @param {DirPathLikeTypes} newPath The new directory path. Can be relative or absolute.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the directory at the destination if it exists. Default is `false`.
+   * @returns {Promise<DirPath>} A promise that resolves to a `DirPath` instance representing the new path of the renamed file.
+   * @throws {Error} If the destination directory exists and `replace` is `false`.
+   */
+  async renameDir(newPath: DirPathLikeTypes, replace: boolean = false): Promise<DirPath> {
+    ensurePathIsDir(this.path, 'renameDir')
+    ensurePathExistence(this.path, 'renameDir', 'directory')
+    return await renameDir(this.path, newPath, replace)
+  }
+
+  /**
+   * _Alias to `renameDir()`._
+   *
+   * Asynchronously renames (or moves) a directory from an old path to a new path.
+   *
+   * If the new path already exists:
+   * - Throws an error unless `replace` is `true`.
+   * - If `replace` is `true`, deletes the destination folder before renaming.
+   *
+   * Automatically resolves relative `newPath` values based on the `oldPath`.
+   * - - - -
+   * @param {DirPathLikeTypes} newPath The new directory path. Can be relative or absolute.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the directory at the destination if it exists. Default is `false`.
+   * @returns {Promise<DirPath>} A promise that resolves to a `DirPath` instance representing the new path of the renamed file.
+   * @throws {Error} If the destination directory exists and `replace` is `false`.
+   */
+  async moveDir(newPath: DirPathLikeTypes, replace: boolean = false): Promise<DirPath> {
+    return await this.renameDir(newPath, replace)
+  }
+
+  /**
+   * Synchronously renames (or moves) a directory from an old path to a new path.
+   *
+   * If the new path already exists:
+   * - Throws an error unless `replace` is `true`.
+   * - If `replace` is `true`, deletes the destination folder before renaming.
+   *
+   * Automatically resolves relative `newPath` values based on the `oldPath`.
+   * - - - -
+   * @param {DirPathLikeTypes} newPath The new directory path. Can be relative or absolute.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the directory at the destination if it exists. Default is `false`.
+   * @returns {DirPath} A promise that resolves to a `DirPath` instance representing the new path of the renamed file.
+   * @throws {Error} If the destination directory exists and `replace` is `false`.
+   */
+  renameDirSync(newPath: DirPathLikeTypes, replace: boolean = false): DirPath {
+    ensurePathIsDir(this.path, 'renameDirSync')
+    ensurePathExistence(this.path, 'renameDirSync', 'directory')
+    return renameDirSync(this.path, newPath, replace)
+  }
+
+  /**
+   * _Alias to `renameDirSync()`._
+   *
+   * Synchronously renames (or moves) a directory from an old path to a new path.
+   *
+   * If the new path already exists:
+   * - Throws an error unless `replace` is `true`.
+   * - If `replace` is `true`, deletes the destination folder before renaming.
+   *
+   * Automatically resolves relative `newPath` values based on the `oldPath`.
+   * - - - -
+   * @param {DirPathLikeTypes} newPath The new directory path. Can be relative or absolute.
+   * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the directory at the destination if it exists. Default is `false`.
+   * @returns {DirPath} A promise that resolves to a `DirPath` instance representing the new path of the renamed file.
+   * @throws {Error} If the destination directory exists and `replace` is `false`.
+   */
+  moveSync(newPath: DirPathLikeTypes, replace: boolean = false): DirPath {
+    return this.renameDirSync(newPath, replace)
   }
 
   // #region Delete Methods
