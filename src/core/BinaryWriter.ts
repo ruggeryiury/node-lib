@@ -40,7 +40,7 @@ export class BinaryWriter {
   // #region String/Buffer
 
   /**
-   * Writes raw `Buffer` or 'string' values on the binary file.
+   * Writes raw `Buffer` or string values on the binary file.
    * - - - -
    * @param {Buffer} value The `Buffer` object to be added to the binary file.
    * @param {BinaryWriteEncodings} encoding `OPTIONAL` Used on string values. Default is `'utf8'`.
@@ -150,8 +150,8 @@ export class BinaryWriter {
    * @param {number} fill `OPTIONAL` The value you want to fill the padding. Default is `0`.
    */
   writePadding(paddingSize: number, fill: number = 0): void {
-    const buf = Buffer.alloc(paddingSize).fill(fill)
-    this._contents.push(buf)
+    if (fill === 0) this._contents.push(Buffer.alloc(paddingSize))
+    else this._contents.push(Buffer.allocUnsafe(paddingSize).fill(fill))
   }
 
   // #region Integer
@@ -341,7 +341,7 @@ export class BinaryWriter {
   // #region Float/Double
 
   /**
-   * Writer a float number value (32-bit) in little-endian byte order.
+   * Writes a float number value (32-bit) in little-endian byte order.
    * - - - -
    * @param {number} value The number to be added to the binary file.
    * @returns {void}
@@ -353,7 +353,7 @@ export class BinaryWriter {
   }
 
   /**
-   * Writer a float number value (32-bit) in big-endian byte order.
+   * Writes a float number value (32-bit) in big-endian byte order.
    * - - - -
    * @param {number} value The number to be added to the binary file.
    * @returns {void}
@@ -365,7 +365,7 @@ export class BinaryWriter {
   }
 
   /**
-   * Writer a double float number value (64-bit) in little-endian byte order.
+   * Writes a double float number value (64-bit) in little-endian byte order.
    * - - - -
    * @param {number} value The number to be added to the binary file.
    * @returns {void}
@@ -377,7 +377,7 @@ export class BinaryWriter {
   }
 
   /**
-   * Writer a double float number value (64-bit) in big-endian byte order.
+   * Writes a double float number value (64-bit) in big-endian byte order.
    * - - - -
    * @param {number} value The number to be added to the binary file.
    * @returns {void}
@@ -393,48 +393,48 @@ export class BinaryWriter {
   /**
    * Writes an unsigned 64-bit value on the binary file (little endian mode).
    * - - - -
-   * @param {bigint} value The number to be added to the binary file.
+   * @param {number | bigint} value The number to be added to the binary file.
    * @returns {void}
    */
-  writeUInt64LE(value: bigint): void {
+  writeUInt64LE(value: number | bigint): void {
     const buf = Buffer.alloc(8)
-    buf.writeBigUInt64LE(value, 0)
+    buf.writeBigUInt64LE(BigInt(value), 0)
     this._contents.push(buf)
   }
 
   /**
    * Writes an unsigned 64-bit value on the binary file (big endian mode).
    * - - - -
-   * @param {bigint} value The number to be added to the binary file.
+   * @param {number | bigint} value The number to be added to the binary file.
    * @returns {void}
    */
-  writeUInt64BE(value: bigint): void {
+  writeUInt64BE(value: number | bigint): void {
     const buf = Buffer.alloc(8)
-    buf.writeBigUInt64BE(value, 0)
+    buf.writeBigUInt64BE(BigInt(value), 0)
     this._contents.push(buf)
   }
 
   /**
    * Writes a signed 64-bit value on the binary file (little endian mode).
    * - - - -
-   * @param {bigint} value The number to be added to the binary file.
+   * @param {number | bigint} value The number to be added to the binary file.
    * @returns {void}
    */
-  writeInt64LE(value: bigint): void {
+  writeInt64LE(value: number | bigint): void {
     const buf = Buffer.alloc(8)
-    buf.writeBigInt64LE(value, 0)
+    buf.writeBigInt64LE(BigInt(value), 0)
     this._contents.push(buf)
   }
 
   /**
    * Writes a signed 64-bit value on the binary file (big endian mode).
    * - - - -
-   * @param {bigint} value The number to be added to the binary file.
+   * @param {number | bigint} value The number to be added to the binary file.
    * @returns {void}
    */
-  writeInt64BE(value: bigint): void {
+  writeInt64BE(value: number | bigint): void {
     const buf = Buffer.alloc(8)
-    buf.writeBigInt64BE(value, 0)
+    buf.writeBigInt64BE(BigInt(value), 0)
     this._contents.push(buf)
   }
 
@@ -560,6 +560,7 @@ export class BinaryWriter {
   }
 
   [inspect.custom]() {
-    return `BinaryWriter { ${this._contents.reduce((prev, curr) => prev + curr.length, 0)} Bytes Written }`
+    const bytesWritten = this._contents.reduce((prev, curr) => prev + curr.length, 0)
+    return `BinaryWriter { ${bytesWritten} ${bytesWritten === 1 ? 'Byte' : 'Bytes'} Written }`
   }
 }

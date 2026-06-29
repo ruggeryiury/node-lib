@@ -1,5 +1,6 @@
 export * from './core/BinaryReader'
 export * from './core/BinaryWriter'
+export * from './core/Cryptography'
 export * from './core/DirPath'
 export * from './core/FilePath'
 export * from './core/HexStr'

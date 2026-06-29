@@ -13,14 +13,16 @@
  */
 export const parseReadableBytesSize = (input: string): number => {
   const trimmed = input.trim().toUpperCase().replace(/\s+/g, '')
-  const match = /^([\d.]+)(KB|MB|GB|TB)$/.exec(trimmed)
+  const match = /^([\d.]+)(b|B|kb|KB|mb|MB|gb|GB|tb|TB)$/.exec(trimmed)
 
   if (!match) throw new Error(`Invalid readable size format: "${input}"`)
 
   const value = parseFloat(match[1])
-  const unit = match[2]
+  const unit = match[2].toUpperCase()
 
   switch (unit) {
+    case 'B':
+      return Math.round(value)
     case 'KB':
       return Math.round(value * 1024)
     case 'MB':

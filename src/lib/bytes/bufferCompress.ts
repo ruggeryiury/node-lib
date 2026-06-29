@@ -1,5 +1,5 @@
 import { promisify } from 'util'
-import { brotliCompress, brotliDecompress, type BrotliOptions, type InputType } from 'zlib'
+import { brotliCompress, brotliDecompress, type BrotliOptions, type InputType } from 'node:zlib'
 
 /**
  * A promisified version of Node.js `zlib.brotliCompress`.

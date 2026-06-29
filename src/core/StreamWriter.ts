@@ -1,6 +1,7 @@
 import type { WriteStream } from 'node:fs'
 import { HexStr, type BinaryWriteEncodings, type BitsArray, type BitsBooleanArray, type FilePath, type FilePathLikeTypes, type HexStringLikeValues } from '../core.exports'
 import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
+import { inspect } from 'node:util'
 
 /**
  * A class with methods to write binary files programmatically using `WriteStream` operators.
@@ -85,7 +86,7 @@ export class StreamWriter {
   // #region String/Buffer
 
   /**
-   * Writes raw `Buffer` or 'string' values on the binary file.
+   * Writes raw `Buffer` or string values on the binary file.
    * - - - -
    * @param {Buffer} value The `Buffer` object to be added to the binary file.
    * @param {BinaryWriteEncodings} encoding `OPTIONAL` Used on string values. Default is `'utf8'`.
@@ -214,7 +215,7 @@ export class StreamWriter {
    */
   writePadding(paddingSize: number, fill: number = 0): void {
     this._checkStreamStatus()
-    const buf = Buffer.alloc(paddingSize).fill(fill)
+    const buf = fill === 0 ? Buffer.alloc(paddingSize) : Buffer.allocUnsafe(paddingSize).fill(fill)
     this._operator.write(buf)
     this._length += buf.length
   }
@@ -434,7 +435,7 @@ export class StreamWriter {
   // #region Float/Double
 
   /**
-   * Writer a float number value (32-bit) in little-endian byte order.
+   * Writes a float number value (32-bit) in little-endian byte order.
    * - - - -
    * @param {number} value The number to be added to the binary file.
    * @returns {void}
@@ -448,7 +449,7 @@ export class StreamWriter {
   }
 
   /**
-   * Writer a float number value (32-bit) in big-endian byte order.
+   * Writes a float number value (32-bit) in big-endian byte order.
    * - - - -
    * @param {number} value The number to be added to the binary file.
    * @returns {void}
@@ -462,7 +463,7 @@ export class StreamWriter {
   }
 
   /**
-   * Writer a double float number value (64-bit) in little-endian byte order.
+   * Writes a double float number value (64-bit) in little-endian byte order.
    * - - - -
    * @param {number} value The number to be added to the binary file.
    * @returns {void}
@@ -476,7 +477,7 @@ export class StreamWriter {
   }
 
   /**
-   * Writer a double float number value (64-bit) in big-endian byte order.
+   * Writes a double float number value (64-bit) in big-endian byte order.
    * - - - -
    * @param {number} value The number to be added to the binary file.
    * @returns {void}
@@ -494,13 +495,13 @@ export class StreamWriter {
   /**
    * Writes an unsigned 64-bit value on the binary file (little endian mode).
    * - - - -
-   * @param {bigint} value The number to be added to the binary file.
+   * @param {bigint | number} value The number to be added to the binary file.
    * @returns {void}
    */
-  writeUInt64LE(value: bigint): void {
+  writeUInt64LE(value: bigint | number): void {
     this._checkStreamStatus()
     const buf = Buffer.alloc(8)
-    buf.writeBigUInt64LE(value, 0)
+    buf.writeBigUInt64LE(BigInt(value), 0)
     this._operator.write(buf)
     this._length += buf.length
   }
@@ -508,13 +509,13 @@ export class StreamWriter {
   /**
    * Writes an unsigned 64-bit value on the binary file (big endian mode).
    * - - - -
-   * @param {bigint} value The number to be added to the binary file.
+   * @param {bigint | number} value The number to be added to the binary file.
    * @returns {void}
    */
-  writeUInt64BE(value: bigint): void {
+  writeUInt64BE(value: bigint | number): void {
     this._checkStreamStatus()
     const buf = Buffer.alloc(8)
-    buf.writeBigUInt64BE(value, 0)
+    buf.writeBigUInt64BE(BigInt(value), 0)
     this._operator.write(buf)
     this._length += buf.length
   }
@@ -522,13 +523,13 @@ export class StreamWriter {
   /**
    * Writes a signed 64-bit value on the binary file (little endian mode).
    * - - - -
-   * @param {bigint} value The number to be added to the binary file.
+   * @param {bigint | number} value The number to be added to the binary file.
    * @returns {void}
    */
-  writeInt64LE(value: bigint): void {
+  writeInt64LE(value: bigint | number): void {
     this._checkStreamStatus()
     const buf = Buffer.alloc(8)
-    buf.writeBigInt64LE(value, 0)
+    buf.writeBigInt64LE(BigInt(value), 0)
     this._operator.write(buf)
     this._length += buf.length
   }
@@ -536,13 +537,13 @@ export class StreamWriter {
   /**
    * Writes a signed 64-bit value on the binary file (big endian mode).
    * - - - -
-   * @param {bigint} value The number to be added to the binary file.
+   * @param {bigint | number} value The number to be added to the binary file.
    * @returns {void}
    */
-  writeInt64BE(value: bigint): void {
+  writeInt64BE(value: bigint | number): void {
     this._checkStreamStatus()
     const buf = Buffer.alloc(8)
-    buf.writeBigInt64BE(value, 0)
+    buf.writeBigInt64BE(BigInt(value), 0)
     this._operator.write(buf)
     this._length += buf.length
   }
@@ -629,5 +630,10 @@ export class StreamWriter {
   // #region Internal
   async [Symbol.asyncDispose](): Promise<void> {
     await this.close()
+  }
+
+  [inspect.custom]() {
+    const bytesWritten = this.length
+    return `StreamWriter (${this.filePath.fullname}) { ${bytesWritten} ${bytesWritten === 1 ? 'Byte' : 'Bytes'} Written }`
   }
 }

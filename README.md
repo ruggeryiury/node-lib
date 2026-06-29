@@ -27,16 +27,26 @@
     - [Directory writing/creating methods](#directory-writingcreating-methods)
     - [Other methods](#other-methods-1)
   - [`MyObject`](#myobject)
+  - [`BinaryWriter` / `StreamWriter`](#binarywriter--streamwriter)
+    - [`BinaryWriter`](#binarywriter)
+    - [`StreamWriter`](#streamwriter)
+    - [Writing raw strings/Buffer objects](#writing-raw-stringsbuffer-objects)
+    - [Writing unsigned integers](#writing-unsigned-integers)
+    - [Writing signed integers](#writing-signed-integers)
+    - [Writing Floats/Double Floats](#writing-floatsdouble-floats)
+    - [Writing BigInts](#writing-bigints)
+    - [Writing Bits Arrays](#writing-bits-arrays)
+    - [Other writing methods](#other-writing-methods)
 
 # About
 
-`node-lib` is a package that abstracts many internal NodeJS functions into user-friendly, intuitive class subdivisions. With `node-lib`, things like file and directory path handling, and binary data writing becomes easier to do!
+`node-lib` is a package that abstracts many internal NodeJS functions into user-friendly, intuitive class subdivisions. With `node-lib`, things like file and directory path handling, and data writing and reading becomes easier to do!
 
 # Package modules overview
 
 - `FilePath` | `DirPath`: Handle file and directory paths easily with built-in handling methods to read, write, copy, modify, and others.
-- `BinaryReader` | `BinaryWriter` | `StreamWriter`: Parse and write binary files easily with several format parsing and writing methods.
-- `HexStr`: Processes hex string with ease.
+- `BinaryReader` | `BinaryWriter` | `StreamWriter`: Read and write binary files easily with several format parsing and writing methods.
+- `HexStr`: Processes and converts hex strings with ease.
 - `MyObject`: Create object maps with type assertion, with built-in methods to convert them to JavaScript object or serialized JSON string.
 
 # API
@@ -275,3 +285,105 @@ console.log(dir.exists) // <- false
 ## `MyObject`
 
 `MyObject` acts as a wrapper to a `Map`, with explicit conversion method to object and enforced typing.
+
+## `BinaryWriter` / `StreamWriter`
+
+The `BinaryWriter` and `StreamWriter` classes join functions to write text with several encoding types and/or binary data into memory or directly to an output file, respectively.
+
+### `BinaryWriter`
+
+To initialize a `BinaryWriter` instance, simply call its constructor! Each subsequent function calls from it will store the provided text/binary data individually, that can be reconstructed as a `Buffer` object sequentially using the `BinaryWriter.toBuffer()`.
+
+```ts
+import { BinaryWriter } from 'node-lib'
+
+// Initialize a BinaryWriter instance calling its constructor.
+const writer = new BinaryWriter()
+
+// Now you can start writing data into memory!
+writer.write(Buffer.from('Hello World!', 'utf-8'))
+
+// Call .toBuffer() to concat all written data into one final buffer object.
+const newBuffer = writer.toBuffer() // <- <Buffer 48 65 6c 6c 6f 20 57 6f 72 6c 64 21>
+```
+
+### `StreamWriter`
+
+The `StreamWriter` initialization is a little different, you have to use the asynchronous static method `StreamWriter.toFile()` to automatically stream the written data to file. This class is useful when dealing with big files, since the `BinaryWriter` store all data into memory.
+
+```ts
+import { StreamWriter } from 'node-lib'
+
+// Initialize the StreamWriter class pointing the streamed data to a file path.
+const writer = await StreamWriter.toFile('path/to/the/new/file.bin')
+
+// Now you can start writing data into the file directly!
+writer.write(Buffer.from('Hello World!', 'utf-8'))
+
+// Don't forget to close the stream writing, otherwise manipulating the
+// new file might give permission errors when trying to access it. The class
+// is automatically closed before going to the garbage collector, but it's
+// asynchronous, and you might not be able to manipulate the new file
+// instantaneously unless you explicitively await for the closing operation.
+await writer.close()
+
+// Now, you can read and manipulte the new file! To speed up the process,
+// you can use the "filePath" property to automatically get a FilePath
+// instance that points to the new file.
+const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 20 57 6f 72 6c 64 21>
+```
+
+### Writing raw strings/Buffer objects
+
+- `write(value: Buffer | string, encoding: BinaryWriteEncodings)` &mdash; Writes raw `Buffer` or string values.
+- `writeASCII(value: string, allocSize?: number)` &mdash; Writes any kind of text on the binary file encoded as ASCII.
+- `writeLatin1(value: string, allocSize?: number)` &mdash; Writes any kind of text on the binary file encoded as Latin1.
+- `writeUTF8(value: string, allocSize?: number)` &mdash; Writes any kind of text on the binary file encoded as UTF-8.
+- `writeHex(value: HexStringLikeValues, allocSize?: number)` &mdash; Writes any kind of HEX string text on the binary file as bytes.
+- `writePadding(paddingSize: number, fill: number = 0)` &mdash; Writes a padding-like `Buffer` filled with specific value.
+
+### Writing unsigned integers
+
+- `writeUInt8(value: number)` &mdash; Writes an unsigned 8-bit value on the binary file.
+- `writeUInt16LE(value: number)` &mdash; Writes an unsigned 16-bit value on the binary file (little endian mode).
+- `writeUInt16BE(value: number)` &mdash; Writes an unsigned 16-bit value on the binary file (big endian mode).
+- `writeUInt24LE(value: number)` &mdash; Writes an unsigned 24-bit value on the binary file (little endian mode).
+- `writeUInt24BE(value: number)` &mdash; Writes an unsigned 24-bit value on the binary file (big endian mode).
+- `writeUInt32LE(value: number)` &mdash; Writes an unsigned 32-bit value on the binary file (little endian mode).
+- `writeUInt32BE(value: number)` &mdash; Writes an unsigned 32-bit value on the binary file (big endian mode).
+
+### Writing signed integers
+
+- `writeInt8(value: number)` &mdash; Writes a signed 8-bit value on the binary file.
+- `writeInt16LE(value: number)` &mdash; Writes a signed 16-bit value on the binary file (little endian mode).
+- `writeInt16BE(value: number)` &mdash; Writes a signed 16-bit value on the binary file (big endian mode).
+- `writeInt24LE(value: number)` &mdash; Writes a signed 24-bit value on the binary file (little endian mode).
+- `writeInt24BE(value: number)` &mdash; Writes a signed 24-bit value on the binary file (big endian mode).
+- `writeInt32LE(value: number)` &mdash; Writes a signed 32-bit value on the binary file (little endian mode).
+- `writeInt32BE(value: number)` &mdash; Writes a signed 32-bit value on the binary file (big endian mode).
+
+### Writing Floats/Double Floats
+
+- `writeFloatLE(value: number)` &mdash; Writes a float number value (32-bit) in little-endian byte order.
+- `writeFloatBE(value: number)` &mdash; Writes a float number value (32-bit) in big-endian byte order.
+- `writeDoubleLE(value: number)` &mdash; Writes a double float number value (64-bit) in little-endian byte order.
+- `writeDoubleBE(value: number)` &mdash; Writes a double float number value (64-bit) in big-endian byte order.
+
+### Writing BigInts
+
+- `writeUInt64LE(value: number | bigint)` &mdash; Writes an unsigned 64-bit value on the binary file (little endian mode).
+- `writeUInt64BE(value: number | bigint)` &mdash; Writes an unsigned 64-bit value on the binary file (big endian mode).
+- `writeInt64LE(value: number | bigint)` &mdash; Writes a signed 64-bit value on the binary file (little endian mode).
+- `writeInt64BE(value: number | bigint)` &mdash; Writes a signed 64-bit value on the binary file (big endian mode).
+
+### Writing Bits Arrays
+
+- `writeUInt8FromBitsArray(bitsArray: BitsArray)` &mdash; Writes an 8-bit unsigned integer from an array of 8 bit values (0 or 1).
+- `writeUInt8FromBitsBooleanArray(booleanArray: BitsBooleanArray)` &mdash; Writes an 8-bit unsigned integer from an array of 8 boolean values.
+- `writeUInt8FromBitString(bitString: string)` &mdash; Writes an 8-bit unsigned integer from a bit string (A string of exactly 8 characters, each either `'0'` or `'1'`.).
+
+### Other writing methods
+
+- `writeString(value: string, encoding: BinaryWriteEncodings = 'utf8')` &mdash; _Alias to `write` with pre-defined utf-8 encoding value._
+- `writeBoolean(value: boolean)` &mdash; Writes boolean values as an 8-bit unsigned integer, from 0 (meaning false) to 1 (meaning true).
+
