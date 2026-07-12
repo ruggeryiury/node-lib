@@ -38,6 +38,9 @@
     - [Writing BigInts](#writing-bigints)
     - [Writing Bits Arrays](#writing-bits-arrays)
     - [Other writing methods](#other-writing-methods)
+  - [`Compression` | `Cryptography`](#compression--cryptography)
+    - [Compression Methods](#compression-methods)
+    - [Cryptography Methods](#cryptography-methods)
 
 # About
 
@@ -423,3 +426,40 @@ const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 
 
 - `writeString(value: string, encoding: BinaryWriteEncodings = 'utf8')` &mdash; _Alias to `write` with pre-defined utf-8 encoding value._
 - `writeBoolean(value: boolean)` &mdash; Writes boolean values as an 8-bit unsigned integer, from 0 (meaning false) to 1 (meaning true).
+
+## `Compression` | `Cryptography`
+
+The `Compression` and `Cryptography` classes contain static methods only, wrapper around the Node.js `zlib` and `crypto` module, respectively. All callback-based functions are exposed as Promise-based methods. You can also find stream-based Transform objects of each method on the static `stream` object, found on each of these classes. They also provides the `constants` property, that exposes the constants provided by the Node.js `zlib` and `crypto` module.
+
+### Compression Methods
+
+- `brotliCompress` | `brotliDecompress` &mdash; Compresses/Decompresses data using the [Brotli algorithm](https://en.wikipedia.org/wiki/Brotli).
+- `crc32` &mdash; Computes the [CRC-32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) checksum of the provided data.
+- `deflate` | `inflate` &mdash; Compresses/Decompresses data using the [Deflate](https://en.wikipedia.org/wiki/Deflate) algorithm.
+- `deflateRaw` | `inflateRaw` &mdash; Compresses/Decompresses data using the raw [Deflate](https://en.wikipedia.org/wiki/Deflate) algorithm without zlib headers or checksums.
+- `gzip` | `gunzip` &mdash; Compresses/Decompresses data using the [Gzip](https://en.wikipedia.org/wiki/Gzip) algorithm.
+- `unzip` &mdash; Automatically detects and decompresses [Gzip](https://en.wikipedia.org/wiki/Gzip) or [Deflate](https://en.wikipedia.org/wiki/Deflate)-compressed data.
+- `zstdCompress` | `zstdDecompress` &mdash; Compresses/Decompresses data using the [Zstandard](https://en.wikipedia.org/wiki/Zstd) algorithm.
+
+### Cryptography Methods
+
+- `argon2` &mdash; Derives a cryptographic key using the [Argon2 password hashing algorithm](https://en.wikipedia.org/wiki/Argon2). Argon2 is a password-based key derivation function that is designed to be expensive computationally and memory-wise in order to make brute-force attacks unrewarding.
+- `checkPrime` &mdash; Determines whether the provided value is a prime number.
+- `decapsulate` &mdash; Key decapsulation using a [KEM algorithm](https://en.wikipedia.org/wiki/Key_encapsulation_mechanism) with a private key.
+- `diffieHellman` &mdash; Computes the [Diffie-Hellman](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange) shared secret based on a `privateKey` and a `publicKey`.
+- `encapsulate` &mdash; Key encapsulation using a [KEM algorithm](https://en.wikipedia.org/wiki/Key_encapsulation_mechanism) with a public key.
+- `generateKey` &mdash; Generates a [symmetric](https://en.wikipedia.org/wiki/Symmetric-key_algorithm) cryptographic key.
+- `generateKeyPair` &mdash; Generates a new [asymmetric](https://en.wikipedia.org/wiki/Public-key_cryptography) key pair of the given type.
+- `generatePrime` &mdash; Generates a prime number suitable for cryptographic applications.
+- `hash` &mdash; A utility for creating one-shot hash digests of data.
+- `hkdf` &mdash; Derives key material using the [HMAC-based Key Derivation Function (HKDF)](https://en.wikipedia.org/wiki/HKDF).
+- `pbkdf2` &mdash; Derives a key from a password using [Password-Based Key Derivation Function 2 (PBKDF2)](https://en.wikipedia.org/wiki/PBKDF2).
+- `privateDecrypt` &mdash; Decrypts a buffer previously encrypted using the corresponding public key with a private key.
+- `publicEncrypt` &mdash; Encrypts the content of a buffer with key and returns a new `Buffer` with encrypted content. The returned data can be decrypted using the corresponding private key.
+- `randomBytes` &mdash; Generates cryptographically strong pseudorandom data.
+- `randomFill` &mdash; Fills a buffer with cryptographically secure random data.
+- `randomInt` &mdash; Generates a cryptographically secure random integer.
+- `scrypt` &mdash; Derives a key from a password using the [scrypt](https://pt.wikipedia.org/wiki/Scrypt) algorithm.
+- `sign` &mdash; Calculates and returns the signature for `data` using the given private key and algorithm.
+- `timingSafeEqual` &mdash; Compares two values in constant time to help prevent timing attacks.
+- `verify` &mdash; Verifies the given signature for `data` using the given key and algorithm.
