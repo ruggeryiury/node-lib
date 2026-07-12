@@ -15,7 +15,10 @@ export interface HexStrProcessorOptions {
   reversed?: boolean
 }
 
-export class HexStr {
+/**
+ * Class with methods to deal with hexadecimal string representations.
+ */
+export class Hex {
   /**
    * Checks if a string contains only valid hexadecimal characters (0-9, A-F).
    * - - - -
@@ -57,7 +60,7 @@ export class HexStr {
    * @throws {TypeError} If the input is neither a non-negative integer nor a valid hex string.
    * @throws {Error} If the string is not a valid hexadecimal format.
    */
-  static processHex(HexStr: HexStringLikeValues, options?: HexStrProcessorOptions): string {
+  static toHexString(HexStr: HexStringLikeValues, options?: HexStrProcessorOptions): string {
     switch (typeof HexStr) {
       case 'number': {
         if (!Number.isInteger(HexStr) || HexStr < 0) throw new TypeError('Input must be a non-negative integer')

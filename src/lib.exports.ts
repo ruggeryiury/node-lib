@@ -2,8 +2,11 @@ export * from './lib/bytes/bufferCompress'
 export * from './lib/bytes/getReadableBytesSize'
 export * from './lib/bytes/parseReadableBytesSize'
 export * from './lib/bytes/randomBytes'
+
 export * from './lib/child-process/execAsync'
+
 export * from './lib/hash/createHash'
+
 export * from './lib/path/absrel'
 export * from './lib/path/basename'
 export * from './lib/path/copy'
@@ -21,5 +24,6 @@ export * from './lib/path/stats'
 export * from './lib/path/stream'
 export * from './lib/path/strictcheckers'
 export * from './lib/path/write'
+
 export * from './lib/strnum/formatNumberWithDots'
 export * from './lib/strnum/hexStringToNumber'

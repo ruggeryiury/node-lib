@@ -1,10 +1,10 @@
 import type { BinaryToTextEncoding } from 'node:crypto'
-import { createWriteStream, type Stats, type WriteStream } from 'node:fs'
+import { createWriteStream, ReadStream, type ReadStreamOptions, type Stats, type WriteStream, type WriteStreamOptions } from 'node:fs'
 import type { FileHandle } from 'node:fs/promises'
 import type { PipelineSource, Stream } from 'node:stream'
 import { inspect, styleText } from 'node:util'
 import { pipeline, type PipelineOptions } from 'node:stream/promises'
-import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, type ReadLinesOptions } from '../lib.exports'
+import { basename, copyFile, copyFileSync, createFileWriteStream, createFileWriteStreamSync, deleteFile, deleteFileSync, dirname, ensurePathExistence, ensurePathIsFile, exists, extname, isAbsolute, openFile, readFile, readFileOffset, readFileSync, readJSON, readJSONSync, readLines, readLinesSync, renameFile, renameFileSync, resolve, stat, statSync, writeFile, writeFileSync, writeFileWithBOM, writeFileWithBOMSync, createHashFromFile, type AllHashAlgorithms, type ReadLinesOptions, createFileReadStream } from '../lib.exports'
 import { DirPath } from './DirPath'
 import { BinaryReader } from './BinaryReader'
 import { StreamWriter } from './StreamWriter'
@@ -120,6 +120,15 @@ export class FilePath {
     return extname(this.path)
   }
 
+  /**
+   * Returns `true` if the instantiated path resolves to an existing file, otherwise `false`.
+   * - - - -
+   * @returns {boolean}
+   */
+  get exists(): boolean {
+    return exists(this.path)
+  }
+
   // #region Static Methods
 
   /**
@@ -133,15 +142,6 @@ export class FilePath {
   }
 
   // #region Main Methods
-
-  /**
-   * Returns `true` if the instantiated path resolves to an existing file, otherwise `false`.
-   * - - - -
-   * @returns {boolean}
-   */
-  get exists(): boolean {
-    return exists(this.path)
-  }
 
   /**
    * Asynchronously computes a cryptographic hash from the contents of the file.
@@ -462,11 +462,11 @@ export class FilePath {
    * If a file already exists at the path, it will be deleted before creating the stream.
    * Optionally accepts an encoding; if `null` is passed, defaults to `utf8`.
    * - - - -
-   * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The character encoding to use. If `null`, `utf8` is used.
+   * @param {BufferEncodingOrNull} [encodingOrOptions] `OPTIONAL` The character encoding to use or an `WriteStreamOptions` object. If `null`, the `utf8` encoding is used as parameter.
    * @returns {Promise<WriteStream>} An instance of `fs.WriteStream` that are created and returned using the `fs.createWriteStream` function.
    */
-  async createWriteStream(encoding?: BufferEncodingOrNull): Promise<WriteStream> {
-    return await createFileWriteStream(this.path, encoding)
+  async createWriteStream(encodingOrOptions?: BufferEncodingOrNull | WriteStreamOptions): Promise<WriteStream> {
+    return await createFileWriteStream(this.path, encodingOrOptions)
   }
 
   /**
@@ -475,11 +475,21 @@ export class FilePath {
    * If a file already exists at the path, it will be deleted before creating the stream.
    * Optionally accepts an encoding; if `null` is passed, defaults to `'utf8'`.
    * - - - -
-   * @param {BufferEncodingOrNull} [encoding] `OPTIONAL` The character encoding to use. If `null`, `'utf8'` is used.
+   * @param {BufferEncodingOrNull} [encodingOrOptions] `OPTIONAL` The character encoding to use or an `WriteStreamOptions` object. If `null`, the `utf8` encoding is used as parameter.
    * @returns {WriteStream} An instance of `fs.WriteStream` that are created and returned using the `fs.createWriteStream` function.
    */
-  createWriteStreamSync(encoding?: BufferEncodingOrNull): WriteStream {
-    return createFileWriteStreamSync(this.path, encoding)
+  createWriteStreamSync(encodingOrOptions?: BufferEncodingOrNull | WriteStreamOptions): WriteStream {
+    return createFileWriteStreamSync(this.path, encodingOrOptions)
+  }
+
+  /**
+   * Synchronously creates a readable file stream at the specified path.
+   * - - - -
+   * @param {BufferEncodingOrNull | ReadStreamOptions | undefined} [encodingOrOptions] `OPTIONAL` The character encoding to use or an `ReadStreamOptions` object. If `null`, the `utf8` encoding is used as parameter.
+   * @returns {ReadStream}
+   */
+  createReadStream(encodingOrOptions?: BufferEncodingOrNull | ReadStreamOptions): ReadStream {
+    return createFileReadStream(this.path, encodingOrOptions)
   }
 
   /**

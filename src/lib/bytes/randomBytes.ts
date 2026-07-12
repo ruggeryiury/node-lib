@@ -1,5 +1,7 @@
-import { randomBytes } from 'node:crypto'
 import { promisify } from 'node:util'
+import { randomBytes as rndmBytes } from 'node:crypto'
+
+const randomBytes = promisify(rndmBytes)
 
 type RandomByteRangeArray = [number, number]
 type RandomBytesCharset = 'lowercase' | 'uppercase' | 'numbers' | 'basicSymbols' | 'extendedSymbols' | 'brackets' | 'braces' | 'base64' | 'base64url' | 'allBytes' | 'lowNibbles' | 'highNibbles' | 'allFullBytes' | 'allNullBytes' | 'c0ControlChars' | 'c1ControlChars' | 'printableChars' | 'punctuationChars' | 'singleBits' | 'powersOfTwo'
@@ -116,7 +118,7 @@ export const randomBytesFromRanges = async (length: number, charsetsOrRanges: (R
   }
 
   const buf = Buffer.allocUnsafe(length)
-  const random = await promisify(randomBytes)(length)
+  const random = await randomBytes(length)
 
   for (let i = 0; i < length; i++) {
     const randomIndex = random[i] % allowedBytes.length

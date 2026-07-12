@@ -26,10 +26,11 @@
     - [Directory reading methods](#directory-reading-methods)
     - [Directory writing/creating methods](#directory-writingcreating-methods)
     - [Other methods](#other-methods-1)
-  - [`MyObject`](#myobject)
   - [`BinaryWriter` / `StreamWriter`](#binarywriter--streamwriter)
     - [`BinaryWriter`](#binarywriter)
+    - [BinaryWriter Properties](#binarywriter-properties)
     - [`StreamWriter`](#streamwriter)
+    - [StreamWriter Properties](#streamwriter-properties)
     - [Writing raw strings/Buffer objects](#writing-raw-stringsbuffer-objects)
     - [Writing unsigned integers](#writing-unsigned-integers)
     - [Writing signed integers](#writing-signed-integers)
@@ -44,10 +45,11 @@
 
 # Package modules overview
 
-- `FilePath` | `DirPath`: Handle file and directory paths easily with built-in handling methods to read, write, copy, modify, and others.
-- `BinaryReader` | `BinaryWriter` | `StreamWriter`: Read and write binary files easily with several format parsing and writing methods.
-- `HexStr`: Processes and converts hex strings with ease.
-- `MyObject`: Create object maps with type assertion, with built-in methods to convert them to JavaScript object or serialized JSON string.
+- `FilePath` | `DirPath` &mdash; Handle file and directory paths easily with built-in handling methods to read, write, copy, modify, and others.
+- `BinaryReader` | `BinaryWriter` | `StreamWriter` &mdash; Read and write binary files easily with several format parsing and writing methods.
+- `HexStr` &mdash; Processes and converts hex strings with ease.
+- `Cryptography` &mdash; _In development:_ Wrapper to promisified functions from the `node:crypto` module.
+- `MyObject` &mdash; Create object maps with type assertion, with built-in methods to convert them to JavaScript object or serialized JSON string.
 
 # API
 
@@ -77,13 +79,14 @@ const file = FilePath.of(path)
 
 ### Class properties
 
-| Property   | Description                                                                                                            |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------- |
-| _path_     | The working path of this class instance.                                                                               |
-| _root_     | The root directory of the file where the path evaluates to.                                                            |
-| _fullname_ | The name of the file with extension (if any).                                                                          |
-| _name_     | The name of the file (without the extension).                                                                          |
-| _ext_      | The extension of the file (if any), returns an empty string if the provided path accidentally evalutes to a directory. |
+| Property   | Type      | Description                                                                                                            |
+| ---------- | --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| _path_     | `string`  | The working path of this class instance.                                                                               |
+| _root_     | `string`  | The root directory of the file where the path evaluates to.                                                            |
+| _fullname_ | `string`  | The name of the file with extension (if any).                                                                          |
+| _name_     | `string`  | The name of the file (without the extension).                                                                          |
+| _ext_      | `string`  | The extension of the file (if any), returns an empty string if the provided path accidentally evalutes to a directory. |
+| _exists_   | `boolean` | Returns `true` if the instantiated path resolves to an existing file, otherwise `false`.                               |
 
 You can also retrieve all these properties at once as an object using `FilePath.toJSON()` method.
 
@@ -220,11 +223,12 @@ const dir = DirPath.of(path)
 
 ### Class properties
 
-| Property | Description                                                 |
-| -------- | ----------------------------------------------------------- |
-| _path_   | The working path of this class instance.                    |
-| _root_   | The root directory of the file where the path evaluates to. |
-| _name_   | The name of the file (without the extension).               |
+| Property | Type      | Description                                                                                   |
+| -------- | --------- | --------------------------------------------------------------------------------------------- |
+| _path_   | `string`  | The working path of this class instance.                                                      |
+| _root_   | `string`  | The root directory of the file where the path evaluates to.                                   |
+| _name_   | `string`  | The name of the file (without the extension).                                                 |
+| _exists_ | `boolean` | Returns `true` if the instantiated path resolves to an existing directory, otherwise `false`. |
 
 You can also retrieve all these properties at once as an object using `DirPath.toJSON()` method.
 
@@ -282,10 +286,6 @@ console.log(dir.exists) // <- false
 - `searchDir(pattern?: RegExp | string | (RegExp | string)[], recursive?: boolean)` &mdash; Searches for files and directories in a folder that match a given pattern.
 - `searchDirSync(pattern?: RegExp | string | (RegExp | string)[], recursive?: boolean)` &mdash; Synchronous version of `searchDir()`.
 
-## `MyObject`
-
-`MyObject` acts as a wrapper to a `Map`, with explicit conversion method to object and enforced typing.
-
 ## `BinaryWriter` / `StreamWriter`
 
 The `BinaryWriter` and `StreamWriter` classes join functions to write text with several encoding types and/or binary data into memory or directly to an output file, respectively.
@@ -306,6 +306,12 @@ writer.write(Buffer.from('Hello World!', 'utf-8'))
 // Call .toBuffer() to concat all written data into one final buffer object.
 const newBuffer = writer.toBuffer() // <- <Buffer 48 65 6c 6c 6f 20 57 6f 72 6c 64 21>
 ```
+
+### BinaryWriter Properties
+
+| Property | Type     | Description                                              |
+| -------- | -------- | -------------------------------------------------------- |
+| _length_ | `number` | Returns the length of the new binary file buffer so far. |
 
 ### `StreamWriter`
 
@@ -333,6 +339,13 @@ await writer.close()
 const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 20 57 6f 72 6c 64 21>
 ```
 
+### StreamWriter Properties
+
+| Property   | Type      | Description                                                                                   |
+| ---------- | --------- | --------------------------------------------------------------------------------------------- |
+| _length_   | `number`  | Returns the length of the new binary file so far.                                             |
+| _isClosed_ | `boolean` | Returns a value that flags if the writing operation of this class instance was closed or not. |
+
 ### Writing raw strings/Buffer objects
 
 - `write(value: Buffer | string, encoding: BinaryWriteEncodings)` &mdash; Writes raw `Buffer` or string values.
@@ -345,20 +358,38 @@ const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 
 ### Writing unsigned integers
 
 - `writeUInt8(value: number)` &mdash; Writes an unsigned 8-bit value on the binary file.
+
+---
+
 - `writeUInt16LE(value: number)` &mdash; Writes an unsigned 16-bit value on the binary file (little endian mode).
 - `writeUInt16BE(value: number)` &mdash; Writes an unsigned 16-bit value on the binary file (big endian mode).
+
+---
+
 - `writeUInt24LE(value: number)` &mdash; Writes an unsigned 24-bit value on the binary file (little endian mode).
 - `writeUInt24BE(value: number)` &mdash; Writes an unsigned 24-bit value on the binary file (big endian mode).
+
+---
+
 - `writeUInt32LE(value: number)` &mdash; Writes an unsigned 32-bit value on the binary file (little endian mode).
 - `writeUInt32BE(value: number)` &mdash; Writes an unsigned 32-bit value on the binary file (big endian mode).
 
 ### Writing signed integers
 
 - `writeInt8(value: number)` &mdash; Writes a signed 8-bit value on the binary file.
+
+---
+
 - `writeInt16LE(value: number)` &mdash; Writes a signed 16-bit value on the binary file (little endian mode).
 - `writeInt16BE(value: number)` &mdash; Writes a signed 16-bit value on the binary file (big endian mode).
+
+---
+
 - `writeInt24LE(value: number)` &mdash; Writes a signed 24-bit value on the binary file (little endian mode).
 - `writeInt24BE(value: number)` &mdash; Writes a signed 24-bit value on the binary file (big endian mode).
+
+---
+
 - `writeInt32LE(value: number)` &mdash; Writes a signed 32-bit value on the binary file (little endian mode).
 - `writeInt32BE(value: number)` &mdash; Writes a signed 32-bit value on the binary file (big endian mode).
 
@@ -366,6 +397,9 @@ const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 
 
 - `writeFloatLE(value: number)` &mdash; Writes a float number value (32-bit) in little-endian byte order.
 - `writeFloatBE(value: number)` &mdash; Writes a float number value (32-bit) in big-endian byte order.
+
+---
+
 - `writeDoubleLE(value: number)` &mdash; Writes a double float number value (64-bit) in little-endian byte order.
 - `writeDoubleBE(value: number)` &mdash; Writes a double float number value (64-bit) in big-endian byte order.
 
@@ -373,6 +407,9 @@ const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 
 
 - `writeUInt64LE(value: number | bigint)` &mdash; Writes an unsigned 64-bit value on the binary file (little endian mode).
 - `writeUInt64BE(value: number | bigint)` &mdash; Writes an unsigned 64-bit value on the binary file (big endian mode).
+
+---
+
 - `writeInt64LE(value: number | bigint)` &mdash; Writes a signed 64-bit value on the binary file (little endian mode).
 - `writeInt64BE(value: number | bigint)` &mdash; Writes a signed 64-bit value on the binary file (big endian mode).
 
@@ -386,4 +423,3 @@ const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 
 
 - `writeString(value: string, encoding: BinaryWriteEncodings = 'utf8')` &mdash; _Alias to `write` with pre-defined utf-8 encoding value._
 - `writeBoolean(value: boolean)` &mdash; Writes boolean values as an 8-bit unsigned integer, from 0 (meaning false) to 1 (meaning true).
-

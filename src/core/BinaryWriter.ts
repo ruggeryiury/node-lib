@@ -1,5 +1,5 @@
 import { inspect } from 'node:util'
-import { type HexStringLikeValues, type BufferEncodingOrNull, HexStr, type FilePathLikeTypes } from '../core.exports'
+import { type HexStringLikeValues, type BufferEncodingOrNull, Hex, type FilePathLikeTypes } from '../core.exports'
 import type { BitsBooleanArray, BitsArray, FilePath } from '../core.exports'
 import { formatNumberWithDots, pathLikeToFilePath } from '../lib.exports'
 
@@ -29,7 +29,7 @@ export class BinaryWriter {
   }
 
   /**
-   * Returns the length of the new binary file so far.
+   * Returns the length of the new binary file buffer so far.
    */
   get length(): number {
     return this._contents.reduce((prev, curr) => {
@@ -133,14 +133,14 @@ export class BinaryWriter {
    * @returns {void}
    */
   writeHex(value: HexStringLikeValues, allocSize?: number): void {
-    if (typeof value === 'string' && !HexStr.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
+    if (typeof value === 'string' && !Hex.isHexString(value)) throw new TypeError(`Value must be a valid hexadecimal value.`)
     if (allocSize) {
       const buf = Buffer.alloc(allocSize)
-      buf.write(HexStr.processHex(value, { prefix: false }), 'hex')
+      buf.write(Hex.toHexString(value, { prefix: false }), 'hex')
       this._contents.push(buf)
       return
     }
-    this._contents.push(Buffer.from(HexStr.processHex(value, { prefix: false }), 'hex'))
+    this._contents.push(Buffer.from(Hex.toHexString(value, { prefix: false }), 'hex'))
   }
 
   /**
@@ -533,7 +533,7 @@ export class BinaryWriter {
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
    * @returns {Promise<FilePath>} A `Promise` that resolves to a `FilePath` instance of the file path where the contents will be written.
    */
-  async toFile(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace = true): Promise<FilePath> {
+  async toFile(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace: boolean = true): Promise<FilePath> {
     const p = pathLikeToFilePath(path)
     return await p.write(this.toBuffer(), encoding, replace)
   }
@@ -548,7 +548,7 @@ export class BinaryWriter {
    * @param {boolean} [replace] `OPTIONAL` Whether to overwrite the file if it already exists. Default is `true`.
    * @returns {Promise<FilePath>} A `FilePath` instance of the file path where the contents will be written.
    */
-  toFileSync(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace = true): FilePath {
+  toFileSync(path: FilePathLikeTypes, encoding?: BufferEncodingOrNull, replace: boolean = true): FilePath {
     const p = pathLikeToFilePath(path)
     return p.writeSync(this.toBuffer(), encoding, replace)
   }

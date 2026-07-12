@@ -1,55 +1,148 @@
-import crypto, { type CipherInfo, type CipherInfoOptions } from 'node:crypto'
+import { constants, createCipheriv, createDecipheriv, createPrivateKey, createPublicKey, privateDecrypt, publicEncrypt, sign, verify, createHash, createHmac, createSign, createVerify, hkdf, pbkdf2, scrypt, timingSafeEqual, generateKey, generateKeyPair, randomBytes, randomInt, randomFill, argon2, checkPrime, createDiffieHellman, createDiffieHellmanGroup, createECDH, createSecretKey, diffieHellman, decapsulate, encapsulate, generatePrime, hash } from 'node:crypto'
 import { promisify } from 'node:util'
 
+// #region Class
 /**
- * A wrapper of many internal functions from the `node:crypto` module. All callback-based functions were promisified to use as asynchronous operations.
+ * Wrapper around the Node.js `crypto` module. All callback-based functions are exposed as Promise-based methods.
  */
 export class Cryptography {
   /**
-   * Returns an array with the names of the supported cipher algorithms.
-   * - - - -
-   * @returns {string[]}
+   * Factory methods for creating cryptographic objects and streams.
    */
-  static getCiphers = (): string[] => crypto.getCiphers()
+  static stream = {
+    /**
+     * Creates a Cipher instance for encryption using the specified algorithm, key, and initialization vector.
+     */
+    createCipheriv: createCipheriv,
+    /**
+     * Creates a Decipher instance for decryption using the specified algorithm, key, and initialization vector.
+     */
+    createDecipheriv: createDecipheriv,
+    /**
+     * Creates a [Diffie-Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange) object.
+     */
+    createDiffieHellman: createDiffieHellman,
+    /**
+     * _Alias to `stream.createDiffieHellman`._
+     *
+     * Creates a [Diffie-Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange) object.
+     */
+    createDiffieHellmanGroup: createDiffieHellmanGroup,
+    /**
+     * Creates an [Elliptic Curve Diffie-Hellman (ECDH) key exchange](https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman) object.
+     */
+    createECDH: createECDH,
+    /**
+     * Creates a Hash object for incremental hashing operations.
+     */
+    createHash: createHash,
+    /**
+     * Creates an [HMAC](https://en.wikipedia.org/wiki/HMAC) object for keyed hashing operations.
+     */
+    createHmac: createHmac,
+    /**
+     * Creates a private key object from the provided key material.
+     */
+    createPrivateKey: createPrivateKey,
+    /**
+     * Creates a public key object from the provided key material.
+     */
+    createPublicKey: createPublicKey,
+    /**
+     * Creates a secret key object from the provided key material.
+     */
+    createSecretKey: createSecretKey,
+    /**
+     * Creates a Sign object for generating digital signatures.
+     */
+    createSign: createSign,
+    /**
+     * Creates a Verify object for verifying digital signatures.
+     */
+    createVerify: createVerify,
+  } as const
   /**
-   * Returns information about a given cipher.
-   * - - - -
-   * @param {string} nameOrID The name or nid of the cipher to query.
-   * @param {CipherInfoOptions | undefined} [options] `OPTIONAL` Some ciphers accept variable length keys and initialization vectors. By default, this method will return the default values for these ciphers. To test if a given key length or iv length is acceptable for given cipher, use the keyLength and ivLength options. If the given values are unacceptable, undefined will be returned.
-   * @returns {CipherInfo | undefined}
+   * Derives a cryptographic key using the [Argon2 password hashing algorithm](https://en.wikipedia.org/wiki/Argon2).
    */
-  static getCipherInfo = (nameOrID: string, options?: CipherInfoOptions): CipherInfo | undefined => crypto.getCipherInfo(nameOrID, options)
-
+  static argon2 = promisify(argon2)
   /**
-   * Generates cryptographically strong pseudorandom data. The `size` argument
-   * is a number indicating the number of bytes to generate.
-   * @param {number} size The number of bytes to generate. The `size` must not be larger than `2**31 - 1`.
+   * Determines whether the provided value is a prime number.
    */
-  static randomBytes = async (size: number): Promise<Buffer<ArrayBuffer>> => await promisify(crypto.randomBytes)(size)
-
+  static checkPrime = promisify(checkPrime)
   /**
-   * Return a random integer `n` such that `min <= n < max`.  This
-   * implementation avoids [modulo bias](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#Modulo_bias).
-   *
-   * The range (`max - min`) must be less than 2**48. `min` and `max` must
-   * be [safe integers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger).
-   * - - - -
-   * @param {number} max End of random range (exclusive).
-   * @param {number | undefined} [min] `OPTIONAL` Start of random range (inclusive). Default is `0`.
-   * @returns {Promise<number>}
+   * Decapsulates a shared secret from a [key encapsulation mechanism (KEM)](https://en.wikipedia.org/wiki/Key_encapsulation_mechanism) ciphertext.
    */
-  static randomInt = async (max: number, min: number = 0): Promise<number> => await promisify<number, number, number>(crypto.randomInt)(min, max)
-
+  static decapsulate = promisify(decapsulate)
   /**
-   * Return a random integer `n` such that `min <= n <= max`.  This
-   * implementation avoids [modulo bias](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#Modulo_bias).
-   *
-   * The range (`max - min`) must be less than 2**48. `min` and `max` must
-   * be [safe integers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger).
-   * - - - -
-   * @param {number} max End of random range (inclusive).
-   * @param {number | undefined} [min] `OPTIONAL` Start of random range (inclusive). Default is `0`.
-   * @returns {Promise<number>}
+   * Computes a shared secret using [Diffie-Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange).
    */
-  static randomIntMaxInclusive = async (max: number, min: number = 0): Promise<number> => await promisify<number, number, number>(crypto.randomInt)(min, max + 1)
+  static diffieHellman = promisify(diffieHellman)
+  /**
+   * Encapsulates a shared secret using a [key encapsulation mechanism (KEM)](https://en.wikipedia.org/wiki/Key_encapsulation_mechanism).
+   */
+  static encapsulate = promisify(encapsulate)
+  /**
+   * Generates a [symmetric](https://en.wikipedia.org/wiki/Symmetric-key_algorithm) cryptographic key.
+   */
+  static generateKey = promisify(generateKey)
+  /**
+   * Generates a public/private key pair ([asymmetric cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography)).
+   */
+  static generateKeyPair = promisify(generateKeyPair)
+  /**
+   * Generates a prime number suitable for cryptographic applications.
+   */
+  static generatePrime = promisify(generatePrime)
+  /**
+   * Computes a cryptographic hash using a one-shot operation.
+   */
+  static hash = hash
+  /**
+   * Derives key material using the[ HMAC-based Key Derivation Function (HKDF)](https://en.wikipedia.org/wiki/HKDF).
+   */
+  static hkdf = promisify(hkdf)
+  /**
+   * Derives a key from a password using [Password-Based Key Derivation Function 2 (PBKDF2)](https://en.wikipedia.org/wiki/PBKDF2).
+   */
+  static pbkdf2 = promisify(pbkdf2)
+  /**
+   * Decrypts data using a private key.
+   */
+  static privateDecrypt = privateDecrypt
+  /**
+   * Encrypts data using a public key.
+   */
+  static publicEncrypt = publicEncrypt
+  /**
+   * Generates cryptographically secure random bytes.
+   */
+  static randomBytes = promisify(randomBytes)
+  /**
+   * Fills a buffer with cryptographically secure random data.
+   */
+  static randomFill = promisify(randomFill)
+  /**
+   * Generates a cryptographically secure random integer.
+   */
+  static randomInt = promisify(randomInt)
+  /**
+   * Derives a key from a password using the [scrypt](https://pt.wikipedia.org/wiki/Scrypt) algorithm.
+   */
+  static scrypt = promisify(scrypt)
+  /**
+   * Generates a digital signature.
+   */
+  static sign = sign
+  /**
+   * Compares two values in constant time to help prevent timing attacks.
+   */
+  static timingSafeEqual = timingSafeEqual
+  /**
+   * Verifies a digital signature.
+   */
+  static verify = verify
+  /**
+   * Exposes the constants provided by the Node.js `crypto` module.
+   */
+  static constants = constants
 }

@@ -73,6 +73,15 @@ export class DirPath {
     return basename(this.path)
   }
 
+  /**
+   * Returns `true` if the instantiated path resolves to an existing directory, otherwise `false`.
+   * - - - -
+   * @returns {boolean}
+   */
+  get exists(): boolean {
+    return exists(this.path)
+  }
+
   // #region Static Methods
 
   /**
@@ -86,15 +95,6 @@ export class DirPath {
   }
 
   // #region Main Methods
-
-  /**
-   * Returns `true` if the instantiated path resolves to an existing directory, otherwise `false`.
-   * - - - -
-   * @returns {boolean}
-   */
-  get exists(): boolean {
-    return exists(this.path)
-  }
 
   /**
    * Returns a new instantiated `DirPath`, resolving the path to a new directory relative from this directory path.
