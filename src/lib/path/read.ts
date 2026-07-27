@@ -129,7 +129,7 @@ export const readJSONSync = <T>(path: FilePathLikeTypes, encoding?: BufferEncodi
 }
 
 /**
- * Asynchronously reads a portion of a file starting from a specific byte offset.
+ * Asynchronously reads a portion of a file starting from a specific byte offset and return as `Buffer`.
  *
  * If `byteLength` is provided, reads that many bytes using a file descriptor.
  * Otherwise, reads the whole file and returns a subarray starting at the offset.

@@ -472,6 +472,44 @@ export class BinaryReader {
   }
 
   /**
+   * Reads an unsigned, little-endian 48-bit integer.
+   * - - - -
+   * @returns {Promise<number>}
+   */
+  async readUInt48LE(): Promise<number> {
+    this._checkExistence()
+    this._checkIfFileHandleIsClosed()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 6)
+      this._offset += 6
+      return buffer.readUIntLE(0, 6)
+    }
+    const buf = Buffer.alloc(6)
+    await this._operator.read({ buffer: buf, position: this._offset, length: 6 })
+    this._offset += 6
+    return buf.readUIntLE(0, 6)
+  }
+
+  /**
+   * Reads an unsigned, big-endian 48-bit integer.
+   * - - - -
+   * @returns {Promise<number>}
+   */
+  async readUInt48BE(): Promise<number> {
+    this._checkExistence()
+    this._checkIfFileHandleIsClosed()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 6)
+      this._offset += 6
+      return buffer.readUIntBE(0, 6)
+    }
+    const buf = Buffer.alloc(6)
+    await this._operator.read({ buffer: buf, position: this._offset, length: 6 })
+    this._offset += 6
+    return buf.readUIntBE(0, 6)
+  }
+
+  /**
    * Reads a signed 8-bit integer.
    * - - - -
    * @returns {Promise<number>}
@@ -602,6 +640,44 @@ export class BinaryReader {
     await this._operator.read({ buffer: buf, position: this._offset, length: 4 })
     this._offset += 4
     return buf.readInt32BE()
+  }
+
+  /**
+   * Reads a signed, little-endian 48-bit integer.
+   * - - - -
+   * @returns {Promise<number>}
+   */
+  async readInt48LE(): Promise<number> {
+    this._checkExistence()
+    this._checkIfFileHandleIsClosed()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 6)
+      this._offset += 6
+      return buffer.readUIntLE(0, 6)
+    }
+    const buf = Buffer.alloc(6)
+    await this._operator.read({ buffer: buf, position: this._offset, length: 6 })
+    this._offset += 6
+    return buf.readIntLE(0, 6)
+  }
+
+  /**
+   * Reads a signed, big-endian 48-bit integer.
+   * - - - -
+   * @returns {Promise<number>}
+   */
+  async readInt48BE(): Promise<number> {
+    this._checkExistence()
+    this._checkIfFileHandleIsClosed()
+    if (Buffer.isBuffer(this._operator)) {
+      const buffer = this._operator.subarray(this._offset, this._offset + 6)
+      this._offset += 6
+      return buffer.readUIntBE(0, 6)
+    }
+    const buf = Buffer.alloc(6)
+    await this._operator.read({ buffer: buf, position: this._offset, length: 6 })
+    this._offset += 6
+    return buf.readIntBE(0, 6)
   }
 
   // #region Float/Double

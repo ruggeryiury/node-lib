@@ -377,6 +377,11 @@ const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 
 - `writeUInt32LE(value: number)` &mdash; Writes an unsigned 32-bit value on the binary file (little endian mode).
 - `writeUInt32BE(value: number)` &mdash; Writes an unsigned 32-bit value on the binary file (big endian mode).
 
+---
+
+- `writeUInt48LE(value: number)` &mdash; Writes an unsigned 48-bit value on the binary file (little endian mode).
+- `writeUInt48BE(value: number)` &mdash; Writes an unsigned 48-bit value on the binary file (big endian mode).
+
 ### Writing signed integers
 
 - `writeInt8(value: number)` &mdash; Writes a signed 8-bit value on the binary file.
@@ -395,6 +400,12 @@ const newFileBuffer = await writer.filePath.read() // <- <Buffer 48 65 6c 6c 6f 
 
 - `writeInt32LE(value: number)` &mdash; Writes a signed 32-bit value on the binary file (little endian mode).
 - `writeInt32BE(value: number)` &mdash; Writes a signed 32-bit value on the binary file (big endian mode).
+
+---
+
+- `writeInt48LE(value: number)` &mdash; Writes a signed 48-bit value on the binary file (little endian mode).
+- `writeInt48BE(value: number)` &mdash; Writes a signed 48-bit value on the binary file (big endian mode).
+-
 
 ### Writing Floats/Double Floats
 
