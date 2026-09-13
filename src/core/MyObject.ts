@@ -57,7 +57,7 @@ export class MyObject<T extends object = Record<string, any>> {
    */
   constructor(initialValues?: Partial<T>) {
     this._map = new Map<keyof T, T[keyof T]>()
-    if (initialValues) MyObject.iterateEachRootObjKey<T>(initialValues as Record<keyof T, unknown>, this._map)
+    if (initialValues) MyObject.iterateEachRootObjKey<T>(initialValues, this._map)
   }
 
   /**
@@ -117,7 +117,7 @@ export class MyObject<T extends object = Record<string, any>> {
    */
   set<K extends keyof T>(key: K, value: T[K]): Map<keyof T, T[keyof T]> {
     if (typeof key === 'symbol') throw new Error('MyObject classes does not accept symbols for keys')
-    return this._map.set(key as keyof T, value as T[keyof T])
+    return this._map.set(key, value)
   }
 
   /**

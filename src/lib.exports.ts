@@ -3,7 +3,7 @@ export * from './lib/bytes/getReadableBytesSize'
 export * from './lib/bytes/parseReadableBytesSize'
 export * from './lib/bytes/randomBytes'
 
-export * from './lib/child-process/execAsync'
+export * from './lib/child-process/asyncOperations'
 
 export * from './lib/hash/createHash'
 

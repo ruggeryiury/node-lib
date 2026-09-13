@@ -200,7 +200,7 @@ console.log(file.exists) // <- false
 
 ---
 
-- `generateHash(algorithm: AllHashAlgorithms, digest: BinaryToTextEncoding)` &mdash; Asynchronously computes a cryptographic hash from the contents of the file.
+- `generateHash(algorithm: AllHashAlgorithms, digest: BufferEncoding)` &mdash; Asynchronously computes a cryptographic hash from the contents of the file.
 
 ## `DirPath`
 
