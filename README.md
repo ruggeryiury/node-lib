@@ -112,6 +112,10 @@ You can get systems stats of a file as an object using the `FilePath.stat()` (as
 - `gotoDir(directoryName: string)` &mdash; Returns a new instantiated `DirPath`, resolving the path to a new directory relative from this file root path.
 - `gotoFile(fileName: string)` &mdash; Returns a new instantiated `FilePath`, resolving the path to a new file relative from this file root path.
 
+---
+
+- `parent()` &mdash; Returns a new `DirPath` instance pointing to the folder where the file is.
+
 ### Checking file existence
 
 You can use the property `FilePath.exists` to check the file existence. `FilePath.exists` is a getter that will always check once it's referenced.

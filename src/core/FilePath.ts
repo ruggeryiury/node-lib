@@ -144,6 +144,15 @@ export class FilePath {
   // #region Main Methods
 
   /**
+   * Returns a new `DirPath` instance pointing to the folder where the file is.
+   * - - - -
+   * @returns {DirPath}
+   */
+  parent(): DirPath {
+    return DirPath.of(this.root)
+  }
+
+  /**
    * Asynchronously computes a cryptographic hash from the contents of the file.
    * - - - -
    * @param {AllHashAlgorithms} [algorithm] The hash algorithm to use. Default is `'sha256'`.
